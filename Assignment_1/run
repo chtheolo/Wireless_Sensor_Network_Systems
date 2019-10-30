@@ -1,0 +1,17 @@
+#!/usr/bin/python
+import TOSSIM
+import sys
+import random
+
+from TOSSIM import *
+
+t = TOSSIM.Tossim([])
+t.addChannel("BlinkC",sys.stdout);
+
+m = t.getNode(0)
+m.bootAtTime(1)
+
+
+for i in xrange(1000000):
+  t.runNextEvent()
+
