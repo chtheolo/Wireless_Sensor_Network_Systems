@@ -48,5 +48,5 @@ pkt.setDestination(master_node)
 print "Delivering " + str(msg) + " to " + str(master_node) + " at " + str(t.time() + 3);
 pkt.deliver(master_node, t.time() + 3)
 
-for i in range(1000000):
+for i in range(10000):
   t.runNextEvent() 

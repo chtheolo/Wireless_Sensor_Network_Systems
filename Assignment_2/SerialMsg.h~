@@ -1,13 +1,13 @@
-#ifndef SERIALMSG_H
-#define SERIALMSG_H
+#ifndef SERIALFLOODINGMSG_H
+#define SERIALFLOODINGMSG_H
 
 enum {
-	AM_BLINKTORADIO = 6,
+	AM_SERIAL_FLOODING_MSG = 6,
 	TIMER_PERIOD_MILLI = 1000 
 };
 
-typedef nx_struct SerialMsg {
-	nx_uint16_t data;
-} SerialMsg;
+typedef nx_struct serial_flooding_msg {
+	nx_uint8_t startFlooding;
+} serial_flooding_msg;
 
 #endif
