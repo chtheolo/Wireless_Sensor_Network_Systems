@@ -4,7 +4,7 @@ import sys
 
 t = Tossim([])
 r = t.radio()
-f = open("chain.txt", "r")
+f = open("grid.txt", "r")
 
 for line in f:
   s = line.split()
@@ -16,20 +16,21 @@ t.addChannel("BroadcastingC", sys.stdout)
 t.addChannel("Re-BroadcastingC", sys.stdout)
 t.addChannel("RadioC", sys.stdout)
 t.addChannel("ReceiveC", sys.stdout)
+t.addChannel("RoutingTableC", sys.stdout)
 
 noise = open("/opt/tinyos-2.1.2/tos/lib/tossim/noise/meyer-heavy.txt", "r")
 for line in noise:
   str1 = line.strip()
   if str1:
     val = int(str1)
-    for i in range(1, 6):
+    for i in range(1, 10): #6,8,10
       t.getNode(i).addNoiseTraceReading(val)
 
-for i in range(1, 6):
+for i in range(1, 10): #6,8,10
   print "Creating noise model for ",i;
   t.getNode(i).createNoiseModel()
   
-for i in range(1,6):
+for i in range(1,10): #6,8,10
 	t.getNode(i).bootAtTime(i* 100001)
 
 for i in range(10000):
