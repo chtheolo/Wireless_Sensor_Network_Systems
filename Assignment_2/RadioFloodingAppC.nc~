@@ -18,8 +18,8 @@ implementation
 	components new AMReceiverC(AM_FLOODING_MSG);
 	components new AMSenderC(AM_FLOODING_MSG);
 	
-//	components new PoolC(message_t, 20) as BroadcastPoolC;
-//	components new QueueC(message_t* , 20) as BroadcastQueueC;
+	components new PoolC(message_t, 20) as BroadcastPoolC;
+	components new QueueC(message_t* , 20) as BroadcastQueueC;
 
   App.Boot -> MainC;
 
@@ -29,8 +29,8 @@ implementation
   App.Leds -> LedsC;
 //  App.Read -> Sensor;
 	
-//	App.BroadcastPool -> BroadcastPoolC;
-//	App.BroadcastQueue -> BroadcastQueueC;
+	App.BroadcastPool -> BroadcastPoolC;
+	App.BroadcastQueue -> BroadcastQueueC;
 	
 	App.Receive -> AMReceiverC;
 	App.Packet -> AMSenderC;

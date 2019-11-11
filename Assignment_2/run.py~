@@ -44,5 +44,5 @@ for i in range(1,6):
 	m=t.getNode(i)
 	v=m.getVariable("RadioFloodingC.seq_num")
 	seq_num = v.getData()
-	print "The node" + str(i) + " has seq_num = " + str(seq_num)
+	print "The node" + str(i) + "has seq_num = " + str(seq_num)
   

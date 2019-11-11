@@ -192,9 +192,6 @@ implementation
 				bcast_pkt->counter = r_pkt->counter;
 				bcast_pkt->seq_num = r_pkt->seq_num;
 				
-				//keep the new seq_num
-				seq_num = r_pkt->seq_num;
-				
 				call Timer1.startOneShot(200 + TOS_NODE_ID *100);
 			}
 		}
