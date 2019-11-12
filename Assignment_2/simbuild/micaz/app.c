@@ -1297,7 +1297,7 @@ typedef struct sim_log_channel {
 } sim_log_channel_t;
 
 enum __nesc_unnamed4272 {
-  SIM_LOG_OUTPUT_COUNT = 200U
+  SIM_LOG_OUTPUT_COUNT = 203U
 };
 
 sim_log_output_t outputs[SIM_LOG_OUTPUT_COUNT];
@@ -3701,21 +3701,25 @@ static error_t PlatformP$Init$init(void );
 static error_t MotePlatformP$SubInit$default$init(void );
 #line 62
 static error_t MotePlatformP$PlatformInit$init(void );
-# 46 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+# 42 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+static void /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$toggle(void );
+static bool /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$get(void );
+
+
 static void /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$makeOutput(void );
 #line 40
 static void /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$set(void );
 
-
-
+static void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$toggle(void );
+static bool /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$get(void );
 
 
 static void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$makeOutput(void );
 #line 40
 static void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$set(void );
 
-
-
+static void /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$toggle(void );
+static bool /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$get(void );
 
 
 static void /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$makeOutput(void );
@@ -3934,6 +3938,12 @@ static am_addr_t ActiveMessageAddressC$amAddress(void );
 static am_addr_t ActiveMessageAddressC$ActiveMessageAddress$amAddress(void );
 # 62 "/opt/tinyos-2.1.2/tos/interfaces/Init.nc"
 static error_t LedsP$Init$init(void );
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+static void LedsP$Leds$led0Toggle(void );
+#line 83
+static void LedsP$Leds$led1Toggle(void );
+#line 100
+static void LedsP$Leds$led2Toggle(void );
 # 109 "/opt/tinyos-2.1.2/tos/lib/timer/Alarm.nc"
 static /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$Alarm$size_type /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$Alarm$getNow(void );
 #line 103
@@ -4090,7 +4100,7 @@ error_t error);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$sendDone(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40bf9490, 
+am_id_t arg_0x40bf20a0, 
 # 103 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 message_t * msg, 
 
@@ -4103,7 +4113,7 @@ error_t error);
 # 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$send(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40bd4a90, 
+uint8_t arg_0x40bf36a8, 
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4117,7 +4127,7 @@ uint8_t len);
 #line 100
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40bd4a90, 
+uint8_t arg_0x40bf36a8, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4144,33 +4154,36 @@ static void MotePlatformP$SerialIdPin$clr(void );
 static inline error_t MotePlatformP$PlatformInit$init(void );
 #line 61
 static inline error_t MotePlatformP$SubInit$default$init(void );
-# 55 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+# 54 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline bool /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$get(void );
 static __inline void /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$set(void );
 
 
 
 
-
+static __inline void /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$toggle(void );
 
 
 static __inline void /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$makeOutput(void );
-#line 55
+#line 54
+static __inline bool /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$get(void );
 static __inline void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$set(void );
 
 
 
 
-
+static __inline void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$toggle(void );
 
 
 static __inline void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$makeOutput(void );
-#line 55
+#line 54
+static __inline bool /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$get(void );
 static __inline void /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$set(void );
 
 
 
 
-
+static __inline void /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$toggle(void );
 
 
 static __inline void /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$makeOutput(void );
@@ -4768,21 +4781,25 @@ am_addr_t ActiveMessageAddressC$addr[1000];
 static am_addr_t ActiveMessageAddressC$ActiveMessageAddress$amAddress(void );
 #line 88
 static inline am_addr_t ActiveMessageAddressC$amAddress(void );
-# 46 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+# 42 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+static void LedsP$Led0$toggle(void );
+static bool LedsP$Led0$get(void );
+
+
 static void LedsP$Led0$makeOutput(void );
 #line 40
 static void LedsP$Led0$set(void );
 
-
-
+static void LedsP$Led1$toggle(void );
+static bool LedsP$Led1$get(void );
 
 
 static void LedsP$Led1$makeOutput(void );
 #line 40
 static void LedsP$Led1$set(void );
 
-
-
+static void LedsP$Led2$toggle(void );
+static bool LedsP$Led2$get(void );
 
 
 static void LedsP$Led2$makeOutput(void );
@@ -4790,6 +4807,12 @@ static void LedsP$Led2$makeOutput(void );
 static void LedsP$Led2$set(void );
 # 56 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
 static inline error_t LedsP$Init$init(void );
+#line 84
+static inline void LedsP$Leds$led0Toggle(void );
+#line 99
+static void LedsP$Leds$led1Toggle(void );
+#line 114
+static inline void LedsP$Leds$led2Toggle(void );
 # 53 "/opt/tinyos-2.1.2/tos/chips/atm128/timer/HplAtm128TimerCtrl8.nc"
 static Atm128_TIFR_t /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$TimerCtrl$getInterruptFlag(void );
 #line 46
@@ -5213,14 +5236,18 @@ uint8_t len);
 static error_t RadioFloodingC$init_RoutingTable$postTask(void );
 # 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
 static void RadioFloodingC$Timer1$startOneShot(uint32_t dt);
-# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
-static error_t RadioFloodingC$RoutingTable$postTask(void );
-# 45 "RadioFloodingC.nc"
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+static void RadioFloodingC$Leds$led0Toggle(void );
+#line 83
+static void RadioFloodingC$Leds$led1Toggle(void );
+#line 100
+static void RadioFloodingC$Leds$led2Toggle(void );
+# 46 "RadioFloodingC.nc"
 enum RadioFloodingC$__nesc_unnamed4338 {
-#line 45
+#line 46
   RadioFloodingC$init_RoutingTable = 5U
 };
-#line 45
+#line 46
 typedef int RadioFloodingC$__nesc_sillytask_init_RoutingTable[RadioFloodingC$init_RoutingTable];
 
 
@@ -5233,17 +5260,17 @@ typedef int RadioFloodingC$__nesc_sillytask_init_RoutingTable[RadioFloodingC$ini
 
 
 enum RadioFloodingC$__nesc_unnamed4339 {
-#line 56
+#line 57
   RadioFloodingC$RoutingTable = 6U
 };
-#line 56
+#line 57
 typedef int RadioFloodingC$__nesc_sillytask_RoutingTable[RadioFloodingC$RoutingTable];
-#line 70
+#line 81
 enum RadioFloodingC$__nesc_unnamed4340 {
-#line 70
+#line 81
   RadioFloodingC$PrintRoutingTable = 7U
 };
-#line 70
+#line 81
 typedef int RadioFloodingC$__nesc_sillytask_PrintRoutingTable[RadioFloodingC$PrintRoutingTable];
 #line 27
 flooding_msg_t *RadioFloodingC$r_pkt[1000];
@@ -5253,17 +5280,18 @@ uint16_t RadioFloodingC$seq_num[1000];
 uint16_t RadioFloodingC$neighbor_id[1000];
 uint16_t RadioFloodingC$i[1000];
 uint16_t RadioFloodingC$last_pos[1000];
+uint16_t RadioFloodingC$k[1000];
 uint16_t RadioFloodingC$RoutingArray[1000][10];
 
 
-message_t RadioFloodingC$PacketBuffer[1000][200];
+message_t RadioFloodingC$PacketBuffer[1000][50];
 
 uint8_t RadioFloodingC$send[1000];
-#line 39
+#line 40
 uint8_t RadioFloodingC$save[1000];
 
 
-
+message_t RadioFloodingC$pkt[1000];
 bool RadioFloodingC$busy[1000];
 
 static inline void RadioFloodingC$init_RoutingTable$runTask(void );
@@ -5278,19 +5306,11 @@ static inline void RadioFloodingC$init_RoutingTable$runTask(void );
 
 
 static inline void RadioFloodingC$RoutingTable$runTask(void );
-#line 70
+#line 81
 static inline void RadioFloodingC$PrintRoutingTable$runTask(void );
-
-
-
-
-
-
-
-
-
+#line 103
 static inline void RadioFloodingC$Boot$booted(void );
-#line 92
+#line 117
 static inline void RadioFloodingC$AMControl$startDone(error_t err);
 
 
@@ -5303,11 +5323,11 @@ static inline void RadioFloodingC$AMControl$startDone(error_t err);
 static inline void RadioFloodingC$AMControl$stopDone(error_t err);
 
 static inline void RadioFloodingC$Timer0$fired(void );
-#line 145
+#line 173
 static inline void RadioFloodingC$Timer1$fired(void );
-#line 163
+#line 195
 static inline message_t *RadioFloodingC$Receive$receive(message_t *msg, void *payload, uint8_t len);
-#line 204
+#line 253
 static void RadioFloodingC$AMSend$sendDone(message_t *msg, error_t err);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*RadioFloodingAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$sendDone(
@@ -5365,7 +5385,7 @@ static inline void /*RadioFloodingAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueE
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40bf9490, 
+am_id_t arg_0x40bf20a0, 
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -5382,7 +5402,7 @@ uint8_t len);
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40bd4a90, 
+uint8_t arg_0x40bf36a8, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -5904,6 +5924,65 @@ inline static void RadioFloodingC$Timer1$startOneShot(uint32_t dt){
 #line 73
 }
 #line 73
+# 54 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline bool /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$get(void )
+#line 54
+{
+#line 54
+  return (atm128RegFile[sim_node()][27U] & (1 << 0)) != 0;
+}
+
+# 43 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+inline static bool LedsP$Led2$get(void ){
+#line 43
+  unsigned char __nesc_result;
+#line 43
+
+#line 43
+  __nesc_result = /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$get();
+#line 43
+
+#line 43
+  return __nesc_result;
+#line 43
+}
+#line 43
+# 60 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline void /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$toggle(void )
+#line 60
+{
+#line 60
+  { __nesc_atomic_t __nesc_atomic = __nesc_atomic_start();
+#line 60
+    atm128RegFile[sim_node()][27U] ^= 1 << 0;
+#line 60
+    __nesc_atomic_end(__nesc_atomic); }
+}
+
+# 42 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+inline static void LedsP$Led2$toggle(void ){
+#line 42
+  /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$toggle();
+#line 42
+}
+#line 42
+# 114 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
+static inline void LedsP$Leds$led2Toggle(void )
+#line 114
+{
+  LedsP$Led2$toggle();
+  sim_log_debug(157U, "LedsC", "LEDS: Led""2"" %s.\n", LedsP$Led2$get() ? "off" : "on");
+#line 116
+  ;
+}
+
+# 100 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+inline static void RadioFloodingC$Leds$led2Toggle(void ){
+#line 100
+  LedsP$Leds$led2Toggle();
+#line 100
+}
+#line 100
 # 189 "/opt/tinyos-2.1.2/tos/lib/tossim/TossimActiveMessageC.nc"
 static inline void *TossimActiveMessageC$Packet$getPayload(message_t *msg, uint8_t len)
 #line 189
@@ -5931,42 +6010,42 @@ inline static void * RadioFloodingC$Packet$getPayload(message_t * msg, uint8_t l
 #line 126
 }
 #line 126
-# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
-inline static error_t RadioFloodingC$RoutingTable$postTask(void ){
-#line 67
-  unsigned char __nesc_result;
-#line 67
-
-#line 67
-  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(RadioFloodingC$RoutingTable);
-#line 67
-
-#line 67
-  return __nesc_result;
-#line 67
-}
-#line 67
-# 163 "RadioFloodingC.nc"
+# 195 "RadioFloodingC.nc"
 static inline message_t *RadioFloodingC$Receive$receive(message_t *msg, void *payload, uint8_t len)
-#line 163
+#line 195
 {
 
 
   if (len == sizeof(flooding_msg_t )) {
 
       RadioFloodingC$r_pkt[sim_node()] = (flooding_msg_t *)payload;
-      sim_log_debug(193U, "ReceiveC", "RECEIVE a msg from node[%hu] with seq_num = %hu %s.\n", __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->sender_id.nxdata), __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata), sim_time_string());
+      sim_log_debug(194U, "ReceiveC", "RECEIVE a msg from node[%hu] with seq_num = %hu %s.\n", __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->sender_id.nxdata), __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata), sim_time_string());
 
       RadioFloodingC$neighbor_id[sim_node()] = __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->sender_id.nxdata);
-      RadioFloodingC$RoutingTable$postTask();
 
+      RadioFloodingC$k[sim_node()] = 0;
+      while (RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] != RadioFloodingC$neighbor_id[sim_node()] && RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] != 0 && RadioFloodingC$k[sim_node()] < 10) {
+          RadioFloodingC$k[sim_node()]++;
+        }
+      if (RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] == RadioFloodingC$neighbor_id[sim_node()]) {
+          sim_log_debug(195U, "RoutingTableC", "Neihgbor already exists in RoutingTable\n");
+        }
+      else {
+#line 212
+        if (RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] == 0) {
+            RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] = RadioFloodingC$neighbor_id[sim_node()];
+          }
+        else {
+            sim_log_debug(196U, "RoutingTableC", "No more positions in RoutingTable\n");
+          }
+        }
 
 
       if (__nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata) > RadioFloodingC$seq_num[sim_node()]) {
 
-          sim_log_debug(194U, "ReceiveC", "This is a NEW MESSAGE with seq_num = %hu .\n\n", __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata));
+          sim_log_debug(197U, "ReceiveC", "This is a NEW MESSAGE with seq_num = %hu .\n\n", __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata));
 
-          if (RadioFloodingC$save[sim_node()] < 200) {
+          if (RadioFloodingC$save[sim_node()] < 50) {
               RadioFloodingC$bcast_pkt[sim_node()] = (flooding_msg_t *)RadioFloodingC$Packet$getPayload(&RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$save[sim_node()]], sizeof(flooding_msg_t ));
 
               RadioFloodingC$save[sim_node()]++;
@@ -5984,7 +6063,11 @@ static inline message_t *RadioFloodingC$Receive$receive(message_t *msg, void *pa
 
           RadioFloodingC$seq_num[sim_node()] = __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata);
 
-          RadioFloodingC$Timer1$startOneShot(200 + TOS_NODE_ID * 100);
+
+          RadioFloodingC$Leds$led2Toggle();
+
+
+          RadioFloodingC$Timer1$startOneShot(TOS_NODE_ID * 100);
         }
     }
   return msg;
@@ -6026,6 +6109,21 @@ inline static message_t * TossimActiveMessageC$Receive$receive(am_id_t arg_0x408
 #line 78
 }
 #line 78
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+inline static error_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer$postTask(void ){
+#line 67
+  unsigned char __nesc_result;
+#line 67
+
+#line 67
+  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(/*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer);
+#line 67
+
+#line 67
+  return __nesc_result;
+#line 67
+}
+#line 67
 # 139 "/opt/tinyos-2.1.2/tos/lib/tossim/SimSchedulerBasicP.nc"
 static inline bool SimSchedulerBasicP$isWaiting(uint8_t id)
 {
@@ -6062,21 +6160,6 @@ static inline int SimSchedulerBasicP$sim_config_task_latency(void )
   return 100;
 }
 
-# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
-inline static error_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer$postTask(void ){
-#line 67
-  unsigned char __nesc_result;
-#line 67
-
-#line 67
-  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(/*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer);
-#line 67
-
-#line 67
-  return __nesc_result;
-#line 67
-}
-#line 67
 # 61 "/opt/tinyos-2.1.2/tos/lib/tossim/SimMoteP.nc"
 static inline long long int SimMoteP$SimMote$getStartTime(void )
 #line 61
@@ -6259,12 +6342,12 @@ inline static error_t RadioFloodingC$AMControl$start(void ){
 #line 104
 }
 #line 104
-# 92 "RadioFloodingC.nc"
+# 117 "RadioFloodingC.nc"
 static inline void RadioFloodingC$AMControl$startDone(error_t err)
-#line 92
+#line 117
 {
   if (err == SUCCESS) {
-      sim_log_debug(187U, "RadioC", "Radio Control => OK %s.\n", sim_time_string());
+      sim_log_debug(188U, "RadioC", "Radio Control => OK %s.\n", sim_time_string());
     }
   else {
       RadioFloodingC$AMControl$start();
@@ -6286,9 +6369,9 @@ static inline void TossimPacketModelC$startDoneTask$runTask(void )
   TossimPacketModelC$Control$startDone(SUCCESS);
 }
 
-# 101 "RadioFloodingC.nc"
+# 126 "RadioFloodingC.nc"
 static inline void RadioFloodingC$AMControl$stopDone(error_t err)
-#line 101
+#line 126
 {
 }
 
@@ -6558,13 +6641,13 @@ inline static error_t RadioFloodingC$init_RoutingTable$postTask(void ){
 #line 67
 }
 #line 67
-# 45 "RadioFloodingC.nc"
+# 46 "RadioFloodingC.nc"
 static inline void RadioFloodingC$init_RoutingTable$runTask(void )
-#line 45
+#line 46
 {
   uint16_t start;
 
-#line 47
+#line 48
   for (start = 0; start < 5 && RadioFloodingC$i[sim_node()] < 10; start++) {
       RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$i[sim_node()]] = 0;
       RadioFloodingC$i[sim_node()]++;
@@ -6575,34 +6658,40 @@ static inline void RadioFloodingC$init_RoutingTable$runTask(void )
 }
 
 static inline void RadioFloodingC$RoutingTable$runTask(void )
-#line 56
+#line 57
 {
-  uint16_t k = 0;
 
-#line 58
-  while (RadioFloodingC$RoutingArray[sim_node()][k] != RadioFloodingC$neighbor_id[sim_node()] && RadioFloodingC$RoutingArray[sim_node()][k] != 0) {
-      k++;
+  while (RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] != RadioFloodingC$neighbor_id[sim_node()] && RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] != 0 && RadioFloodingC$k[sim_node()] < 10) {
+      RadioFloodingC$k[sim_node()]++;
     }
-  if (k == RadioFloodingC$last_pos[sim_node()]) {
-      RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$last_pos[sim_node()]] = RadioFloodingC$neighbor_id[sim_node()];
-      RadioFloodingC$last_pos[sim_node()]++;
+  if (RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] == RadioFloodingC$neighbor_id[sim_node()]) {
+      sim_log_debug(185U, "RoutingTableC", "Neihgbor already exists in RoutingTable\n");
     }
   else {
 #line 65
-    if (k < RadioFloodingC$last_pos[sim_node()]) {
-        sim_log_debug(185U, "RoutingTableC", "Neihgbor already exists in RoutingTable\n");
+    if (RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] == 0) {
+        RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] = RadioFloodingC$neighbor_id[sim_node()];
+      }
+    else {
+        sim_log_debug(186U, "RoutingTableC", "No more positions in RoutingTable\n");
       }
     }
 }
 
-#line 70
+
+
+
+
+
+
+
 static inline void RadioFloodingC$PrintRoutingTable$runTask(void )
-#line 70
+#line 81
 {
   uint8_t j;
 
   for (j = 0; j < RadioFloodingC$last_pos[sim_node()]; j++) {
-      sim_log_debug(186U, "RoutingTableC", "Node[%hu] : Route[%hu] = Node[%hu] .\n", TOS_NODE_ID, j, RadioFloodingC$RoutingArray[sim_node()][j]);
+      sim_log_debug(187U, "RoutingTableC", "Node[%hu] : Route[%hu] = Node[%hu] .\n", TOS_NODE_ID, j, RadioFloodingC$RoutingArray[sim_node()][j]);
     }
 }
 
@@ -6634,9 +6723,9 @@ static inline void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone
 }
 
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
-inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t arg_0x40bd4a90, message_t * msg, error_t error){
+inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t arg_0x40bf36a8, message_t * msg, error_t error){
 #line 100
-  switch (arg_0x40bd4a90) {
+  switch (arg_0x40bf36a8) {
 #line 100
     case 0U:
 #line 100
@@ -6646,7 +6735,7 @@ inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t
 #line 100
     default:
 #line 100
-      /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(arg_0x40bd4a90, msg, error);
+      /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(arg_0x40bf36a8, msg, error);
 #line 100
       break;
 #line 100
@@ -6780,13 +6869,13 @@ inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$errorTask$postTask
 }
 #line 67
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(am_id_t arg_0x40bf9490, am_addr_t addr, message_t * msg, uint8_t len){
+inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(am_id_t arg_0x40bf20a0, am_addr_t addr, message_t * msg, uint8_t len){
 #line 80
   unsigned char __nesc_result;
 #line 80
 
 #line 80
-  __nesc_result = TossimActiveMessageC$AMSend$send(arg_0x40bf9490, addr, msg, len);
+  __nesc_result = TossimActiveMessageC$AMSend$send(arg_0x40bf20a0, addr, msg, len);
 #line 80
 
 #line 80
@@ -7587,6 +7676,65 @@ static inline void CpmModelC$sim_gain_ack_handle(sim_event_t *evt)
   CpmModelC$free_receive_message((CpmModelC$receive_message_t *)evt->data);
 }
 
+# 54 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline bool /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$get(void )
+#line 54
+{
+#line 54
+  return (atm128RegFile[sim_node()][27U] & (1 << 2)) != 0;
+}
+
+# 43 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+inline static bool LedsP$Led0$get(void ){
+#line 43
+  unsigned char __nesc_result;
+#line 43
+
+#line 43
+  __nesc_result = /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$get();
+#line 43
+
+#line 43
+  return __nesc_result;
+#line 43
+}
+#line 43
+# 60 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline void /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$toggle(void )
+#line 60
+{
+#line 60
+  { __nesc_atomic_t __nesc_atomic = __nesc_atomic_start();
+#line 60
+    atm128RegFile[sim_node()][27U] ^= 1 << 2;
+#line 60
+    __nesc_atomic_end(__nesc_atomic); }
+}
+
+# 42 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+inline static void LedsP$Led0$toggle(void ){
+#line 42
+  /*HplAtm128GeneralIOC.PortA.Bit2*/HplAtm128GeneralIOPinP$2$IO$toggle();
+#line 42
+}
+#line 42
+# 84 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
+static inline void LedsP$Leds$led0Toggle(void )
+#line 84
+{
+  LedsP$Led0$toggle();
+  sim_log_debug(151U, "LedsC", "LEDS: Led""0"" %s.\n", LedsP$Led0$get() ? "off" : "on");
+#line 86
+  ;
+}
+
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+inline static void RadioFloodingC$Leds$led0Toggle(void ){
+#line 67
+  LedsP$Leds$led0Toggle();
+#line 67
+}
+#line 67
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 inline static error_t RadioFloodingC$AMSend$send(am_addr_t addr, message_t * msg, uint8_t len){
 #line 80
@@ -7602,15 +7750,15 @@ inline static error_t RadioFloodingC$AMSend$send(am_addr_t addr, message_t * msg
 #line 80
 }
 #line 80
-# 103 "RadioFloodingC.nc"
+# 128 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Timer0$fired(void )
-#line 103
+#line 128
 {
   RadioFloodingC$counter[sim_node()]++;
   RadioFloodingC$seq_num[sim_node()]++;
-  sim_log_debug(188U, "BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu %s.\n", RadioFloodingC$counter[sim_node()], RadioFloodingC$seq_num[sim_node()], sim_time_string());
+  sim_log_debug(189U, "BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu %s.\n", RadioFloodingC$counter[sim_node()], RadioFloodingC$seq_num[sim_node()], sim_time_string());
 
-  if (RadioFloodingC$save[sim_node()] < 200) {
+  if (RadioFloodingC$save[sim_node()] < 50) {
 
 
       RadioFloodingC$bcast_pkt[sim_node()] = (flooding_msg_t *)RadioFloodingC$Packet$getPayload(&RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$save[sim_node()]], sizeof(flooding_msg_t ));
@@ -7637,19 +7785,30 @@ static inline void RadioFloodingC$Timer0$fired(void )
 
   if (!RadioFloodingC$busy[sim_node()]) {
 
-      sim_log_debug(189U, "BroadcastingC", "sender_id=%hu, counter=%hu ,seq_num=%hu .\n", __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->sender_id.nxdata), __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->counter.nxdata), __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->seq_num.nxdata));
+      memcpy(&RadioFloodingC$pkt[sim_node()], &RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$send[sim_node()]], sizeof(message_t ));
+      sim_log_debug(190U, "BroadcastingC", "sender_id=%hu, counter=%hu ,seq_num=%hu .\n", __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->sender_id.nxdata), __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->counter.nxdata), __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->seq_num.nxdata));
 
-      if (RadioFloodingC$AMSend$send(AM_BROADCAST_ADDR, &RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$send[sim_node()]], sizeof(flooding_msg_t )) == SUCCESS) {
-          sim_log_debug(190U, "BroadcastingC", "START BROADCASTING ... %s.\n\n", sim_time_string());
+      if (RadioFloodingC$AMSend$send(AM_BROADCAST_ADDR, &RadioFloodingC$pkt[sim_node()], sizeof(flooding_msg_t )) == SUCCESS) {
+          sim_log_debug(191U, "BroadcastingC", "START BROADCASTING ... %s.\n\n", sim_time_string());
+
+          RadioFloodingC$Leds$led0Toggle();
           RadioFloodingC$busy[sim_node()] = TRUE;
         }
     }
 }
 
-
+# 83 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+inline static void RadioFloodingC$Leds$led1Toggle(void ){
+#line 83
+  LedsP$Leds$led1Toggle();
+#line 83
+}
+#line 83
+# 173 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Timer1$fired(void )
-#line 145
+#line 173
 {
+  RadioFloodingC$Leds$led1Toggle();
 
   if (!RadioFloodingC$busy[sim_node()]) {
       RadioFloodingC$bcast_pkt[sim_node()] = (flooding_msg_t *)RadioFloodingC$Packet$getPayload(&RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$send[sim_node()]], sizeof(flooding_msg_t ));
@@ -7657,10 +7816,13 @@ static inline void RadioFloodingC$Timer1$fired(void )
           return;
         }
 
-      sim_log_debug(191U, "Re-BroadcastingC", "sender_id=%hu, counter=%hu ,seq_num=%hu .\n", __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->sender_id.nxdata), __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->counter.nxdata), __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->seq_num.nxdata));
+      memcpy(&RadioFloodingC$pkt[sim_node()], &RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$send[sim_node()]], sizeof(message_t ));
+      sim_log_debug(192U, "Re-BroadcastingC", "sender_id=%hu, counter=%hu ,seq_num=%hu .\n", __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->sender_id.nxdata), __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->counter.nxdata), __nesc_ntoh_uint16(RadioFloodingC$bcast_pkt[sim_node()]->seq_num.nxdata));
 
-      if (RadioFloodingC$AMSend$send(AM_BROADCAST_ADDR, &RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$send[sim_node()]], sizeof(flooding_msg_t )) == SUCCESS) {
-          sim_log_debug(192U, "BroadcastingC", "Start Re-BROADCASTING ... %s.\n\n", sim_time_string());
+      if (RadioFloodingC$AMSend$send(AM_BROADCAST_ADDR, &RadioFloodingC$pkt[sim_node()], sizeof(flooding_msg_t )) == SUCCESS) {
+          sim_log_debug(193U, "BroadcastingC", "Start Re-BROADCASTING ... %s.\n\n", sim_time_string());
+
+          RadioFloodingC$Leds$led1Toggle();
           RadioFloodingC$busy[sim_node()] = TRUE;
         }
     }
@@ -7698,6 +7860,48 @@ inline static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$f
 #line 83
 }
 #line 83
+# 60 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$toggle(void )
+#line 60
+{
+#line 60
+  { __nesc_atomic_t __nesc_atomic = __nesc_atomic_start();
+#line 60
+    atm128RegFile[sim_node()][27U] ^= 1 << 1;
+#line 60
+    __nesc_atomic_end(__nesc_atomic); }
+}
+
+# 42 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+inline static void LedsP$Led1$toggle(void ){
+#line 42
+  /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$toggle();
+#line 42
+}
+#line 42
+# 54 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline bool /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$get(void )
+#line 54
+{
+#line 54
+  return (atm128RegFile[sim_node()][27U] & (1 << 1)) != 0;
+}
+
+# 43 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+inline static bool LedsP$Led1$get(void ){
+#line 43
+  unsigned char __nesc_result;
+#line 43
+
+#line 43
+  __nesc_result = /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$get();
+#line 43
+
+#line 43
+  return __nesc_result;
+#line 43
+}
+#line 43
 # 145 "/opt/tinyos-2.1.2/tos/lib/tossim/TossimActiveMessageC.nc"
 static inline void TossimActiveMessageC$AMPacket$setDestination(message_t *amsg, am_addr_t addr)
 #line 145
@@ -7757,7 +7961,7 @@ uint8_t len)
   if (/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg != (void *)0) {
       return EBUSY;
     }
-  sim_log_debug(195U, "AMQueue", "AMQueue: request to send from %hhu (%p): passed checks\n", clientId, msg);
+  sim_log_debug(198U, "AMQueue", "AMQueue: request to send from %hhu (%p): passed checks\n", clientId, msg);
 
   /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg = msg;
   /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Packet$setPayloadLength(msg, len);
@@ -7767,12 +7971,12 @@ uint8_t len)
       am_id_t amId = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMPacket$type(msg);
       am_addr_t dest = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMPacket$destination(msg);
 
-      sim_log_debug(196U, "AMQueue", "%s: request to send from %hhu (%p): queue empty\n", __FUNCTION__, clientId, msg);
+      sim_log_debug(199U, "AMQueue", "%s: request to send from %hhu (%p): queue empty\n", __FUNCTION__, clientId, msg);
       /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()] = clientId;
 
       err = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(amId, dest, msg, len);
       if (err != SUCCESS) {
-          sim_log_debug(197U, "AMQueue", "%s: underlying send failed.\n", __FUNCTION__);
+          sim_log_debug(200U, "AMQueue", "%s: underlying send failed.\n", __FUNCTION__);
           /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()] = 1;
           /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg = (void *)0;
         }
@@ -7780,7 +7984,7 @@ uint8_t len)
       return err;
     }
   else {
-      sim_log_debug(198U, "AMQueue", "AMQueue: request to send from %hhu (%p): queue not empty\n", clientId, msg);
+      sim_log_debug(201U, "AMQueue", "AMQueue: request to send from %hhu (%p): queue not empty\n", clientId, msg);
     }
   return SUCCESS;
 }
@@ -8527,18 +8731,20 @@ inline static void RadioFloodingC$Timer0$startPeriodic(uint32_t dt){
 #line 64
 }
 #line 64
-# 80 "RadioFloodingC.nc"
+# 103 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Boot$booted(void )
-#line 80
+#line 103
 {
   RadioFloodingC$init_RoutingTable$postTask();
   RadioFloodingC$AMControl$start();
+
+
 
   RadioFloodingC$send[sim_node()] = 0;
   RadioFloodingC$save[sim_node()] = 0;
 
   if (TOS_NODE_ID == 1) {
-      RadioFloodingC$Timer0$startPeriodic(200 + TOS_NODE_ID * 100);
+      RadioFloodingC$Timer0$startPeriodic(TOS_NODE_ID * 100 + 500);
     }
 }
 
@@ -10091,6 +10297,19 @@ static am_id_t TossimActiveMessageC$AMPacket$type(message_t *amsg)
   return __nesc_ntoh_uint8(header->type.nxdata);
 }
 
+# 144 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
+static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$startTimer(uint8_t num, uint32_t t0, uint32_t dt, bool isoneshot)
+{
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer_t *timer = &/*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num];
+
+#line 147
+  timer->t0 = t0;
+  timer->dt = dt;
+  timer->isoneshot = isoneshot;
+  timer->isrunning = TRUE;
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer$postTask();
+}
+
 # 205 "/opt/tinyos-2.1.2/tos/lib/tossim/SimSchedulerBasicP.nc"
 static error_t SimSchedulerBasicP$TaskBasic$postTask(uint8_t id)
 {
@@ -10123,19 +10342,6 @@ static void SimSchedulerBasicP$sim_scheduler_submit_event(void )
       sim_queue_insert(&SimSchedulerBasicP$sim_scheduler_event[sim_node()]);
       SimSchedulerBasicP$sim_scheduler_event_pending[sim_node()] = TRUE;
     }
-}
-
-# 144 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
-static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$startTimer(uint8_t num, uint32_t t0, uint32_t dt, bool isoneshot)
-{
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer_t *timer = &/*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num];
-
-#line 147
-  timer->t0 = t0;
-  timer->dt = dt;
-  timer->isoneshot = isoneshot;
-  timer->isrunning = TRUE;
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer$postTask();
 }
 
 # 161 "/opt/tinyos-2.1.2/tos/chips/atm128/timer/Atm128AlarmAsyncP.nc"
@@ -10363,13 +10569,13 @@ static bool SimSchedulerBasicP$Scheduler$runNextTask(void )
   return TRUE;
 }
 
-# 204 "RadioFloodingC.nc"
+# 253 "RadioFloodingC.nc"
 static void RadioFloodingC$AMSend$sendDone(message_t *msg, error_t err)
-#line 204
+#line 253
 {
-  if (&RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$send[sim_node()]] == msg) {
+  if (&RadioFloodingC$pkt[sim_node()] == msg) {
       RadioFloodingC$busy[sim_node()] = FALSE;
-      if (RadioFloodingC$send[sim_node()] < 200) {
+      if (RadioFloodingC$send[sim_node()] < 50) {
           RadioFloodingC$send[sim_node()]++;
         }
       else {
@@ -10463,7 +10669,7 @@ static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$sendDone(am_id_t id, 
       /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$sendDone(/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()], msg, err);
     }
   else {
-      sim_log_debug(199U, "PointerBug", "%s received send done for %p, signaling for %p.\n", __FUNCTION__, msg, /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()]].msg);
+      sim_log_debug(202U, "PointerBug", "%s received send done for %p, signaling for %p.\n", __FUNCTION__, msg, /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()]].msg);
     }
 }
 
@@ -10545,6 +10751,16 @@ static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$fireTimers(uin
         }
     }
   /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer$postTask();
+}
+
+# 99 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
+static void LedsP$Leds$led1Toggle(void )
+#line 99
+{
+  LedsP$Led1$toggle();
+  sim_log_debug(154U, "LedsC", "LEDS: Led""1"" %s.\n", LedsP$Led1$get() ? "off" : "on");
+#line 101
+  ;
 }
 
 # 53 "/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc"
@@ -11408,6 +11624,12 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(RadioFloodingC$last_pos[__nesc_mote]);
     return 0;
   }
+  if (!strcmp(varname, "RadioFloodingC$k"))
+  {
+    *addr = (uintptr_t)&RadioFloodingC$k[__nesc_mote];
+    *size = sizeof(RadioFloodingC$k[__nesc_mote]);
+    return 0;
+  }
   if (!strcmp(varname, "RadioFloodingC$RoutingArray"))
   {
     *addr = (uintptr_t)&RadioFloodingC$RoutingArray[__nesc_mote];
@@ -11430,6 +11652,12 @@ static int __nesc_nido_resolve(int __nesc_mote,
   {
     *addr = (uintptr_t)&RadioFloodingC$save[__nesc_mote];
     *size = sizeof(RadioFloodingC$save[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "RadioFloodingC$pkt"))
+  {
+    *addr = (uintptr_t)&RadioFloodingC$pkt[__nesc_mote];
+    *size = sizeof(RadioFloodingC$pkt[__nesc_mote]);
     return 0;
   }
   if (!strcmp(varname, "RadioFloodingC$busy"))
@@ -11671,10 +11899,12 @@ static void __nesc_nido_initialise(int __nesc_mote)
   memset((void *)&RadioFloodingC$neighbor_id[__nesc_mote], 0, sizeof RadioFloodingC$neighbor_id[__nesc_mote]);
   RadioFloodingC$i[__nesc_mote] = 0;
   RadioFloodingC$last_pos[__nesc_mote] = 0;
+  memset((void *)&RadioFloodingC$k[__nesc_mote], 0, sizeof RadioFloodingC$k[__nesc_mote]);
   memset((void *)&RadioFloodingC$RoutingArray[__nesc_mote], 0, sizeof RadioFloodingC$RoutingArray[__nesc_mote]);
   memset((void *)&RadioFloodingC$PacketBuffer[__nesc_mote], 0, sizeof RadioFloodingC$PacketBuffer[__nesc_mote]);
   memset((void *)&RadioFloodingC$send[__nesc_mote], 0, sizeof RadioFloodingC$send[__nesc_mote]);
   memset((void *)&RadioFloodingC$save[__nesc_mote], 0, sizeof RadioFloodingC$save[__nesc_mote]);
+  memset((void *)&RadioFloodingC$pkt[__nesc_mote], 0, sizeof RadioFloodingC$pkt[__nesc_mote]);
   RadioFloodingC$busy[__nesc_mote] = FALSE;
 
   /* Module AMQueueEntryP$0 */

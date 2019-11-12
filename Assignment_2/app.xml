@@ -2440,7 +2440,7 @@
         <long>&#10; An AM send queue that provides a Service Instance pattern for&#10; formatted packets and calls an underlying AMSend in a round-robin&#10; fashion. Used to share L2 bandwidth between different communication&#10; clients.&#10;&#10; @author Philip Levis&#10; @date   Jan 16 2006&#10;</long>
       </documentation>
       <parameters>
-        <constant name="numClients" ref="0x40bd43f8" loc="45:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+        <constant name="numClients" ref="0x40bf3010" loc="45:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
           <component-ref qname="AMQueueImplP"/>
           <type-int cname="int" size="I:4" alignment="I:4"></type-int>
         </constant>
@@ -2480,7 +2480,7 @@
         <long>&#10; The virtualized AM reception abstraction.&#10;&#10; @author Philip Levis&#10; @date   Jan 16 2006&#10; @see    TEP 116: Packet Protocols&#10;</long>
       </documentation>
       <parameters>
-        <constant name="amId" ref="0x40bd2c20" loc="43:/opt/tinyos-2.1.2/tos/system/AMReceiverC.nc">
+        <constant name="amId" ref="0x40bcb550" loc="43:/opt/tinyos-2.1.2/tos/system/AMReceiverC.nc">
           <component-ref qname="AMReceiverC"/>
           <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
             <typename><typedef-ref name="am_id_t" ref="0x406eb168"/></typename>
@@ -2525,7 +2525,7 @@
         <long>&#10; The virtualized active message send abstraction. Each instantiation&#10; of AMSenderC has its own queue of depth one. Therefore, it does not&#10; have to contend with other AMSenderC instantiations for queue space.&#10; The underlying implementation schedules the packets in these queues&#10; using some form of fair-share queueing.&#10;&#10; @author Philip Levis&#10; @date   Jan 16 2006&#10; @see    TEP 116: Packet Protocols&#10;</long>
       </documentation>
       <parameters>
-        <constant name="AMId" ref="0x40bcb790" loc="47:/opt/tinyos-2.1.2/tos/system/AMSenderC.nc">
+        <constant name="AMId" ref="0x40bc2088" loc="47:/opt/tinyos-2.1.2/tos/system/AMSenderC.nc">
           <component-ref qname="AMSenderC"/>
           <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
             <typename><typedef-ref name="am_id_t" ref="0x406eb168"/></typename>
@@ -2540,7 +2540,7 @@
         <long>&#10; Internal AM component that fills in needed packet fields for the &#10; AMSend -> Send transformation.&#10;&#10; @author Philip Levis&#10; @date   Jan 16 2006&#10;</long>
       </documentation>
       <parameters>
-        <constant name="amId" ref="0x40bc2e48" loc="43:/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc">
+        <constant name="amId" ref="0x40be3730" loc="43:/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc">
           <component-ref qname="AMQueueEntryP"/>
           <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
             <typename><typedef-ref name="am_id_t" ref="0x406eb168"/></typename>
@@ -2555,7 +2555,7 @@
         <long>&#10; The virtualized active message send abstraction. Each instantiation&#10; of AMSenderC has its own queue of depth one. Therefore, it does not&#10; have to contend with other AMSenderC instantiations for queue space.&#10; The underlying implementation schedules the packets in these queues&#10; using some form of fair-share queueing.&#10;&#10; @author Philip Levis&#10; @date   Jan 16 2006&#10; @see    TEP 116: Packet Protocols&#10;</long>
       </documentation>
       <parameters>
-        <constant name="AMId" ref="0x40bc43a0" loc="47:/opt/tinyos-2.1.2/tos/system/DirectAMSenderC.nc">
+        <constant name="AMId" ref="0x40bc0c48" loc="47:/opt/tinyos-2.1.2/tos/system/DirectAMSenderC.nc">
           <component-ref qname="DirectAMSenderC"/>
           <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
             <typename><typedef-ref name="am_id_t" ref="0x406eb168"/></typename>
@@ -3297,7 +3297,7 @@
         <short>&#10; </short>
         <long>&#10; @author Phil Levis&#10; @author David Gay&#10; Revision:  $Revision: 1.12 $&#10;&#10; Defines global error codes for error_t in TinyOS.&#10;</long>
       </documentation>
-      <function command="" provided="0" name="send" ref="0x40be4350" loc="75:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+      <function command="" provided="0" name="send" ref="0x40be0c78" loc="75:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
         <documentation loc="57:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
           <short> &#10; Send a packet with a data payload of &#60;tt>len&#60;/tt>.</short>
           <long> &#10; Send a packet with a data payload of &#60;tt>len&#60;/tt>. To determine&#10; the maximum available size, use the Packet interface of the&#10; component providing Send. If send returns SUCCESS, then the&#10; component will signal the sendDone event in the future; if send&#10; returns an error, it will not signal sendDone.  Note that a&#10; component may accept a send request which it later finds it&#10; cannot satisfy; in this case, it will signal sendDone with an&#10; appropriate error code.&#10;&#10; @param   'message_t* ONE msg'     the packet to send&#10; @param   len     the length of the packet payload&#10; @return          SUCCESS if the request was accepted and will issue&#10;                  a sendDone event, EBUSY if the component cannot accept&#10;                  the request now but will be able to later, FAIL&#10;                  if the stack is in a state that cannot accept requests&#10;                  (e.g., it's off).&#10;</long>
@@ -3319,21 +3319,21 @@
           </function-parameters>
         </type-function>
         <parameters>
-          <variable name="msg" ref="0x40be4010" loc="75:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+          <variable name="msg" ref="0x40be0938" loc="75:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
             <type-pointer size="I:4" alignment="I:4">
               <type-tag size="I:41" alignment="I:1"><nx_struct-ref name="message_t" ref="0x406f5838"/>
                 <typename><typedef-ref name="message_t" ref="0x406f4600"/></typename>
               </type-tag>
             </type-pointer>
           </variable>
-          <variable name="len" ref="0x40be41f0" loc="75:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+          <variable name="len" ref="0x40be0b18" loc="75:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
             <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
               <typename><typedef-ref name="uint8_t" ref="0x40219250"/></typename>
             </type-int>
           </variable>
         </parameters>
       </function>
-      <function command="" provided="0" name="getPayload" ref="0x40be0eb0" loc="125:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+      <function command="" provided="0" name="getPayload" ref="0x40bdca18" loc="125:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
         <documentation loc="115:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
           <short>&#10; Return a pointer to a protocol's payload region in a packet which&#10; at least a certain length.</short>
           <long>&#10; Return a pointer to a protocol's payload region in a packet which&#10; at least a certain length.  If the payload region is smaller than&#10; the len parameter, then getPayload returns NULL. This command&#10; behaves identicallt to &#60;tt>Packet.getPayload&#60;/tt> and is&#10; included in this interface as a convenience.&#10;&#10; @param   'message_t* ONE msg'    the packet&#10; @return  'void* COUNT_NOK(len)'  a pointer to the packet's payload&#10;</long>
@@ -3355,21 +3355,21 @@
           </function-parameters>
         </type-function>
         <parameters>
-          <variable name="msg" ref="0x40be0b50" loc="125:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+          <variable name="msg" ref="0x40bdc6b8" loc="125:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
             <type-pointer size="I:4" alignment="I:4">
               <type-tag size="I:41" alignment="I:1"><nx_struct-ref name="message_t" ref="0x406f5838"/>
                 <typename><typedef-ref name="message_t" ref="0x406f4600"/></typename>
               </type-tag>
             </type-pointer>
           </variable>
-          <variable name="len" ref="0x40be0d30" loc="125:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+          <variable name="len" ref="0x40bdc898" loc="125:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
             <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
               <typename><typedef-ref name="uint8_t" ref="0x40219250"/></typename>
             </type-int>
           </variable>
         </parameters>
       </function>
-      <function command="" provided="0" name="maxPayloadLength" ref="0x40be05f0" loc="112:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+      <function command="" provided="0" name="maxPayloadLength" ref="0x40bdc158" loc="112:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
         <documentation loc="102:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
           <short>&#10; Return the maximum payload length that this communication layer&#10; can provide.</short>
           <long>&#10; Return the maximum payload length that this communication layer&#10; can provide. This command behaves identically to&#10; &#60;tt>Packet.maxPayloadLength&#60;/tt> and is included in this&#10; interface as a convenience.&#10;&#10; @return  the maximum payload length&#10;</long>
@@ -3385,7 +3385,7 @@
         <parameters>
         </parameters>
       </function>
-      <function command="" provided="0" name="cancel" ref="0x40be2010" loc="89:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+      <function command="" provided="0" name="cancel" ref="0x40bddb38" loc="89:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
         <documentation loc="77:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
           <short>&#10; Cancel a requested transmission.</short>
           <long>&#10; Cancel a requested transmission. Returns SUCCESS if the &#10; transmission was cancelled properly (not sent in its&#10; entirety). Note that the component may not know&#10; if the send was successfully cancelled, if the radio is&#10; handling much of the logic; in this case, a component&#10; should be conservative and return an appropriate error code.&#10;&#10; @param   'message_t* ONE msg'    the packet whose transmission should be cancelled&#10; @return         SUCCESS if the packet was successfully cancelled, FAIL&#10;                 otherwise&#10;</long>
@@ -3404,7 +3404,7 @@
           </function-parameters>
         </type-function>
         <parameters>
-          <variable name="msg" ref="0x40be4e38" loc="89:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+          <variable name="msg" ref="0x40bdd9e0" loc="89:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
             <type-pointer size="I:4" alignment="I:4">
               <type-tag size="I:41" alignment="I:1"><nx_struct-ref name="message_t" ref="0x406f5838"/>
                 <typename><typedef-ref name="message_t" ref="0x406f4600"/></typename>
@@ -3413,7 +3413,7 @@
           </variable>
         </parameters>
       </function>
-      <function event="" provided="0" name="sendDone" ref="0x40be2ca8" loc="100:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+      <function event="" provided="0" name="sendDone" ref="0x40bdb820" loc="100:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
         <documentation loc="91:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
           <short> &#10; Signaled in response to an accepted send request.</short>
           <long> &#10; Signaled in response to an accepted send request. &#60;tt>msg&#60;/tt>&#10; is the sent buffer, and &#60;tt>error&#60;/tt> indicates whether the&#10; send was succesful, and if not, the cause of the failure.&#10; &#10; @param 'message_t* ONE msg'   the message which was requested to send&#10; @param error SUCCESS if it was transmitted successfully, FAIL if&#10;              it was not, ECANCEL if it was cancelled via &#60;tt>cancel&#60;/tt>&#10;</long>
@@ -3433,14 +3433,14 @@
           </function-parameters>
         </type-function>
         <parameters>
-          <variable name="msg" ref="0x40be2950" loc="100:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+          <variable name="msg" ref="0x40bdb4c8" loc="100:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
             <type-pointer size="I:4" alignment="I:4">
               <type-tag size="I:41" alignment="I:1"><nx_struct-ref name="message_t" ref="0x406f5838"/>
                 <typename><typedef-ref name="message_t" ref="0x406f4600"/></typename>
               </type-tag>
             </type-pointer>
           </variable>
-          <variable name="error" ref="0x40be2b48" loc="100:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
+          <variable name="error" ref="0x40bdb6c0" loc="100:/opt/tinyos-2.1.2/tos/interfaces/Send.nc">
             <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
               <typename><typedef-ref name="error_t" ref="0x405cbe98"/></typename>
             </type-int>
@@ -7351,15 +7351,15 @@
         </type-tag>
       </field>
     </struct>
-    <enum loc="45:RadioFloodingC.nc" ref="0x40b8ef08" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="57:RadioFloodingC.nc" ref="0x40b8ef20" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="70:RadioFloodingC.nc" ref="0x40b8fd18" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="46:RadioFloodingC.nc" ref="0x40bcc7f0" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="56:RadioFloodingC.nc" ref="0x40b8e658" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="81:RadioFloodingC.nc" ref="0x40b8e5f8" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
@@ -7474,21 +7474,21 @@
       <component-ref qname="VirtualizeTimerC"/>
       <type-int cname="unknown int" size="U:" alignment="U:"></type-int>
     </enum>
-    <enum loc="47:/opt/tinyos-2.1.2/tos/system/AMQueueP.nc" ref="0x40bd5700" defined="" scoped="" size="I:4" alignment="I:4">
+    <enum loc="169:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc" ref="0x40bf5d60" defined="" scoped="" size="U:" alignment="U:">
+      <component-ref qname="AMQueueImplP"/>
+      <type-int cname="unknown int" size="U:" alignment="U:"></type-int>
+    </enum>
+    <enum loc="126:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc" ref="0x40bf4730" defined="" scoped="" size="U:" alignment="U:">
+      <component-ref qname="AMQueueImplP"/>
+      <type-int cname="unknown int" size="U:" alignment="U:"></type-int>
+    </enum>
+    <enum loc="47:/opt/tinyos-2.1.2/tos/system/AMQueueP.nc" ref="0x40bf72a0" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="AMQueueP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </enum>
-    <enum loc="126:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc" ref="0x40bfba38" defined="" scoped="" size="U:" alignment="U:">
+    <struct loc="55:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc" ref="0x40bf0128" defined="" scoped="" size="I:4" alignment="I:4">
       <component-ref qname="AMQueueImplP"/>
-      <type-int cname="unknown int" size="U:" alignment="U:"></type-int>
-    </enum>
-    <enum loc="169:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc" ref="0x40bfb120" defined="" scoped="" size="U:" alignment="U:">
-      <component-ref qname="AMQueueImplP"/>
-      <type-int cname="unknown int" size="U:" alignment="U:"></type-int>
-    </enum>
-    <struct loc="55:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc" ref="0x40bf74d8" defined="" scoped="" size="I:4" alignment="I:4">
-      <component-ref qname="AMQueueImplP"/>
-      <field name="msg" ref="0x40bf75e8" bit-offset="I:0" size="I:4">
+      <field name="msg" ref="0x40bf0238" bit-offset="I:0" size="I:4">
         <type-pointer size="I:4" alignment="I:4">
           <type-tag size="I:41" alignment="I:1"><nx_struct-ref name="message_t" ref="0x406f5838"/>
             <typename><typedef-ref name="message_t" ref="0x406f4600"/></typename>
@@ -7526,7 +7526,7 @@
       </type-array>
     </variable>
     <variable name="outputs" ref="0x40549c40" loc="67:/opt/tinyos-2.1.2/tos/lib/tossim/sim_log.c">
-      <type-array elements="I:200" size="I:1600" alignment="I:4">
+      <type-array elements="I:203" size="I:1624" alignment="I:4">
         <type-tag size="I:8" alignment="I:4"><struct-ref name="sim_log_output" ref="0x4054a2c8"/>
           <typename><typedef-ref name="sim_log_output_t" ref="0x4054a7b0"/></typename>
         </type-tag>
@@ -8055,15 +8055,15 @@
         </type-tag>
       </type-array>
     </variable>
-    <variable name="PacketBuffer" ref="0x40bab398" loc="37:RadioFloodingC.nc">
+    <variable name="PacketBuffer" ref="0x40bab618" loc="38:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
-      <type-array elements="I:200" size="I:8200" alignment="I:1">
+      <type-array elements="I:50" size="I:2050" alignment="I:1">
         <type-tag size="I:41" alignment="I:1"><nx_struct-ref name="message_t" ref="0x406f5838"/>
           <typename><typedef-ref name="message_t" ref="0x406f4600"/></typename>
         </type-tag>
       </type-array>
     </variable>
-    <variable name="send" ref="0x40bab5a8" loc="39:RadioFloodingC.nc">
+    <variable name="send" ref="0x40bab828" loc="40:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
         <typename><typedef-ref name="uint8_t" ref="0x40219250"/></typename>
@@ -8077,7 +8077,7 @@
         </type-tag>
       </type-pointer>
     </variable>
-    <variable name="RoutingArray" ref="0x40bab088" loc="34:RadioFloodingC.nc">
+    <variable name="RoutingArray" ref="0x40bab308" loc="35:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-array elements="I:10" size="I:20" alignment="I:2">
         <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:2">
@@ -8085,7 +8085,7 @@
         </type-int>
       </type-array>
     </variable>
-    <variable name="pkt" ref="0x40bab918" loc="42:RadioFloodingC.nc">
+    <variable name="pkt" ref="0x40babb98" loc="43:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-tag size="I:41" alignment="I:1"><nx_struct-ref name="message_t" ref="0x406f5838"/>
         <typename><typedef-ref name="message_t" ref="0x406f4600"/></typename>
@@ -8105,7 +8105,13 @@
         <typename><typedef-ref name="uint16_t" ref="0x40219490"/></typename>
       </type-int>
     </variable>
-    <variable name="save" ref="0x40bab710" loc="39:RadioFloodingC.nc">
+    <variable name="k" ref="0x40bab010" loc="34:RadioFloodingC.nc">
+      <component-ref qname="RadioFloodingC"/>
+      <type-int cname="unsigned short" unsigned="" size="I:2" alignment="I:2">
+        <typename><typedef-ref name="uint16_t" ref="0x40219490"/></typename>
+      </type-int>
+    </variable>
+    <variable name="save" ref="0x40bab990" loc="40:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
         <typename><typedef-ref name="uint8_t" ref="0x40219250"/></typename>
@@ -8117,7 +8123,7 @@
         <typename><typedef-ref name="uint16_t" ref="0x40219490"/></typename>
       </type-int>
     </variable>
-    <variable name="busy" ref="0x40babb00" loc="43:RadioFloodingC.nc">
+    <variable name="busy" ref="0x40babe00" loc="44:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
         <typename><typedef-ref name="bool" ref="0x40524710"/></typename>
@@ -8141,21 +8147,21 @@
         <typename><typedef-ref name="uint16_t" ref="0x40219490"/></typename>
       </type-int>
     </variable>
-    <variable name="current" ref="0x40bf78b8" loc="59:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+    <variable name="current" ref="0x40bf0508" loc="59:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
       <component-ref qname="AMQueueImplP"/>
       <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
         <typename><typedef-ref name="uint8_t" ref="0x40219250"/></typename>
       </type-int>
     </variable>
-    <variable name="queue" ref="0x40bf7d10" loc="60:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+    <variable name="queue" ref="0x40bf0960" loc="60:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
       <component-ref qname="AMQueueImplP"/>
       <type-array elements="U:" size="U:" alignment="I:4">
-        <type-tag size="I:4" alignment="I:4"><struct-ref scoped="" ref="0x40bf74d8"/>
-          <typename><typedef-ref name="queue_entry_t" scoped="" ref="0x40bf76a0"/></typename>
+        <type-tag size="I:4" alignment="I:4"><struct-ref scoped="" ref="0x40bf0128"/>
+          <typename><typedef-ref name="queue_entry_t" scoped="" ref="0x40bf02f0"/></typename>
         </type-tag>
       </type-array>
     </variable>
-    <variable name="cancelMask" ref="0x40bf6230" loc="61:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+    <variable name="cancelMask" ref="0x40bf0e60" loc="61:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
       <component-ref qname="AMQueueImplP"/>
       <type-array elements="U:" size="U:" alignment="I:1">
         <type-int cname="unsigned char" unsigned="" size="I:1" alignment="I:1">
@@ -10013,7 +10019,7 @@
     <constant cst="I:2" name="CSB2" ref="0x4075b398" loc="904:/opt/tinyos-2.1.2/tos/chips/atm128/sim/atm128_sim.h">
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:200" name="SIM_LOG_OUTPUT_COUNT" ref="0x40549868" loc="64:/opt/tinyos-2.1.2/tos/lib/tossim/sim_log.c">
+    <constant cst="I:203" name="SIM_LOG_OUTPUT_COUNT" ref="0x40549868" loc="64:/opt/tinyos-2.1.2/tos/lib/tossim/sim_log.c">
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
     <constant cst="I:0" name="SPI2X" ref="0x4076c9b8" loc="970:/opt/tinyos-2.1.2/tos/chips/atm128/sim/atm128_sim.h">
@@ -10600,27 +10606,27 @@
       <component-ref qname="VirtualizeTimerC"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:5" name="init_RoutingTable" ref="0x40b8edf8" loc="45:RadioFloodingC.nc">
+    <constant cst="I:5" name="init_RoutingTable" ref="0x40bcc6e0" loc="46:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:7" name="PrintRoutingTable" ref="0x40b8fc08" loc="70:RadioFloodingC.nc">
+    <constant cst="I:7" name="PrintRoutingTable" ref="0x40b8e4e8" loc="81:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:6" name="RoutingTable" ref="0x40b8e548" loc="56:RadioFloodingC.nc">
+    <constant cst="I:6" name="RoutingTable" ref="0x40b8ee10" loc="57:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="I:1" name="NUM_CLIENTS" ref="0x40bd5be0" loc="48:/opt/tinyos-2.1.2/tos/system/AMQueueP.nc">
+    <constant cst="I:1" name="NUM_CLIENTS" ref="0x40bf7780" loc="48:/opt/tinyos-2.1.2/tos/system/AMQueueP.nc">
       <component-ref qname="AMQueueP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="U:" name="errorTask" ref="0x40bfb010" loc="169:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+    <constant cst="U:" name="errorTask" ref="0x40bf5c50" loc="169:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
       <component-ref qname="AMQueueImplP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
-    <constant cst="U:" name="CancelTask" ref="0x40bfb928" loc="126:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+    <constant cst="U:" name="CancelTask" ref="0x40bf4620" loc="126:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
       <component-ref qname="AMQueueImplP"/>
       <type-int cname="int" size="I:4" alignment="I:4"></type-int>
     </constant>
@@ -12161,37 +12167,37 @@
         <typename><typedef-ref name="Timer_t" scoped="" ref="0x40b4ec88"/></typename>
       </type-tag>
     </typedef>
-    <typedef name="__nesc_sillytask_RoutingTable" ref="0x40b8e850" loc="56:RadioFloodingC.nc">
+    <typedef name="__nesc_sillytask_RoutingTable" ref="0x40bcc138" loc="57:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-array elements="I:6" size="I:24" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_PrintRoutingTable" ref="0x40b8ff20" loc="70:RadioFloodingC.nc">
+    <typedef name="__nesc_sillytask_PrintRoutingTable" ref="0x40b8e800" loc="81:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-array elements="I:7" size="I:28" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_init_RoutingTable" ref="0x40bd2140" loc="45:RadioFloodingC.nc">
+    <typedef name="__nesc_sillytask_init_RoutingTable" ref="0x40bcc9f8" loc="46:RadioFloodingC.nc">
       <component-ref qname="RadioFloodingC"/>
       <type-array elements="I:5" size="I:20" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="queue_entry_t" ref="0x40bf76a0" loc="57:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+    <typedef name="queue_entry_t" ref="0x40bf02f0" loc="57:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
       <component-ref qname="AMQueueImplP"/>
-      <type-tag size="I:4" alignment="I:4"><struct-ref scoped="" ref="0x40bf74d8"/>
-        <typename><typedef-ref name="queue_entry_t" scoped="" ref="0x40bf76a0"/></typename>
+      <type-tag size="I:4" alignment="I:4"><struct-ref scoped="" ref="0x40bf0128"/>
+        <typename><typedef-ref name="queue_entry_t" scoped="" ref="0x40bf02f0"/></typename>
       </type-tag>
     </typedef>
-    <typedef name="__nesc_sillytask_errorTask" ref="0x40bfb318" loc="169:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+    <typedef name="__nesc_sillytask_errorTask" ref="0x40bf4010" loc="169:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
       <component-ref qname="AMQueueImplP"/>
       <type-array elements="U:" size="U:" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>
       </type-array>
     </typedef>
-    <typedef name="__nesc_sillytask_CancelTask" ref="0x40bfbc30" loc="126:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
+    <typedef name="__nesc_sillytask_CancelTask" ref="0x40bf4928" loc="126:/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc">
       <component-ref qname="AMQueueImplP"/>
       <type-array elements="U:" size="U:" alignment="I:4">
         <type-int cname="int" size="I:4" alignment="I:4"></type-int>

@@ -33,16 +33,27 @@ for i in range(1, 6): #6,8,10
   print "Creating noise model for ",i;
   t.getNode(i).createNoiseModel()
   
-for i in range(1,6): #6,8,10
+for i in range(1, 6): #6,8,10
 	t.getNode(i).bootAtTime(i* 100001)
 
 
-for i in range(10000):
+for i in range(100000): 
   t.runNextEvent()
   
-for i in range(1,6):
+for i in range(1, 6): #6,8,10
 	m=t.getNode(i)
 	v=m.getVariable("RadioFloodingC.seq_num")
 	seq_num = v.getData()
-	print "The node" + str(i) + "has seq_num = " + str(seq_num)
+	print "The node_" + str(i) + " has seq_num = " + str(seq_num)
   
+for i in range(1, 6): #6,8,10
+	m=t.getNode(i)
+	v=m.getVariable("RadioFloodingC.RoutingArray")
+	RoutingArray = v.getData()
+	print "The node_" + str(i)
+	for j in range(10):
+		print "node[" + str(RoutingArray[j]) + "]"
+
+
+
+
