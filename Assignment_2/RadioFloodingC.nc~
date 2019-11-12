@@ -33,12 +33,12 @@ implementation
 	uint16_t last_pos=0;
 	uint16_t k;
 	uint16_t RoutingArray[SIZER];
-	//uint8_t maxS;
 	
 	message_t PacketBuffer[SIZE];
-	//message_t* p_pktbuffer;
 	uint8_t send,save;
 	
+	uint8_t transmissions;
+	uint8_t receivedMsgs;
 	
 	message_t pkt;
 	bool busy = FALSE;
@@ -101,6 +101,7 @@ implementation
 	/*								***								*/
 	
 	event void Boot.booted() {
+		
 		post init_RoutingTable();
 		call AMControl.start();
 		
@@ -112,6 +113,8 @@ implementation
 		if (TOS_NODE_ID == 1) {
 			call Timer0.startPeriodic(TOS_NODE_ID *100 + 500);
 		}
+		transmissions = 0;
+		receivedMsgs = 0;
 	}
 	
 	event void AMControl.startDone(error_t err) {
@@ -165,6 +168,7 @@ implementation
 				//post BroadcastLeds();
 				call Leds.led0Toggle();
 				busy = TRUE;
+				transmissions++;
 			
 			}
 		}
@@ -185,8 +189,9 @@ implementation
 			if (call AMSend.send(AM_BROADCAST_ADDR, &pkt/*PacketBuffer[send]*/, sizeof (flooding_msg_t)) == SUCCESS){
 				dbg("BroadcastingC", "Start Re-BROADCASTING ... %s.\n\n", sim_time_string());
 				//post ReBroadcast();
-				call Leds.led2Toggle();
+				//call Leds.led2Toggle();
 				busy = TRUE;
+				transmissions++;
 				
 			}
 		}
@@ -196,7 +201,7 @@ implementation
 		//dbg("ReceiveC", "RECEIVE RADIO_MSG %s.\n", sim_time_string());
 		
 		if (len == sizeof (flooding_msg_t)) {
-			
+			receivedMsgs++;
 			r_pkt = (flooding_msg_t*) payload;			
 			dbg("ReceiveC", "RECEIVE a msg from node[%hu] with seq_num = %hu %s.\n", r_pkt->sender_id, r_pkt->seq_num ,sim_time_string());
 		
@@ -241,8 +246,6 @@ implementation
 				seq_num = r_pkt->seq_num;
 				
 				//post ReceiveLeds();
-				call Leds.led2Toggle();
-				//call Leds.led1Toggle();
 				
 				call Timer1.startOneShot(TOS_NODE_ID *100);
 			}

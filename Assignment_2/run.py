@@ -40,19 +40,30 @@ for i in range(1, 6): #6,8,10
 for i in range(1000): 
   t.runNextEvent()
   
-for i in range(1, 6): #6,8,10
-	m=t.getNode(i)
-	v=m.getVariable("RadioFloodingC.seq_num")
-	seq_num = v.getData()
-	print "The node_" + str(i) + " has seq_num = " + str(seq_num)
-  
-for i in range(1, 6): #6,8,10
-	m=t.getNode(i)
-	v=m.getVariable("RadioFloodingC.RoutingArray")
-	RoutingArray = v.getData()
-	print "The node_" + str(i)
-	for j in range(10):
-		print "node[" + str(RoutingArray[j]) + "]"
+#for i in range(1, 6): #6,8,10
+#	m=t.getNode(i)
+#	v=m.getVariable("RadioFloodingC.seq_num")
+#	seq_num = v.getData()
+#	print "The node_" + str(i) + " has seq_num = " + str(seq_num) + "\n"
+#	
+#	v=m.getVariable("RadioFloodingC.transmissions")
+#	transmissions = v.getData()
+#	print "The node[" + str(i) + "]" + " transmitted " + str(transmissions) + " packets.\n"
+#	
+#	v=m.getVariable("RadioFloodingC.receivedMsgs")
+#	receivedMsgs = v.getData()
+#	print "The node[" + str(i) + "]" + " received " + " " + str(receivedMsgs) + " packets.\n"
+#	
+#	v=m.getVariable("RadioFloodingC.RoutingArray")
+#	RoutingArray = v.getData()
+#	print "\nThe Routing Table of node_" + str(i)
+#	for j in range(10):
+#		print "node[" + str(RoutingArray[j]) + "]"
+#  
+#  print "\n"
+#for i in range(1, 6): #6,8,10
+#	m=t.getNode(i)
+	
 
 
 
