@@ -1,0 +1,282 @@
+  1   2   -54.0
+  1   4   -54.0
+  2   1   -54.0
+  2   3   -54.0
+  2   5   -54.0
+  3   2   -54.0
+  3   6   -54.0
+  4   1   -55.0
+  4   5   -60.0
+  4   7   -60.0
+  5   2   -60.0
+  5   4   -60.0
+  5   6   -60.0
+  5   8   -60.0
+  6   3   -60.0
+  6   5   -60.0
+  6   9   -60.0
+  7   4   -64.0
+  7   8   -64.0
+  8   5   -64.0
+  8   7   -64.0
+  9   6   -64.0
+  9   8   -64.0
+  8   9   -64.0
+Creating noise model for  1
+Creating noise model for  2
+Creating noise model for  3
+Creating noise model for  4
+Creating noise model for  5
+Creating noise model for  6
+Creating noise model for  7
+Creating noise model for  8
+Creating noise model for  9
+DEBUG (1): RADIO_CONTROL = OK 0:0:0.000010010.
+DEBUG (2): RADIO_CONTROL = OK 0:0:0.000020010.
+DEBUG (3): RADIO_CONTROL = OK 0:0:0.000030010.
+DEBUG (4): RADIO_CONTROL = OK 0:0:0.000040010.
+DEBUG (5): RADIO_CONTROL = OK 0:0:0.000050010.
+DEBUG (6): RADIO_CONTROL = OK 0:0:0.000060010.
+DEBUG (7): RADIO_CONTROL = OK 0:0:0.000070010.
+DEBUG (8): RADIO_CONTROL = OK 0:0:0.000080010.
+DEBUG (9): RADIO_CONTROL = OK 0:0:0.000090010.
+DEBUG (1): New Attempt for BROADCASTING  counter = 1 with seq_num = 1 0:0:0.097666260.
+
+DEBUG (1): source_id=1, seq_num=1, forwarder_id=1, bcast_time = 100, counter=1.
+DEBUG (1): START BROADCASTING ... 0:0:0.097666260.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 1, bcast_time = 100, counter = 1 @ 0:0:0.107538639.
+DEBUG (4): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 1, bcast_time = 100, counter = 1 @ 0:0:0.107538639.
+DEBUG (2): NEW MESSAGE 
+DEBUG (1): New Attempt for BROADCASTING  counter = 2 with seq_num = 2 0:0:0.195322510.
+
+DEBUG (1): source_id=1, seq_num=2, forwarder_id=1, bcast_time = 100, counter=2.
+DEBUG (1): START BROADCASTING ... 0:0:0.195322510.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 1, bcast_time = 100, counter = 2 @ 0:0:0.205805237.
+DEBUG (4): Neihgbor already exists in NeighborsTable
+DEBUG (4): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 1, bcast_time = 100, counter = 2 @ 0:0:0.205805237.
+DEBUG (2): Neihgbor already exists in NeighborsTable
+DEBUG (2): NEW MESSAGE 
+DEBUG (1): New Attempt for BROADCASTING  counter = 3 with seq_num = 3 0:0:0.292978760.
+
+DEBUG (1): source_id=1, seq_num=3, forwarder_id=1, bcast_time = 100, counter=3.
+DEBUG (1): START BROADCASTING ... 0:0:0.292978760.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 1, bcast_time = 100, counter = 3 @ 0:0:0.304682183.
+DEBUG (4): Neihgbor already exists in NeighborsTable
+DEBUG (4): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 1, bcast_time = 100, counter = 3 @ 0:0:0.304682183.
+DEBUG (2): Neihgbor already exists in NeighborsTable
+DEBUG (2): NEW MESSAGE 
+DEBUG (1): New Attempt for BROADCASTING  counter = 4 with seq_num = 4 0:0:0.390635010.
+
+DEBUG (1): source_id=1, seq_num=4, forwarder_id=1, bcast_time = 100, counter=4.
+DEBUG (1): START BROADCASTING ... 0:0:0.390635010.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 1, bcast_time = 100, counter = 4 @ 0:0:0.393061143.
+DEBUG (4): Neihgbor already exists in NeighborsTable
+DEBUG (4): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 1, bcast_time = 100, counter = 4 @ 0:0:0.393061143.
+DEBUG (2): Neihgbor already exists in NeighborsTable
+DEBUG (2): NEW MESSAGE 
+DEBUG (1): New Attempt for BROADCASTING  counter = 5 with seq_num = 5 0:0:0.488291260.
+
+DEBUG (1): source_id=1, seq_num=5, forwarder_id=1, bcast_time = 100, counter=5.
+DEBUG (1): START BROADCASTING ... 0:0:0.488291260.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 1, bcast_time = 100, counter = 5 @ 0:0:0.495371296.
+DEBUG (4): Neihgbor already exists in NeighborsTable
+DEBUG (4): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 1, bcast_time = 100, counter = 5 @ 0:0:0.495371296.
+DEBUG (2): Neihgbor already exists in NeighborsTable
+DEBUG (2): NEW MESSAGE 
+DEBUG (2): source_id=1, seq_num=1, forwarder_id=2, bcast_time = 200, counter=1.
+DEBUG (2): START Re-BROADCASTING ... 0:0:0.690449697.
+
+DEBUG (4): source_id=1, seq_num=1, forwarder_id=4, bcast_time = 200, counter=1.
+DEBUG (4): START Re-BROADCASTING ... 0:0:0.690469697.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 4, bcast_time = 200, counter = 1 @ 0:0:0.696649471.
+DEBUG (7): NEW MESSAGE 
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 4, bcast_time = 200, counter = 1 @ 0:0:0.696649471.
+DEBUG (5): NEW MESSAGE 
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 4, bcast_time = 200, counter = 1 @ 0:0:0.696649471.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 2, bcast_time = 200, counter = 1 @ 0:0:0.700535698.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 2, bcast_time = 200, counter = 1 @ 0:0:0.700535698.
+DEBUG (3): NEW MESSAGE 
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 2, bcast_time = 200, counter = 1 @ 0:0:0.700535698.
+DEBUG (5): source_id=1, seq_num=1, forwarder_id=5, bcast_time = 100, counter=1.
+DEBUG (5): START Re-BROADCASTING ... 0:0:0.793995323.
+
+DEBUG (7): source_id=1, seq_num=1, forwarder_id=7, bcast_time = 100, counter=1.
+DEBUG (7): START Re-BROADCASTING ... 0:0:0.794015323.
+
+DEBUG (3): source_id=1, seq_num=1, forwarder_id=3, bcast_time = 100, counter=1.
+DEBUG (3): START Re-BROADCASTING ... 0:0:0.797881572.
+
+DEBUG (8): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 7, bcast_time = 100, counter = 1 @ 0:0:0.800042509.
+DEBUG (8): NEW MESSAGE 
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 7, bcast_time = 100, counter = 1 @ 0:0:0.800042509.
+DEBUG (8): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 5, bcast_time = 100, counter = 1 @ 0:0:0.802540195.
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 5, bcast_time = 100, counter = 1 @ 0:0:0.802540195.
+DEBUG (6): NEW MESSAGE 
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 5, bcast_time = 100, counter = 1 @ 0:0:0.802540195.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 5, bcast_time = 100, counter = 1 @ 0:0:0.802540195.
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 3, bcast_time = 100, counter = 1 @ 0:0:0.806029718.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 3, bcast_time = 100, counter = 1 @ 0:0:0.806029718.
+DEBUG (8): source_id=1, seq_num=1, forwarder_id=8, bcast_time = 200, counter=1.
+DEBUG (8): START Re-BROADCASTING ... 0:0:0.995197198.
+
+DEBUG (6): source_id=1, seq_num=1, forwarder_id=6, bcast_time = 200, counter=1.
+DEBUG (6): START Re-BROADCASTING ... 0:0:0.997130323.
+
+DEBUG (9): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 8, bcast_time = 200, counter = 1 @ 0:0:1.002460339.
+DEBUG (9): NEW MESSAGE 
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 8, bcast_time = 200, counter = 1 @ 0:0:1.002460339.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 8, bcast_time = 200, counter = 1 @ 0:0:1.002460339.
+DEBUG (9): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 6, bcast_time = 200, counter = 1 @ 0:0:1.006911149.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 6, bcast_time = 200, counter = 1 @ 0:0:1.006911149.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 6, bcast_time = 200, counter = 1 @ 0:0:1.006911149.
+DEBUG (9): source_id=1, seq_num=1, forwarder_id=9, bcast_time = 100, counter=1.
+DEBUG (9): START Re-BROADCASTING ... 0:0:1.099699385.
+
+DEBUG (8): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 9, bcast_time = 100, counter = 1 @ 0:0:1.107710203.
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 9, bcast_time = 100, counter = 1 @ 0:0:1.107710203.
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_1
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_2
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 5, 100, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_3
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[2, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_4
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[1, 100, 7, 100, 5, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_5
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 2, 200, 8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_6
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[5, 100, 3, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_7
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[4, 200, 8, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_8
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[7, 100, 5, 100, 9, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+
+Allocated variable RadioFloodingC$NeighborsArray
+
+The Routing Table of node_9
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[8, 200, 6, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+

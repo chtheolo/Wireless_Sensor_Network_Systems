@@ -1,231 +1,247 @@
 #include "Timer.h"
 
 #include "RadioFlooding.h"
+#include "SerialPacket.h"
 
-#define SIZE 50
-#define SIZER 10
+#define NUMBER_OF_MSGS 30
+#define SIZE 10
+#define NEIGHBOR_SIZE 10
+#define mpos 5
 
 module RadioFloodingC @safe()
 {
-  uses interface Boot;
-  uses interface Leds;
-  uses interface Timer<TMilli> as Timer0;
-  uses interface Timer<TMilli> as Timer1;
+	uses interface Boot;
+	uses interface Leds;
+	uses interface Timer<TMilli> as Timer0;
+	uses interface Timer<TMilli> as Timer1;
+	//user interface 
  
 	uses interface Packet;
 	uses interface AMPacket;
 	uses interface AMSend;
 	uses interface Receive;
-	uses interface SplitControl as AMControl;
-	
-//	uses interface Queue<message_t *> as BroadcastQueue;
-//	uses interface Pool<message_t> as BroadcastPool;
-  //uses interface Read<uint16_t>;
+	uses interface SplitControl as RadioAMControl;
+
+	uses interface Packet as SerialPacket;
+	uses interface AMPacket as SerialAMPacket;
+	uses interface AMSend as SerialAMSend;
+	uses interface Receive as SerialReceive;
+	uses interface SplitControl as SerialAMControl;
+
 }
 implementation
 {
 	flooding_msg_t* r_pkt;
 	flooding_msg_t* bcast_pkt;
-	uint16_t counter = 0;
-	uint16_t seq_num = 0;
-	uint16_t neighbor_id;
-	uint16_t i=0;
-	uint16_t last_pos=0;
-	uint16_t k;
-	uint16_t RoutingArray[SIZER];
-	
-	message_t PacketBuffer[SIZE];
-	uint8_t send,save;
-	
-//	uint8_t transmissions;
-//	uint8_t receivedMsgs;
-	
+	serial_msg_t* s_pkt;
 	message_t pkt;
-	bool busy = FALSE;
 	
-	task void init_RoutingTable() {
-		uint16_t start;
-		for (start=0; start < 5 && i<SIZER; start++) {
-			RoutingArray[i] = 0;
+	/*msg payload*/ 
+	//uint16_t source_id = 0;
+	uint16_t seq_num = 0;
+	//uint16_t forwarder_id;
+	uint16_t bcast_time;
+	uint16_t counter = 0;
+	
+	/*helping variables*/
+	uint16_t i;
+	uint16_t last_pos=0;
+	uint16_t start;
+	uint16_t neighbor_id;
+	uint16_t standard_bcast;
+	uint8_t k;
+	uint8_t send,save;
+	bool busy = FALSE;
+
+	
+	/* Arrays */
+	uint16_t NeighborsArray[NEIGHBOR_SIZE][2];
+	uint8_t FireBroadcasting[mpos];	
+	bool StateMessages[NEIGHBOR_SIZE];
+
+	message_t PacketBuffer[SIZE];
+
+	
+	/* Tasks START HERE ! */
+	task void init_NeighborsTable() {
+		for (start=0; start < 5 && i<NEIGHBOR_SIZE; start++) {
+			for (k=0; k<2; k++) {
+				NeighborsArray[i][k] = 0;
+			}
 			i++;
 		}
-		if (i<SIZER) {
-			post init_RoutingTable();
+		if (i<NEIGHBOR_SIZE) {
+			post init_NeighborsTable();
 		}
 	}
 	
-	task void RoutingTable() {
-		//uint16_t k=0;
-		while (RoutingArray[k] != neighbor_id && RoutingArray[k] != 0 && k < SIZER) {
+	task void init_StateMessages() {
+		for (start=0; start < NEIGHBOR_SIZE; start++) {
+			StateMessages[start] = 0;
+		}
+	}
+	
+	task void NeighborsTable() {
+		k=0;
+		while (NeighborsArray[k][0] != neighbor_id && NeighborsArray[k][0] != 0 && k < NEIGHBOR_SIZE) {
 			k++;
 		}
-		if (RoutingArray[k] == neighbor_id) {
-			dbg("RoutingTableC", "Neihgbor already exists in RoutingTable\n");
+		if (NeighborsArray[k][0] == neighbor_id) {
+			NeighborsArray[k][1] = bcast_time;
+			dbg("RoutingTableC", "Neihgbor already exists in NeighborsTable\n");
 		}
-		else if (RoutingArray[k] == 0) {
-			RoutingArray[k] = neighbor_id;
+		else if (NeighborsArray[k][0] == 0) {
+			NeighborsArray[k][0] = neighbor_id;
+			NeighborsArray[k][1] = bcast_time;
+			neighbor_id = 0;
 		}
-		else {
-			dbg("RoutingTableC", "No more positions in RoutingTable\n");
-		}
-		/*if (k == last_pos){
-			RoutingArray[last_pos] = neighbor_id;
-			
-			last_pos++;
-		}
-		else if (k < last_pos) {
-			dbg("RoutingTableC", "Neihgbor already exists in RoutingTable\n");
-		}*/
-	}
-	
-	task void PrintRoutingTable() {
-		uint8_t j;
-	
-		for(j=0; j<last_pos; j++) {
-			dbg("RoutingTableC", "Node[%hu] : Route[%hu] = Node[%hu] .\n", TOS_NODE_ID, j, RoutingArray[j]);
+		else if(k > NEIGHBOR_SIZE) {
+			dbg("RoutingTableC", "No more positions in NeighborsTable\n");
 		}
 	}
-	
-//	task void ReceiveLeds() {
-//		call Leds.led2Toggle();
-//	}
-//	
-//	task void BroadcastLeds() {
-//		call Leds.led0Toggle();
-//	}
-//	
-//	task void ReBroadcast() {
-//		call Leds.led1Toggle();
-//	}
-		
+
 	/*								***								*/
 	
 	event void Boot.booted() {
-		
-		post init_RoutingTable();
-		call AMControl.start();
+		i=0;
+		send=0;
+		save=0;
+		standard_bcast = 100;
+
+		call RadioAMControl.start();
+		call SerialAMControl.start();
+
+		post init_NeighborsTable();
+		post init_StateMessages();
 		
 		//call Leds.led0On();
 		
-		send=0;
-		save=0;
-		
 		if (TOS_NODE_ID == 1) {
-			call Timer0.startPeriodic(TOS_NODE_ID *100 + 500);
+			call Timer0.startPeriodic(/*TOS_NODE_ID *100 + 500*/standard_bcast);
 		}
-//		transmissions = 0;
-//		receivedMsgs = 0;
 	}
 	
-	event void AMControl.startDone(error_t err) {
+/*				RADIO CONTROL 				*/	
+	event void RadioAMControl.startDone(error_t err) {
 		if (err == SUCCESS) {
-			dbg("RadioC", "Radio Control => OK %s.\n", sim_time_string());
+			dbg("RadioC", "RADIO_CONTROL = OK %s.\n", sim_time_string());
 		}
 		else {
-			call AMControl.start();
+			call RadioAMControl.start();
 		}
 	}
 	
-	event void AMControl.stopDone(error_t err) { }
+	event void RadioAMControl.stopDone(error_t err) { }
+
+/*				SERIAL CONTROL 				*/
+	event void SerialAMControl.startDone(error_t err) {
+		if (err == SUCCESS) {
+			dbg("RadioC", "RADIO_CONTROL = OK %s.\n", sim_time_string());
+		}
+		else {
+			call SerialAMControl.start();
+		}
+	}
+	
+	event void SerialAMControl.stopDone(error_t err) { }
+
+/*		***		*** 	***		***			*/
+
 	
 	event void Timer0.fired() {
+		StateMessages[TOS_NODE_ID]++;
 		counter++;
-		seq_num++;
-		dbg("BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu %s.\n", counter, seq_num, sim_time_string());
+		
+		if(StateMessages[TOS_NODE_ID] == 5) {
+			call Timer0.stop();
+		}
+
+		dbg("BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu @ %s.\n\n", counter, StateMessages[TOS_NODE_ID], sim_time_string());
 		
 		if (save < SIZE) {
-		
-			//dbg("BroadcastingC", "Save = %hu and busy = %hu %s \n", save, busy, sim_time_string());
 			bcast_pkt = (flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (flooding_msg_t) ));
 			if (bcast_pkt == NULL) {
 				return;
-			}
-			
+			}	
 		}
 		else {
-		
 			save=0;
 			bcast_pkt = (flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (flooding_msg_t) ));
 			if (bcast_pkt == NULL) {
 				return;
 			}
-			
 		}
-		
 		save++;
-		
-		bcast_pkt->sender_id = TOS_NODE_ID;
+
+		bcast_pkt->source_id = TOS_NODE_ID;
+		bcast_pkt->seq_num = StateMessages[TOS_NODE_ID];
+		bcast_pkt->forwarder_id = TOS_NODE_ID;
+		bcast_pkt->bcast_time = /*TOS_NODE_ID*100 +500*/standard_bcast;
 		bcast_pkt->counter = counter;
-		bcast_pkt->seq_num = seq_num;
 		
 		if (!busy) {
-			
 			memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
-			dbg("BroadcastingC", "sender_id=%hu, counter=%hu ,seq_num=%hu .\n", bcast_pkt->sender_id, bcast_pkt->counter, bcast_pkt->seq_num);
+
+			dbg("BroadcastingC", "source_id=%hu, seq_num=%hu, forwarder_id=%hu, bcast_time = %hu, counter=%hu.\n", bcast_pkt->source_id, bcast_pkt->seq_num, bcast_pkt->forwarder_id, bcast_pkt->bcast_time, bcast_pkt->counter);
 			
-			if (call AMSend.send(AM_BROADCAST_ADDR, &pkt /*&PacketBuffer[send]*/, sizeof (flooding_msg_t)) == SUCCESS){
+			if (call AMSend.send(AM_BROADCAST_ADDR, &pkt , sizeof (flooding_msg_t)) == SUCCESS){
 				dbg("BroadcastingC", "START BROADCASTING ... %s.\n\n", sim_time_string());
 				//post BroadcastLeds();
-				call Leds.led0Toggle();
+				call Leds.led1Toggle();
 				busy = TRUE;
-//				transmissions++;
-			
 			}
 		}
 	}
 	
 	event void Timer1.fired() {
-		call Leds.led1Toggle();
-		//dbg("Re-BroadcastingC", "Timer for Re-BROADCASTING %s.\n", sim_time_string());
 		if (!busy) {
 			bcast_pkt = (flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[send], sizeof (flooding_msg_t) ));
 			if (bcast_pkt == NULL) {
 				return;
 			}
-			
 			memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
-			dbg("Re-BroadcastingC", "sender_id=%hu, counter=%hu ,seq_num=%hu .\n", bcast_pkt->sender_id, bcast_pkt->counter, bcast_pkt->seq_num);
+
+			dbg("Re-BroadcastingC", "source_id=%hu, seq_num=%hu, forwarder_id=%hu, bcast_time = %hu, counter=%hu.\n", bcast_pkt->source_id, bcast_pkt->seq_num, bcast_pkt->forwarder_id, bcast_pkt->bcast_time, bcast_pkt->counter);
 			
-			if (call AMSend.send(AM_BROADCAST_ADDR, &pkt/*PacketBuffer[send]*/, sizeof (flooding_msg_t)) == SUCCESS){
-				dbg("BroadcastingC", "Start Re-BROADCASTING ... %s.\n\n", sim_time_string());
-				//post ReBroadcast();
-				//call Leds.led2Toggle();
+			if (call AMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (flooding_msg_t)) == SUCCESS){
+
+				dbg("BroadcastingC", "START Re-BROADCASTING ... %s.\n\n", sim_time_string());
+
+				call Leds.led2Toggle();
 				busy = TRUE;
-//				transmissions++;
-				
 			}
 		}
 	}
 	
 	event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
-		//dbg("ReceiveC", "RECEIVE RADIO_MSG %s.\n", sim_time_string());
-		
 		if (len == sizeof (flooding_msg_t)) {
-//			receivedMsgs++;
-			r_pkt = (flooding_msg_t*) payload;			
-			dbg("ReceiveC", "RECEIVE a msg from node[%hu] with seq_num = %hu %s.\n", r_pkt->sender_id, r_pkt->seq_num ,sim_time_string());
-		
-			neighbor_id = r_pkt->sender_id;
-			//post RoutingTable();
-			
+			r_pkt = (flooding_msg_t*) payload;
+
+			dbg("ReceiveC", "RECEIVE MESSAGE : source_id = %hu , seq_num = %hu, forwarder_id = %hu, bcast_time = %hu, counter = %hu @ %s.\n", r_pkt->source_id, r_pkt->seq_num, r_pkt->forwarder_id, r_pkt->bcast_time, r_pkt->counter, sim_time_string());
+
 			k=0;
-			while (RoutingArray[k] != neighbor_id && RoutingArray[k] != 0 && k < SIZER) {
+			while (NeighborsArray[k][0] != r_pkt->forwarder_id && NeighborsArray[k][0] != 0 && k < NEIGHBOR_SIZE) {
 				k++;
 			}
-			if (RoutingArray[k] == neighbor_id) {
-				dbg("RoutingTableC", "Neihgbor already exists in RoutingTable\n");
+			if (NeighborsArray[k][0] == r_pkt->forwarder_id) {
+				NeighborsArray[k][1] = r_pkt->bcast_time;
+				dbg("RoutingTableC", "Neihgbor already exists in NeighborsTable\n");
 			}
-			else if (RoutingArray[k] == 0) {
-				RoutingArray[k] = neighbor_id;
+			else if (NeighborsArray[k][0] == 0) {
+				NeighborsArray[k][0] = r_pkt->forwarder_id;
+				NeighborsArray[k][1] = r_pkt->bcast_time;
+				neighbor_id = 0;
 			}
-			else {
-				dbg("RoutingTableC", "No more positions in RoutingTable\n");
+			else if(k > NEIGHBOR_SIZE) {
+				dbg("RoutingTableC", "No more positions in NeighborsTable\n");
 			}
-			
-			//post PrintRoutingTable();
-			
-			if (r_pkt->seq_num > seq_num) {
-				dbg("ReceiveC", "This is a NEW MESSAGE with seq_num = %hu .\n\n", r_pkt->seq_num);
+
+
+			if (r_pkt->seq_num > StateMessages[r_pkt->source_id]) {
+				StateMessages[r_pkt->source_id] = r_pkt->seq_num;
+
+				dbg("ReceiveC", "NEW MESSAGE \n");
+
 				if (save < SIZE) {
 					bcast_pkt = (flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (flooding_msg_t) ));
 					save++;
@@ -235,35 +251,48 @@ implementation
 					bcast_pkt = (flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (flooding_msg_t) ));
 					save++;					
 				}
-				
-				bcast_pkt->sender_id = TOS_NODE_ID;
-				bcast_pkt->counter = r_pkt->counter;
+
+				if (standard_bcast == r_pkt->bcast_time ) {
+					standard_bcast = standard_bcast + 100; 
+				}
+				bcast_pkt->source_id = r_pkt->source_id;
 				bcast_pkt->seq_num = r_pkt->seq_num;
+				bcast_pkt->forwarder_id = TOS_NODE_ID;
+				bcast_pkt->bcast_time = standard_bcast;
+				bcast_pkt->counter = r_pkt->counter;
 				
-				//keep the new seq_num
-				seq_num = r_pkt->seq_num;
-	
 				//post ReceiveLeds();
 				
-				call Timer1.startOneShot(TOS_NODE_ID *100);
+				call Timer1.startOneShot(standard_bcast);
+			}
+		}
+		return msg;
+	}
+
+/*				***		RECEIVE SERIAL MESSAGE 		***				*/
+
+	event message_t* Receive.receive(message_t* msg, void* payload, uint8_t len) {
+		if (len == sizeof (serial_msg_t)) {
+			s_pkt = (serial_msg_t*) payload;
+			if (s_pkt->data != period) {
+				call Timer.startPeriodic(s_pkt->data); 
+				dbg("BlinkC", "Led1 toggle %s.\n", sim_time_string());
+				//call Leds.led2Toggle();
 			}
 		}
 		return msg;
 	}
 	
 	event void AMSend.sendDone(message_t* msg, error_t err) {
-		if (&pkt/*PacketBuffer[send]*/ == msg) {
+		if (&pkt == msg) {
 			busy = FALSE;
 			if (send < SIZE) {
-					send++;
-				}
-				else {
-					send = 0;
-				}
-		}	
+				send++;
+			}
+			else {
+				send = 0;
+			}
+		}		
 	}
 	
 }
-
-
-

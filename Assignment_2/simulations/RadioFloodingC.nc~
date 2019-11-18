@@ -1,10 +1,12 @@
 #include "Timer.h"
+#include "stdlib.h"
 
 #include "RadioFlooding.h"
 
 #define SIZE 30
 #define SIZER 10
 #define mpos 5
+#define LATSIZE 40
 
 module RadioFloodingC @safe()
 {
@@ -18,6 +20,7 @@ module RadioFloodingC @safe()
 	uses interface AMSend;
 	uses interface Receive;
 	uses interface SplitControl as AMControl;
+	
 	
 
 }
@@ -40,9 +43,12 @@ implementation
 	uint8_t receivedMsgs;
 	uint8_t newMessageReceived;
 	
-	uint8_t StartTime;
-	uint8_t EndTime;
-	uint8_t diffTime;
+	uint16_t latencyArr[LATSIZE];
+	uint8_t latencyArrtime;//[LATSIZE];
+	uint8_t ptype;
+	unsigned char *str_time, *startTime;
+	
+
 	
 	uint16_t start;
 	
@@ -69,29 +75,6 @@ implementation
 		}
 	}
 	
-	/*task void RoutingTable() {
-		//uint16_t k=0;
-		while (RoutingArray[k] != neighbor_id && RoutingArray[k] != 0 && k < SIZER) {
-			k++;
-		}
-		if (RoutingArray[k] == neighbor_id) {
-			dbg("RoutingTableC", "Neihgbor already exists in RoutingTable\n");
-		}
-		else if (RoutingArray[k] == 0) {
-			RoutingArray[k] = neighbor_id;
-		}
-		else {
-			dbg("RoutingTableC", "No more positions in RoutingTable\n");
-		}
-		/*if (k == last_pos){
-			RoutingArray[last_pos] = neighbor_id;
-			
-			last_pos++;
-		}
-		else if (k < last_pos) {
-			dbg("RoutingTableC", "Neihgbor already exists in RoutingTable\n");
-		}
-	}*/
 	
 	task void PrintRoutingTable() {
 		uint8_t j;
@@ -101,18 +84,21 @@ implementation
 		}
 	}
 	
-//	task void ReceiveLeds() {
-//		call Leds.led2Toggle();
+//	task void maketimer() {
+//		uint8_t u, v=0, n=0;
+//		for (u=0; u<3; u++) {
+//			if (*(str_time+v) == ':' && *(str_time + v) == '.') {
+//				v++;
+//			}
+//			else {
+//				*(startTime+n) = *(str_time+v);
+//				n++;
+//			}
+//			v++;
+//		}
+//		dbg("TimersC", "TIME = %s", startTime);
 //	}
-//	
-//	task void BroadcastLeds() {
-//		call Leds.led0Toggle();
-//	}
-//	
-//	task void ReBroadcast() {
-//		call Leds.led1Toggle();
-//	}
-		
+	
 	/*								***								*/
 	
 	event void Boot.booted() {
@@ -125,6 +111,7 @@ implementation
 		
 		send=0;
 		save=0;
+		ptype=0;
 		
 		if (TOS_NODE_ID == 1) {
 			call Timer0.startPeriodic(TOS_NODE_ID *100 + 500);
@@ -143,12 +130,14 @@ implementation
 		}
 	}
 	
-	event void AMControl.stopDone(error_t err) { }
+	event void AMControl.stopDone(error_t err) {
+
+	}
 	
 	event void Timer0.fired() {
 		counter++;
 		seq_num++;
-		dbg("BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu %s.\n", counter, seq_num, sim_time_string());
+		dbg("BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu @ %s.\n", counter, seq_num, sim_time_string());
 		
 		if (save < SIZE) {
 		
@@ -187,10 +176,15 @@ implementation
 				call Leds.led0Toggle();
 				busy = TRUE;
 				transmissions++;
-				if (seq_num == 1 ) {
-					StartTime = sim_time_string();
-				}
-			
+				
+
+//					str_time = sim_time_string();
+//					post maketimer();
+					
+					
+//					ptype++;
+				//}
+				
 			}
 		}
 	}
@@ -224,9 +218,8 @@ implementation
 		if (len == sizeof (flooding_msg_t)) {
 			receivedMsgs++;
 			r_pkt = (flooding_msg_t*) payload;
-
 						
-			dbg("ReceiveC", "RECEIVE a msg from node[%hu] with seq_num = %hu %s.\n", r_pkt->sender_id, r_pkt->seq_num ,sim_time_string());
+			//dbg("ReceiveC", "RECEIVE a msg from node[%hu] with seq_num = %hu @ %s.\n", r_pkt->sender_id, r_pkt->seq_num ,sim_time_string());
 		
 			
 			//post RoutingTable();
@@ -235,26 +228,24 @@ implementation
 				k++;
 			}
 			if (RoutingArray[k] == r_pkt->sender_id) {
-				dbg("RoutingTableC", "Neihgbor already exists in RoutingTable\n");
+				//dbg("RoutingTableC", "Neihgbor already exists in RoutingTable\n");
 			}
 			else if (RoutingArray[k] == 0) {
 				RoutingArray[k] = r_pkt->sender_id;
 			}
 			else {
-				dbg("RoutingTableC", "No more positions in RoutingTable\n");
+				//dbg("RoutingTableC", "No more positions in RoutingTable\n");
 			}
 			
 			//post PrintRoutingTable();
 			
 			if (r_pkt->seq_num > seq_num) {
 			
-				if (r_pkt->seq_num == 1 && r_pkt->hops == 8) {
-					EndTime = sim_time_string();
-					diffTime = EndTime - StartTime;
-					dbg("TimeC", "\n\nThe diffTime is : %hu \n\n", diffTime);
-				}
 				newMessageReceived++;
-				dbg("ReceiveC", "This is a NEW MESSAGE with seq_num = %hu .\n\n", r_pkt->seq_num);
+				
+				
+				
+				dbg("ReceiveC", "This is a NEW MESSAGE with seq_num=%hu @ %s.\n\n", r_pkt->seq_num, sim_time_string());
 				
 				if (save < SIZE) {
 					bcast_pkt = (flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (flooding_msg_t) ));
@@ -271,6 +262,12 @@ implementation
 				bcast_pkt->counter = r_pkt->counter;
 				bcast_pkt->seq_num = r_pkt->seq_num;
 				bcast_pkt->hops = r_pkt->hops +1;
+				
+//				if (ptype < LATSIZE) {
+//					latencyArr[ptype] = r_pkt->seq_num;
+//					dbg("TimersC", "")sim_time_string();
+//					ptype++;
+//				}
 				
 				//keep the new seq_num
 				seq_num = r_pkt->seq_num;

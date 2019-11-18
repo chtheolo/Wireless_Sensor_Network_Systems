@@ -7,7 +7,7 @@ import sys
 n = NescApp()
 t = Tossim(n.variables.variables())
 r = t.radio()
-f = open("chain.txt", "r")
+f = open("grid.txt", "r")
 
 for line in f:
   s = line.split()
@@ -21,7 +21,7 @@ last_node = int(s[1]) +1
 t.addChannel("BroadcastingC", sys.stdout)
 t.addChannel("Re-BroadcastingC", sys.stdout)
 t.addChannel("RadioC", sys.stdout)
-t.addChannel("TimeC", sys.stdout)
+t.addChannel("TimersC", sys.stdout)
 t.addChannel("ReceiveC", sys.stdout)
 t.addChannel("RoutingTableC", sys.stdout)
 
@@ -41,7 +41,7 @@ for i in range(1, last_node): #6,8,10
 	t.getNode(i).bootAtTime(i* 100001)
 
 
-for i in range(9000): 
+for i in range(1000): 
   t.runNextEvent()
   
 for i in range(1, last_node): #6,8,10
@@ -62,15 +62,22 @@ for i in range(1, last_node): #6,8,10
 	newMessageReceived = v.getData()
 	print "The node[" + str(i) + "]" + " received  " + " " + str(newMessageReceived) + " new packets.\n"
 	
-	v=m.getVariable("RadioFloodingC.diffTime")
-	diffTime = v.getData()
-	print "The node[" + str(i) + "]" + " latency of message[1] = " + " " + str(diffTime) + " s .\n"
+#	v=m.getVariable("RadioFloodingC.latencyArr")
+#	v=m.getVariable("RadioFloodingC.latencyArrtime")
+#	latencyArr = v.getData()
+#	latencyArrtime = v.getData()
+#	print "\nThe time Table of node_" + str(i) + " for packets"
+#	for j in range(40):
+#	print "paket[" + str(latencyArrtime) + "]\n"
+		
+#	print "\n"
 	
-	v=m.getVariable("RadioFloodingC.RoutingArray")
-	RoutingArray = v.getData()
-	print "\nThe Routing Table of node_" + str(i)
-	for j in range(10):
-		print "node[" + str(RoutingArray[j]) + "]"
+	
+#	v=m.getVariable("RadioFloodingC.RoutingArray")
+#	RoutingArray = v.getData()
+#	print "\nThe Routing Table of node_" + str(i)
+#	for j in range(10):
+#		print "node[" + str(RoutingArray[j]) + "]"
 	
 	print "\n"
   

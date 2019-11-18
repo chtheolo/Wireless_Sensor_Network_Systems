@@ -1297,7 +1297,7 @@ typedef struct sim_log_channel {
 } sim_log_channel_t;
 
 enum __nesc_unnamed4272 {
-  SIM_LOG_OUTPUT_COUNT = 202U
+  SIM_LOG_OUTPUT_COUNT = 198U
 };
 
 sim_log_output_t outputs[SIM_LOG_OUTPUT_COUNT];
@@ -4096,7 +4096,7 @@ error_t error);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$sendDone(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40be80a0, 
+am_id_t arg_0x40bed0a0, 
 # 103 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 message_t * msg, 
 
@@ -4109,7 +4109,7 @@ error_t error);
 # 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$send(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40bea6a8, 
+uint8_t arg_0x40bee6a8, 
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4123,7 +4123,7 @@ uint8_t len);
 #line 100
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40bea6a8, 
+uint8_t arg_0x40bee6a8, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -5235,12 +5235,12 @@ static error_t RadioFloodingC$init_FireBroadcasting$postTask(void );
 static void RadioFloodingC$Leds$led0Toggle(void );
 #line 83
 static void RadioFloodingC$Leds$led1Toggle(void );
-# 55 "RadioFloodingC.nc"
+# 61 "RadioFloodingC.nc"
 enum RadioFloodingC$__nesc_unnamed4338 {
-#line 55
+#line 61
   RadioFloodingC$init_RoutingTable = 5U
 };
-#line 55
+#line 61
 typedef int RadioFloodingC$__nesc_sillytask_init_RoutingTable[RadioFloodingC$init_RoutingTable];
 
 
@@ -5253,19 +5253,24 @@ typedef int RadioFloodingC$__nesc_sillytask_init_RoutingTable[RadioFloodingC$ini
 
 
 enum RadioFloodingC$__nesc_unnamed4339 {
-#line 66
+#line 72
   RadioFloodingC$init_FireBroadcasting = 6U
 };
-#line 66
+#line 72
 typedef int RadioFloodingC$__nesc_sillytask_init_FireBroadcasting[RadioFloodingC$init_FireBroadcasting];
-#line 96
+
+
+
+
+
+
 enum RadioFloodingC$__nesc_unnamed4340 {
-#line 96
+#line 79
   RadioFloodingC$PrintRoutingTable = 7U
 };
-#line 96
+#line 79
 typedef int RadioFloodingC$__nesc_sillytask_PrintRoutingTable[RadioFloodingC$PrintRoutingTable];
-#line 26
+#line 29
 flooding_msg_t *RadioFloodingC$r_pkt[1000];
 flooding_msg_t *RadioFloodingC$bcast_pkt[1000];
 uint16_t RadioFloodingC$counter[1000];
@@ -5278,16 +5283,19 @@ uint16_t RadioFloodingC$RoutingArray[1000][10];
 
 message_t RadioFloodingC$PacketBuffer[1000][30];
 uint8_t RadioFloodingC$send[1000];
-#line 37
+#line 40
 uint8_t RadioFloodingC$save[1000];
 
 uint8_t RadioFloodingC$transmissions[1000];
 uint8_t RadioFloodingC$receivedMsgs[1000];
 uint8_t RadioFloodingC$newMessageReceived[1000];
 
-uint8_t RadioFloodingC$StartTime[1000];
-uint8_t RadioFloodingC$EndTime[1000];
-uint8_t RadioFloodingC$diffTime[1000];
+
+
+uint8_t RadioFloodingC$ptype[1000];
+
+
+uint8_t RadioFloodingC$maxhops[1000];
 
 uint16_t RadioFloodingC$start[1000];
 
@@ -5309,11 +5317,16 @@ static inline void RadioFloodingC$init_RoutingTable$runTask(void );
 
 
 static inline void RadioFloodingC$init_FireBroadcasting$runTask(void );
-#line 96
+
+
+
+
+
+
 static inline void RadioFloodingC$PrintRoutingTable$runTask(void );
-#line 118
+#line 104
 static inline void RadioFloodingC$Boot$booted(void );
-#line 137
+#line 125
 static inline void RadioFloodingC$AMControl$startDone(error_t err);
 
 
@@ -5325,12 +5338,14 @@ static inline void RadioFloodingC$AMControl$startDone(error_t err);
 
 static inline void RadioFloodingC$AMControl$stopDone(error_t err);
 
+
+
 static inline void RadioFloodingC$Timer0$fired(void );
-#line 198
+#line 193
 static inline void RadioFloodingC$Timer1$fired(void );
-#line 221
+#line 216
 static inline message_t *RadioFloodingC$Receive$receive(message_t *msg, void *payload, uint8_t len);
-#line 287
+#line 285
 static void RadioFloodingC$AMSend$sendDone(message_t *msg, error_t err);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*RadioFloodingAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$sendDone(
@@ -5388,7 +5403,7 @@ static inline void /*RadioFloodingAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueE
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40be80a0, 
+am_id_t arg_0x40bed0a0, 
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -5405,7 +5420,7 @@ uint8_t len);
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40bea6a8, 
+uint8_t arg_0x40bee6a8, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -5954,9 +5969,9 @@ inline static void * RadioFloodingC$Packet$getPayload(message_t * msg, uint8_t l
 #line 126
 }
 #line 126
-# 221 "RadioFloodingC.nc"
+# 216 "RadioFloodingC.nc"
 static inline message_t *RadioFloodingC$Receive$receive(message_t *msg, void *payload, uint8_t len)
-#line 221
+#line 216
 {
 
 
@@ -5965,7 +5980,6 @@ static inline message_t *RadioFloodingC$Receive$receive(message_t *msg, void *pa
       RadioFloodingC$r_pkt[sim_node()] = (flooding_msg_t *)payload;
 
 
-      sim_log_debug(192U, "ReceiveC", "RECEIVE a msg from node[%hu] with seq_num = %hu %s.\n", __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->sender_id.nxdata), __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata), sim_time_string());
 
 
 
@@ -5974,28 +5988,24 @@ static inline message_t *RadioFloodingC$Receive$receive(message_t *msg, void *pa
           RadioFloodingC$k[sim_node()]++;
         }
       if (RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] == __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->sender_id.nxdata)) {
-          sim_log_debug(193U, "RoutingTableC", "Neihgbor already exists in RoutingTable\n");
         }
       else {
-#line 240
         if (RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] == 0) {
             RadioFloodingC$RoutingArray[sim_node()][RadioFloodingC$k[sim_node()]] = __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->sender_id.nxdata);
           }
         else {
-            sim_log_debug(194U, "RoutingTableC", "No more positions in RoutingTable\n");
           }
         }
 
 
+
       if (__nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata) > RadioFloodingC$seq_num[sim_node()]) {
 
-          if (__nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->hops.nxdata) == 8) {
-              RadioFloodingC$EndTime[sim_node()] = sim_time_string();
-              RadioFloodingC$diffTime[sim_node()] = RadioFloodingC$EndTime[sim_node()] - RadioFloodingC$StartTime[sim_node()];
-              sim_log_debug(195U, "TimeC", "\n\nThe diffTime is : %hu \n\n", RadioFloodingC$diffTime[sim_node()]);
-            }
           RadioFloodingC$newMessageReceived[sim_node()]++;
-          sim_log_debug(196U, "ReceiveC", "This is a NEW MESSAGE with seq_num = %hu .\n\n", __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata));
+
+
+
+          sim_log_debug(192U, "ReceiveC", "This is a NEW MESSAGE with seq_num=%hu @ %s.\n\n", __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata), sim_time_string());
 
           if (RadioFloodingC$save[sim_node()] < 30) {
               RadioFloodingC$bcast_pkt[sim_node()] = (flooding_msg_t *)RadioFloodingC$Packet$getPayload(&RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$save[sim_node()]], sizeof(flooding_msg_t ));
@@ -6012,6 +6022,12 @@ static inline message_t *RadioFloodingC$Receive$receive(message_t *msg, void *pa
           __nesc_hton_uint16(RadioFloodingC$bcast_pkt[sim_node()]->counter.nxdata, __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->counter.nxdata));
           __nesc_hton_uint16(RadioFloodingC$bcast_pkt[sim_node()]->seq_num.nxdata, __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata));
           __nesc_hton_uint16(RadioFloodingC$bcast_pkt[sim_node()]->hops.nxdata, __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->hops.nxdata) + 1);
+
+
+
+
+
+
 
 
           RadioFloodingC$seq_num[sim_node()] = __nesc_ntoh_uint16(RadioFloodingC$r_pkt[sim_node()]->seq_num.nxdata);
@@ -6294,9 +6310,9 @@ inline static error_t RadioFloodingC$AMControl$start(void ){
 #line 104
 }
 #line 104
-# 137 "RadioFloodingC.nc"
+# 125 "RadioFloodingC.nc"
 static inline void RadioFloodingC$AMControl$startDone(error_t err)
-#line 137
+#line 125
 {
   if (err == SUCCESS) {
       sim_log_debug(186U, "RadioC", "Radio Control => OK %s.\n", sim_time_string());
@@ -6321,9 +6337,9 @@ static inline void TossimPacketModelC$startDoneTask$runTask(void )
   TossimPacketModelC$Control$startDone(SUCCESS);
 }
 
-# 146 "RadioFloodingC.nc"
+# 134 "RadioFloodingC.nc"
 static inline void RadioFloodingC$AMControl$stopDone(error_t err)
-#line 146
+#line 134
 {
 }
 
@@ -6593,9 +6609,9 @@ inline static error_t RadioFloodingC$init_RoutingTable$postTask(void ){
 #line 67
 }
 #line 67
-# 55 "RadioFloodingC.nc"
+# 61 "RadioFloodingC.nc"
 static inline void RadioFloodingC$init_RoutingTable$runTask(void )
-#line 55
+#line 61
 {
 
   for (RadioFloodingC$start[sim_node()] = 0; RadioFloodingC$start[sim_node()] < 5 && RadioFloodingC$i[sim_node()] < 10; RadioFloodingC$start[sim_node()]++) {
@@ -6608,16 +6624,16 @@ static inline void RadioFloodingC$init_RoutingTable$runTask(void )
 }
 
 static inline void RadioFloodingC$init_FireBroadcasting$runTask(void )
-#line 66
+#line 72
 {
   for (RadioFloodingC$start[sim_node()] = 0; RadioFloodingC$start[sim_node()] < 5; RadioFloodingC$start[sim_node()]++) {
       RadioFloodingC$FireBroadcasting[sim_node()][RadioFloodingC$start[sim_node()]] = RadioFloodingC$start[sim_node()] * 200;
     }
 }
 
-#line 96
+
 static inline void RadioFloodingC$PrintRoutingTable$runTask(void )
-#line 96
+#line 79
 {
   uint8_t j;
 
@@ -6654,9 +6670,9 @@ static inline void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone
 }
 
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
-inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t arg_0x40bea6a8, message_t * msg, error_t error){
+inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t arg_0x40bee6a8, message_t * msg, error_t error){
 #line 100
-  switch (arg_0x40bea6a8) {
+  switch (arg_0x40bee6a8) {
 #line 100
     case 0U:
 #line 100
@@ -6666,7 +6682,7 @@ inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t
 #line 100
     default:
 #line 100
-      /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(arg_0x40bea6a8, msg, error);
+      /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(arg_0x40bee6a8, msg, error);
 #line 100
       break;
 #line 100
@@ -6800,13 +6816,13 @@ inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$errorTask$postTask
 }
 #line 67
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(am_id_t arg_0x40be80a0, am_addr_t addr, message_t * msg, uint8_t len){
+inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(am_id_t arg_0x40bed0a0, am_addr_t addr, message_t * msg, uint8_t len){
 #line 80
   unsigned char __nesc_result;
 #line 80
 
 #line 80
-  __nesc_result = TossimActiveMessageC$AMSend$send(arg_0x40be80a0, addr, msg, len);
+  __nesc_result = TossimActiveMessageC$AMSend$send(arg_0x40bed0a0, addr, msg, len);
 #line 80
 
 #line 80
@@ -7681,13 +7697,13 @@ inline static error_t RadioFloodingC$AMSend$send(am_addr_t addr, message_t * msg
 #line 80
 }
 #line 80
-# 148 "RadioFloodingC.nc"
+# 138 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Timer0$fired(void )
-#line 148
+#line 138
 {
   RadioFloodingC$counter[sim_node()]++;
   RadioFloodingC$seq_num[sim_node()]++;
-  sim_log_debug(187U, "BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu %s.\n", RadioFloodingC$counter[sim_node()], RadioFloodingC$seq_num[sim_node()], sim_time_string());
+  sim_log_debug(187U, "BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu @ %s.\n", RadioFloodingC$counter[sim_node()], RadioFloodingC$seq_num[sim_node()], sim_time_string());
 
   if (RadioFloodingC$save[sim_node()] < 30) {
 
@@ -7726,9 +7742,6 @@ static inline void RadioFloodingC$Timer0$fired(void )
           RadioFloodingC$Leds$led0Toggle();
           RadioFloodingC$busy[sim_node()] = TRUE;
           RadioFloodingC$transmissions[sim_node()]++;
-          if (RadioFloodingC$seq_num[sim_node()] == 1) {
-              RadioFloodingC$StartTime[sim_node()] = sim_time_string();
-            }
         }
     }
 }
@@ -7792,9 +7805,9 @@ inline static void RadioFloodingC$Leds$led1Toggle(void ){
 #line 83
 }
 #line 83
-# 198 "RadioFloodingC.nc"
+# 193 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Timer1$fired(void )
-#line 198
+#line 193
 {
   RadioFloodingC$Leds$led1Toggle();
 
@@ -7908,7 +7921,7 @@ uint8_t len)
   if (/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg != (void *)0) {
       return EBUSY;
     }
-  sim_log_debug(197U, "AMQueue", "AMQueue: request to send from %hhu (%p): passed checks\n", clientId, msg);
+  sim_log_debug(193U, "AMQueue", "AMQueue: request to send from %hhu (%p): passed checks\n", clientId, msg);
 
   /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg = msg;
   /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Packet$setPayloadLength(msg, len);
@@ -7918,12 +7931,12 @@ uint8_t len)
       am_id_t amId = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMPacket$type(msg);
       am_addr_t dest = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMPacket$destination(msg);
 
-      sim_log_debug(198U, "AMQueue", "%s: request to send from %hhu (%p): queue empty\n", __FUNCTION__, clientId, msg);
+      sim_log_debug(194U, "AMQueue", "%s: request to send from %hhu (%p): queue empty\n", __FUNCTION__, clientId, msg);
       /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()] = clientId;
 
       err = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(amId, dest, msg, len);
       if (err != SUCCESS) {
-          sim_log_debug(199U, "AMQueue", "%s: underlying send failed.\n", __FUNCTION__);
+          sim_log_debug(195U, "AMQueue", "%s: underlying send failed.\n", __FUNCTION__);
           /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()] = 1;
           /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg = (void *)0;
         }
@@ -7931,7 +7944,7 @@ uint8_t len)
       return err;
     }
   else {
-      sim_log_debug(200U, "AMQueue", "AMQueue: request to send from %hhu (%p): queue not empty\n", clientId, msg);
+      sim_log_debug(196U, "AMQueue", "AMQueue: request to send from %hhu (%p): queue not empty\n", clientId, msg);
     }
   return SUCCESS;
 }
@@ -8693,9 +8706,9 @@ inline static error_t RadioFloodingC$init_FireBroadcasting$postTask(void ){
 #line 67
 }
 #line 67
-# 118 "RadioFloodingC.nc"
+# 104 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Boot$booted(void )
-#line 118
+#line 104
 {
 
   RadioFloodingC$init_RoutingTable$postTask();
@@ -8706,6 +8719,8 @@ static inline void RadioFloodingC$Boot$booted(void )
 
   RadioFloodingC$send[sim_node()] = 0;
   RadioFloodingC$save[sim_node()] = 0;
+  RadioFloodingC$ptype[sim_node()] = 0;
+  RadioFloodingC$maxhops[sim_node()] = 0;
 
   if (TOS_NODE_ID == 1) {
       RadioFloodingC$Timer0$startPeriodic(TOS_NODE_ID * 100 + 500);
@@ -10536,9 +10551,9 @@ static bool SimSchedulerBasicP$Scheduler$runNextTask(void )
   return TRUE;
 }
 
-# 287 "RadioFloodingC.nc"
+# 285 "RadioFloodingC.nc"
 static void RadioFloodingC$AMSend$sendDone(message_t *msg, error_t err)
-#line 287
+#line 285
 {
   if (&RadioFloodingC$pkt[sim_node()] == msg) {
       RadioFloodingC$busy[sim_node()] = FALSE;
@@ -10636,7 +10651,7 @@ static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$sendDone(am_id_t id, 
       /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$sendDone(/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()], msg, err);
     }
   else {
-      sim_log_debug(201U, "PointerBug", "%s received send done for %p, signaling for %p.\n", __FUNCTION__, msg, /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()]].msg);
+      sim_log_debug(197U, "PointerBug", "%s received send done for %p, signaling for %p.\n", __FUNCTION__, msg, /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()]].msg);
     }
 }
 
@@ -11623,22 +11638,16 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(RadioFloodingC$newMessageReceived[__nesc_mote]);
     return 0;
   }
-  if (!strcmp(varname, "RadioFloodingC$StartTime"))
+  if (!strcmp(varname, "RadioFloodingC$ptype"))
   {
-    *addr = (uintptr_t)&RadioFloodingC$StartTime[__nesc_mote];
-    *size = sizeof(RadioFloodingC$StartTime[__nesc_mote]);
+    *addr = (uintptr_t)&RadioFloodingC$ptype[__nesc_mote];
+    *size = sizeof(RadioFloodingC$ptype[__nesc_mote]);
     return 0;
   }
-  if (!strcmp(varname, "RadioFloodingC$EndTime"))
+  if (!strcmp(varname, "RadioFloodingC$maxhops"))
   {
-    *addr = (uintptr_t)&RadioFloodingC$EndTime[__nesc_mote];
-    *size = sizeof(RadioFloodingC$EndTime[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "RadioFloodingC$diffTime"))
-  {
-    *addr = (uintptr_t)&RadioFloodingC$diffTime[__nesc_mote];
-    *size = sizeof(RadioFloodingC$diffTime[__nesc_mote]);
+    *addr = (uintptr_t)&RadioFloodingC$maxhops[__nesc_mote];
+    *size = sizeof(RadioFloodingC$maxhops[__nesc_mote]);
     return 0;
   }
   if (!strcmp(varname, "RadioFloodingC$start"))
@@ -11905,9 +11914,8 @@ static void __nesc_nido_initialise(int __nesc_mote)
   memset((void *)&RadioFloodingC$transmissions[__nesc_mote], 0, sizeof RadioFloodingC$transmissions[__nesc_mote]);
   memset((void *)&RadioFloodingC$receivedMsgs[__nesc_mote], 0, sizeof RadioFloodingC$receivedMsgs[__nesc_mote]);
   memset((void *)&RadioFloodingC$newMessageReceived[__nesc_mote], 0, sizeof RadioFloodingC$newMessageReceived[__nesc_mote]);
-  memset((void *)&RadioFloodingC$StartTime[__nesc_mote], 0, sizeof RadioFloodingC$StartTime[__nesc_mote]);
-  memset((void *)&RadioFloodingC$EndTime[__nesc_mote], 0, sizeof RadioFloodingC$EndTime[__nesc_mote]);
-  memset((void *)&RadioFloodingC$diffTime[__nesc_mote], 0, sizeof RadioFloodingC$diffTime[__nesc_mote]);
+  memset((void *)&RadioFloodingC$ptype[__nesc_mote], 0, sizeof RadioFloodingC$ptype[__nesc_mote]);
+  memset((void *)&RadioFloodingC$maxhops[__nesc_mote], 0, sizeof RadioFloodingC$maxhops[__nesc_mote]);
   memset((void *)&RadioFloodingC$start[__nesc_mote], 0, sizeof RadioFloodingC$start[__nesc_mote]);
   memset((void *)&RadioFloodingC$pkt[__nesc_mote], 0, sizeof RadioFloodingC$pkt[__nesc_mote]);
   RadioFloodingC$busy[__nesc_mote] = FALSE;
