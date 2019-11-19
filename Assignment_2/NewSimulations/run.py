@@ -8,7 +8,7 @@ import sys
 n = NescApp()
 t = Tossim(n.variables.variables())
 r = t.radio()
-f = open("Topologies/grid.txt", "r")
+f = open("Topologies/wheel.txt", "r")
 
 for line in f:
   s = line.split()
@@ -18,7 +18,6 @@ for line in f:
 
 last_node = int(s[1]) +1
 
-t.addChannel("BlinkC", sys.stdout)
 t.addChannel("BroadcastingC", sys.stdout)
 t.addChannel("Re-BroadcastingC", sys.stdout)
 t.addChannel("RadioC", sys.stdout)

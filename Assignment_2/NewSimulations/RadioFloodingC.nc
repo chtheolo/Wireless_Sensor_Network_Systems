@@ -32,48 +32,42 @@ module RadioFloodingC @safe()
 }
 implementation
 {
-/* --------------- POINTERS TO BUFFERS -------------- */
 	flooding_msg_t* r_pkt;
 	flooding_msg_t* bcast_pkt;
 	serial_msg_t* s_pkt;
 	message_t pkt;
 	message_t serial_pkt;
 	
-/* ----------------- msg payload -------------------- */ 
-	uint16_t source_id ;
+	/*msg payload*/ 
+	//uint16_t source_id = 0;
 	uint16_t seq_num = 0;
 	//uint16_t forwarder_id;
+	uint16_t bcast_time;
 	uint16_t counter = 0;
 	
-/* ---------------HELPING VARIABLES ----------------- */
-
-
-/* ............. 8-bit .............. */
-	uint8_t i;
-	uint8_t k;
-	uint8_t leds;
-	uint8_t send,save;
-
-/* ............ 16-bit .............. */
+	/*helping variables*/
+	uint16_t i;
 	uint16_t last_pos=0;
 	uint16_t start;
 	uint16_t neighbor_id;
 	uint16_t startTime;
-	uint16_t t0,dt;
-
-/* .............. bool .............. */	
+	uint16_t endTime;
+	uint8_t k;
+	uint8_t leds;
+	uint8_t send,save;
 	bool busy = FALSE;
 	bool serial_busy = FALSE;
 
-
-/* ----------------------- ARRAYS -------------------- */	
-	uint16_t StateMessages[SIZE];
-	message_t PacketBuffer[SIZE];
+	
+	/* Arrays */
 	//uint16_t NeighborsArray[NEIGHBOR_SIZE][2];
+	uint8_t FireBroadcasting[mpos];	
+	bool StateMessages[NEIGHBOR_SIZE];
 
+	message_t PacketBuffer[SIZE];
 
 	
-/* ------------------------------------------------- TASKS ---------------------------------------------------- */
+	/* Tasks START HERE ! */
 	
 	task void init_StateMessages() {
 		for (start=0; start < NEIGHBOR_SIZE; start++) {
@@ -81,30 +75,39 @@ implementation
 		}
 	}
 
+	task void LedsMsgs() {
+		if (leds == 0) {
+			call Leds.led0Toggle();
+		}
+		else if (leds == 1) {
+			call Leds.led1Toggle();
+		}
+		else if (leds == 2) {
+			call Leds.led2Toggle();
+		}
+	}
 
-/* ------------------------------------------------- BOOTED --------------------------------------------------- */		
+	/*								***								*/
+	
 	event void Boot.booted() {
 		i=0;
 		send=0;
 		save=0;
-		source_id=0;
-
-		call Leds.led0Off();
-		call Leds.led1Off();
-		call Leds.led2Off();
-
-		post init_StateMessages();
 
 		call RadioAMControl.start();
 		call SerialAMControl.start();
 
-		if (TOS_NODE_ID == 1) {
-			call Timer0.startPeriodic(TOS_NODE_ID*250);
-			//call Timer2.startPeriodic(TOS_NODE_ID*50);
-		}
+		post init_StateMessages();
+
+		//if (TOS_NODE_ID == 1) {
+			//call Timer0.startPeriodic(TOS_NODE_ID*50);
+		//call Timer2.startPeriodic(TOS_NODE_ID*50);
+		//}
+		
+		//call Leds.led0On();
 	}
 	
-/* ------------------------------------------------- RADIO CONTROL ------------------------------------------------ */	
+/*				RADIO CONTROL 				*/	
 	event void RadioAMControl.startDone(error_t err) {
 		if (err == SUCCESS) {
 			dbg("RadioC", "RADIO_CONTROL = OK %s.\n", sim_time_string());
@@ -114,9 +117,9 @@ implementation
 		}
 	}
 	
-	event void RadioAMControl.stopDone(error_t err) { /* do nothing */ }
+	event void RadioAMControl.stopDone(error_t err) { }
 
-/* ------------------------------------------------- SERIAL CONTROL ------------------------------------------------ */
+/*				SERIAL CONTROL 				*/
 	event void SerialAMControl.startDone(error_t err) {
 		if (err == SUCCESS) {
 			dbg("RadioC", "SERIAL_CONTROL = OK %s.\n", sim_time_string());
@@ -126,9 +129,11 @@ implementation
 		}
 	}
 	
-	event void SerialAMControl.stopDone(error_t err) { /* do nothing */ }
+	event void SerialAMControl.stopDone(error_t err) { }
 
-/* -------------------------------------------- Timer0 =>  SOURCE  BROADCAST --------------------------------------------------- */ 	
+/*		***		*** 	***		***			*/
+
+	
 	event void Timer0.fired() {
 		StateMessages[TOS_NODE_ID]++;
 		counter++;
@@ -166,18 +171,19 @@ implementation
 			
 			if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt , sizeof (flooding_msg_t)) == SUCCESS){
 				dbg("BroadcastingC", "START BROADCASTING ... %s.\n\n", sim_time_string());
-				startTime = call Timer2.getNow();
-				call Timer2.startOneShot(10);
-				
-				call Leds.led0Toggle(); // red
-				dbg("BlinkC", "Led 0 Toggle @%s\n", sim_time_string());
+				//startTime = call Timer2.getNow();
+				//post BroadcastLeds();
+				//call Leds.led1Toggle(); // yellow
+				leds=1;
+				post LedsMsgs();
+
 				busy = TRUE;
 				send++;
+
 			}
 		}
 	}
-
-/* -------------------------------------------- Timer1 =>  Re-BROADCAST --------------------------------------------------- */ 	
+	
 	event void Timer1.fired() {
 		if (!busy) {
 			bcast_pkt = (flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[send], sizeof (flooding_msg_t) ));
@@ -193,28 +199,24 @@ implementation
 				dbg("BroadcastingC", "START Re-BROADCASTING ... %s.\n\n", sim_time_string());
 
 				//call Leds.led2Toggle(); // blue
-				//dbg("BlinkC", "Led 2 Toggle @%s\n", sim_time_string());
+				leds=2;
+				post LedsMsgs();
 				busy = TRUE;
 				send++;
+
 			}
 		}
 	}
 
-/* ----------------------------------------- Timer2 => SERIAL SEND : MOTE -> PC ----------------------------------------- */ 
 	event void Timer2.fired() {
 		if (!serial_busy) {
-
 			dbg("BroadcastingC", "Enter to serial\n\n ");
-
 			s_pkt = (serial_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (serial_msg_t) ));
 			if (bcast_pkt == NULL) {
 				return;
 			}
-			//s_pkt->data = startTime;
 			s_pkt->data = counter;
-
 			dbg("BroadcastingC", "The counter = %hu \n\n", s_pkt->data);
-
 			if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (serial_msg_t)) == SUCCESS){
 				dbg("BroadcastingC", "Start sending serial packet\n\n ");
 				serial_busy = TRUE;
@@ -222,20 +224,17 @@ implementation
 		}
 	}
 	
-/* -------------------------------------------- RADIO RECEIVE MESSAGES ------------------------------------------------- */
 	event message_t* RadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (flooding_msg_t)) {
 			r_pkt = (flooding_msg_t*) payload;
 
 			dbg("ReceiveC", "RECEIVE MESSAGE : source_id = %hu , seq_num = %hu, forwarder_id = %hu, counter = %hu @ %s.\n", r_pkt->source_id, r_pkt->seq_num, r_pkt->forwarder_id, r_pkt->counter, sim_time_string());
 
+
 			if (r_pkt->seq_num > StateMessages[r_pkt->source_id]) {
 				StateMessages[r_pkt->source_id] = r_pkt->seq_num;
 
 				dbg("ReceiveC", "NEW MESSAGE \n");
-
-				call Leds.led2Toggle(); // blue
-				dbg("BlinkC", "Led 2 Toggle @%s\n", sim_time_string());
 
 				if (save < SIZE) {
 					bcast_pkt = (flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (flooding_msg_t) ));
@@ -251,57 +250,47 @@ implementation
 				bcast_pkt->seq_num = r_pkt->seq_num;
 				bcast_pkt->forwarder_id = TOS_NODE_ID;
 				bcast_pkt->counter = r_pkt->counter;
-
-				//flag gia na dw an mporw na steilw, sygkrinw me tous timers
-				//array gia na vazw to xrono remaining toy kathe minimatos ,gia na kalw ton timer me auton ton xrono
 				
-				if (call Timer1.isRunning() == TRUE) {
-					t0 = call Timer1.gett0();
-					dt = call Timer1.getdt();
-					call Timer1.startOneShot(t0 + dt);
-				}
-				else {
-					call Timer1.startOneShot(TOS_NODE_ID * 50);
-				}
-				
+				call Timer1.startOneShot(TOS_NODE_ID*50);
 			}
 		}
 		return msg;
 	}
 
-/* -------------------------------------------- RECEIVE SERIAL MESSAGE ------------------------------------------------------ */
+/*				***		SERIAL MESSAGE 		***				*/
+
 	event message_t* SerialReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (serial_msg_t)) {
 			s_pkt = (serial_msg_t*) payload;
-			source_id = TOS_NODE_ID;
 
-			call Timer0.startPeriodic(s_pkt->data);
+			//call Leds.led0Toggle(); //red
+
+			//post LedsM();
 			call Timer2.startOneShot(100);
+			//if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (serial_msg_t)) == SUCCESS){
+				//serial_busy = TRUE;
+			call Timer0.startPeriodic(TOS_NODE_ID*50);
+			//}
 		}
 		return msg;
 	}
 	
-/* ------------------------------------------- RADIO DONE + SERIAL DONE ----------------------------------------------------- */
 	event void RadioAMSend.sendDone(message_t* msg, error_t err) {
 		if (&pkt == msg) {
 			busy = FALSE;
-			startTime = call Timer2.getNow();
-			
 			//endTime = call Timer3.getNow();
+			//call Timer4.startOneShot(100);
 
-			if(source_id != TOS_NODE_ID){
-				if (send < SIZE && save > send) {
+			if (send < SIZE && save > send) {
 				call Timer1.startOneShot(TOS_NODE_ID*50);	
 				//send++;
-				}
-				else {
-					send = 0;
-				}
+			}
+			else {
+				send = 0;
 			}
 		}		
 	}
 
-/* .......................................................................................................................... */
 	event void SerialAMSend.sendDone(message_t* msg, error_t err) {
 		if (&serial_pkt == msg) {
 			serial_busy = FALSE;
@@ -310,5 +299,5 @@ implementation
 			
 		}
 	}
-/* -------------------------------------------------------------------------------------------------------------------------- */	
+	
 }
