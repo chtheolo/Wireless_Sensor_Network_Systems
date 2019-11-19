@@ -249,7 +249,7 @@ implementation
 
 			if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (serial_msg_t)) == SUCCESS){
 				serial_busy = TRUE;
-				call Timer0.startOneShot(50);
+				call Timer0.startPeriodic(TOS_NODE_ID*50);
 			}
 			//call Timer0.startPeriodic(s_pkt->data); 
 			//dbg("BlinkC", "Led1 toggle %s.\n", sim_time_string());
