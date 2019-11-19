@@ -9,7 +9,6 @@ typedef nx_struct flooding_msg {
 	nx_uint16_t source_id;
 	nx_uint16_t seq_num;
 	nx_uint16_t forwarder_id;
-	nx_uint16_t bcast_time;
 	nx_uint16_t counter;
 } flooding_msg_t;
 

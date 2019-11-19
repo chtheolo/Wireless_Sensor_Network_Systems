@@ -8,7 +8,7 @@ import sys
 n = NescApp()
 t = Tossim(n.variables.variables())
 r = t.radio()
-f = open("grid.txt", "r")
+f = open("Topologies/wheel.txt", "r")
 
 for line in f:
   s = line.split()
@@ -24,7 +24,7 @@ t.addChannel("RadioC", sys.stdout)
 t.addChannel("ReceiveC", sys.stdout)
 t.addChannel("RoutingTableC", sys.stdout)
 
-noise = open("meyer-heavy.txt", "r")
+noise = open("Noise/simple-noise.txt", "r")
 for line in noise:
   str1 = line.strip()
   if str1:
@@ -40,20 +40,20 @@ for i in range(1, last_node): #6,8,10
 	t.getNode(i).bootAtTime(i* 100001)
 
 
-for i in range(10000): 
+for i in range(1000000): 
   t.runNextEvent()
   
-for i in range(1, last_node): #6,8,10
-  m=t.getNode(i)
-  v=m.getVariable("RadioFloodingC.NeighborsArray")
-  NeighborsArray = v.getData()
-
-  #print(np.matrix(NeighborsArray))
-  print "\nThe Routing Table of node_" + str(i)
-  for j in range(10):
-    print str(NeighborsArray)
-  
-  print "\n"
+#for i in range(1, last_node): #6,8,10
+#  m=t.getNode(i)
+#  v=m.getVariable("RadioFloodingC.NeighborsArray")
+#  NeighborsArray = v.getData()
+#
+#  #print(np.matrix(NeighborsArray))
+#  print "\nThe Routing Table of node_" + str(i)
+#  for j in range(10):
+#    print str(NeighborsArray)
+#  
+#  print "\n"
 
 
 #	v=m.getVariable("RadioFloodingC.seq_num")

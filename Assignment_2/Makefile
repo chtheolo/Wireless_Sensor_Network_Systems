@@ -1,9 +1,9 @@
 COMPONENT=RadioFloodingAppC
-BUILD_EXTRA_DEPS = RadioFlooding.py 
-CLEAN_EXTRA = RadioFlooding.py
+BUILD_EXTRA_DEPS = SerialPacket.py 
+CLEAN_EXTRA = SerialPacket.py
 
-RadioFlooding.py: RadioFlooding.h
-	mig python -target=$(PLATFORM) $(CFLAGS) -python-classname=RadioFlooding RadioFlooding.h flooding_msg -o $@
+SerialPacket.py: SerialPacket.h
+	mig python -target=$(PLATFORM) $(CFLAGS) -python-classname=SerialPacket SerialPacket.h serial_msg -o $@
 
 include $(MAKERULES)
 
