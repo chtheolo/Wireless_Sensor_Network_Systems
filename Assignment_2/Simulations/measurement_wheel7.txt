@@ -1,0 +1,441 @@
+  1   2   -54.0
+  1   3   -54.0
+  1   5   -54.0
+  2   1   -54.0
+  2   3   -54.0
+  2   4   -54.0
+  3   1   -54.0
+  3   2   -54.0
+  3   4   -54.0
+  3   5   -54.0
+  3   6   -54.0
+  3   7   -54.0
+  4   2   -54.0
+  4   3   -54.0
+  4   7   -54.0
+  5   1   -54.0
+  5   3   -54.0
+  5   6   -54.0
+  6   3   -54.0
+  6   5   -54.0
+  6   7   -54.0
+  7   3   -54.0
+  7   4   -54.0
+  6   7   -54.0
+Creating noise model for  1
+Creating noise model for  2
+Creating noise model for  3
+Creating noise model for  4
+Creating noise model for  5
+Creating noise model for  6
+Creating noise model for  7
+DEBUG (1): RADIO_CONTROL = OK 0:0:0.000010020.
+DEBUG (1): SERIAL_CONTROL = OK 0:0:0.000010030.
+DEBUG (2): RADIO_CONTROL = OK 0:0:0.000020020.
+DEBUG (2): SERIAL_CONTROL = OK 0:0:0.000020030.
+DEBUG (3): RADIO_CONTROL = OK 0:0:0.000030020.
+DEBUG (3): SERIAL_CONTROL = OK 0:0:0.000030030.
+DEBUG (4): RADIO_CONTROL = OK 0:0:0.000040020.
+DEBUG (4): SERIAL_CONTROL = OK 0:0:0.000040030.
+DEBUG (5): RADIO_CONTROL = OK 0:0:0.000050020.
+DEBUG (5): SERIAL_CONTROL = OK 0:0:0.000050030.
+DEBUG (6): RADIO_CONTROL = OK 0:0:0.000060020.
+DEBUG (6): SERIAL_CONTROL = OK 0:0:0.000060030.
+DEBUG (7): RADIO_CONTROL = OK 0:0:0.000070020.
+DEBUG (7): SERIAL_CONTROL = OK 0:0:0.000070030.
+DEBUG (1): New Attempt for BROADCASTING  counter = 1 with seq_num = 1 @ 0:0:0.048838135.
+
+DEBUG (1): source_id=1, seq_num=1, forwarder_id=1, counter=1.
+DEBUG (1): START BROADCASTING ... 0:0:0.048838135.
+
+DEBUG (1): Led 0 Toggle @0:0:0.048838135
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 1, counter = 1 @ 0:0:0.057520335.
+DEBUG (5): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 1, counter = 1 @ 0:0:0.057520335.
+DEBUG (3): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 1, counter = 1 @ 0:0:0.057520335.
+DEBUG (2): NEW MESSAGE 
+DEBUG (1): Enter to serial
+
+ DEBUG (1): The counter = 1 
+
+DEBUG (1): New Attempt for BROADCASTING  counter = 2 with seq_num = 2 @ 0:0:0.097666260.
+
+DEBUG (1): source_id=1, seq_num=2, forwarder_id=1, counter=2.
+DEBUG (1): START BROADCASTING ... 0:0:0.097666260.
+
+DEBUG (1): Led 0 Toggle @0:0:0.097666260
+DEBUG (1): Enter to serial
+
+ DEBUG (1): The counter = 2 
+
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 1, counter = 1 @ 0:0:0.107614932.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 1, counter = 1 @ 0:0:0.107614932.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 1, counter = 1 @ 0:0:0.107614932.
+DEBUG (1): New Attempt for BROADCASTING  counter = 3 with seq_num = 3 @ 0:0:0.146494385.
+
+DEBUG (1): source_id=1, seq_num=3, forwarder_id=1, counter=3.
+DEBUG (1): START BROADCASTING ... 0:0:0.146494385.
+
+DEBUG (1): Led 0 Toggle @0:0:0.146494385
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 1, counter = 2 @ 0:0:0.148920518.
+DEBUG (5): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 1, counter = 2 @ 0:0:0.148920518.
+DEBUG (3): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 1, counter = 2 @ 0:0:0.148920518.
+DEBUG (2): NEW MESSAGE 
+DEBUG (1): Enter to serial
+
+ DEBUG (1): The counter = 3 
+
+DEBUG (1): New Attempt for BROADCASTING  counter = 4 with seq_num = 4 @ 0:0:0.195322510.
+
+DEBUG (1): source_id=1, seq_num=4, forwarder_id=1, counter=4.
+DEBUG (1): START BROADCASTING ... 0:0:0.195322510.
+
+DEBUG (1): Led 0 Toggle @0:0:0.195322510
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 1, counter = 3 @ 0:0:0.203394362.
+DEBUG (5): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 1, counter = 3 @ 0:0:0.203394362.
+DEBUG (3): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 1, counter = 3 @ 0:0:0.203394362.
+DEBUG (2): NEW MESSAGE 
+DEBUG (1): Enter to serial
+
+ DEBUG (1): The counter = 4 
+
+DEBUG (1): New Attempt for BROADCASTING  counter = 5 with seq_num = 5 @ 0:0:0.244150635.
+
+DEBUG (1): source_id=1, seq_num=5, forwarder_id=1, counter=5.
+DEBUG (1): START BROADCASTING ... 0:0:0.244150635.
+
+DEBUG (1): Led 0 Toggle @0:0:0.244150635
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 1, counter = 4 @ 0:0:0.252603954.
+DEBUG (5): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 1, counter = 4 @ 0:0:0.252603954.
+DEBUG (3): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 1, counter = 4 @ 0:0:0.252603954.
+DEBUG (2): NEW MESSAGE 
+DEBUG (1): Enter to serial
+
+ DEBUG (1): The counter = 5 
+
+DEBUG (1): source_id=1, seq_num=5, forwarder_id=1, counter=5.
+DEBUG (1): START Re-BROADCASTING ... 0:0:0.300791260.
+
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 1, counter = 5 @ 0:0:0.308588455.
+DEBUG (5): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 1, counter = 5 @ 0:0:0.308588455.
+DEBUG (3): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 1, counter = 5 @ 0:0:0.308588455.
+DEBUG (2): NEW MESSAGE 
+DEBUG (2): source_id=1, seq_num=1, forwarder_id=2, counter=1.
+DEBUG (2): START Re-BROADCASTING ... 0:0:1.065449697.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 2, counter = 1 @ 0:0:1.071980421.
+DEBUG (4): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 2, counter = 1 @ 0:0:1.071980421.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 2, counter = 1 @ 0:0:1.071980421.
+DEBUG (3): source_id=1, seq_num=1, forwarder_id=3, counter=1.
+DEBUG (3): START Re-BROADCASTING ... 0:0:1.114287822.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 3, counter = 1 @ 0:0:1.120009835.
+DEBUG (7): NEW MESSAGE 
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 3, counter = 1 @ 0:0:1.120009835.
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 3, counter = 1 @ 0:0:1.120009835.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 3, counter = 1 @ 0:0:1.120009835.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 3, counter = 1 @ 0:0:1.120009835.
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 3, counter = 1 @ 0:0:1.120009835.
+DEBUG (6): NEW MESSAGE 
+DEBUG (2): source_id=1, seq_num=2, forwarder_id=2, counter=2.
+DEBUG (2): START Re-BROADCASTING ... 0:0:1.168965322.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 2, counter = 2 @ 0:0:1.173924400.
+DEBUG (4): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 2, counter = 2 @ 0:0:1.173924400.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 2, counter = 2 @ 0:0:1.173924400.
+DEBUG (5): source_id=1, seq_num=1, forwarder_id=5, counter=1.
+DEBUG (5): START Re-BROADCASTING ... 0:0:1.211964073.
+
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 5, counter = 1 @ 0:0:1.215641419.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 5, counter = 1 @ 0:0:1.215641419.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 5, counter = 1 @ 0:0:1.215641419.
+DEBUG (3): source_id=1, seq_num=2, forwarder_id=3, counter=2.
+DEBUG (3): START Re-BROADCASTING ... 0:0:1.266631572.
+
+DEBUG (2): source_id=1, seq_num=3, forwarder_id=2, counter=3.
+DEBUG (2): START Re-BROADCASTING ... 0:0:1.271504385.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 3, counter = 2 @ 0:0:1.273055485.
+DEBUG (7): NEW MESSAGE 
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 3, counter = 2 @ 0:0:1.273055485.
+DEBUG (6): NEW MESSAGE 
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 3, counter = 2 @ 0:0:1.273055485.
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 3, counter = 2 @ 0:0:1.273055485.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 3, counter = 2 @ 0:0:1.273055485.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 3, counter = 2 @ 0:0:1.273055485.
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 2, counter = 3 @ 0:0:1.276417686.
+DEBUG (4): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 2, counter = 3 @ 0:0:1.276417686.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 2, counter = 3 @ 0:0:1.276417686.
+DEBUG (2): source_id=1, seq_num=4, forwarder_id=2, counter=4.
+DEBUG (2): START Re-BROADCASTING ... 0:0:1.374043447.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 2, counter = 4 @ 0:0:1.376088113.
+DEBUG (4): NEW MESSAGE 
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 2, counter = 4 @ 0:0:1.376088113.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 2, counter = 4 @ 0:0:1.376088113.
+DEBUG (3): source_id=1, seq_num=3, forwarder_id=3, counter=3.
+DEBUG (3): START Re-BROADCASTING ... 0:0:1.418975322.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 3, counter = 3 @ 0:0:1.421569301.
+DEBUG (7): NEW MESSAGE 
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 3, counter = 3 @ 0:0:1.421569301.
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 3, counter = 3 @ 0:0:1.421569301.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 3, counter = 3 @ 0:0:1.421569301.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 3, counter = 3 @ 0:0:1.421569301.
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 3, counter = 3 @ 0:0:1.421569301.
+DEBUG (6): NEW MESSAGE 
+DEBUG (5): source_id=1, seq_num=2, forwarder_id=5, counter=2.
+DEBUG (5): START Re-BROADCASTING ... 0:0:1.459034385.
+
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 5, counter = 2 @ 0:0:1.462894836.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 5, counter = 2 @ 0:0:1.462894836.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 5, counter = 2 @ 0:0:1.462894836.
+DEBUG (2): source_id=1, seq_num=5, forwarder_id=2, counter=5.
+DEBUG (2): START Re-BROADCASTING ... 0:0:1.473652822.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 2, counter = 5 @ 0:0:1.476597751.
+DEBUG (4): NEW MESSAGE 
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 2, counter = 5 @ 0:0:1.476597751.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 2, counter = 5 @ 0:0:1.476597751.
+DEBUG (3): source_id=1, seq_num=4, forwarder_id=3, counter=4.
+DEBUG (3): START Re-BROADCASTING ... 0:0:1.567412822.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 3, counter = 4 @ 0:0:1.570922323.
+DEBUG (7): NEW MESSAGE 
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 3, counter = 4 @ 0:0:1.570922323.
+DEBUG (6): NEW MESSAGE 
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 3, counter = 4 @ 0:0:1.570922323.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 3, counter = 4 @ 0:0:1.570922323.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 3, counter = 4 @ 0:0:1.570922323.
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 3, counter = 4 @ 0:0:1.570922323.
+DEBUG (5): source_id=1, seq_num=3, forwarder_id=5, counter=3.
+DEBUG (5): START Re-BROADCASTING ... 0:0:1.707081260.
+
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 5, counter = 3 @ 0:0:1.713550949.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 5, counter = 3 @ 0:0:1.713550949.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 5, counter = 3 @ 0:0:1.713550949.
+DEBUG (3): source_id=1, seq_num=5, forwarder_id=3, counter=5.
+DEBUG (3): START Re-BROADCASTING ... 0:0:1.716826885.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 3, counter = 5 @ 0:0:1.718673188.
+DEBUG (7): NEW MESSAGE 
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 3, counter = 5 @ 0:0:1.718673188.
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 3, counter = 5 @ 0:0:1.718673188.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 3, counter = 5 @ 0:0:1.718673188.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 3, counter = 5 @ 0:0:1.718673188.
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 3, counter = 5 @ 0:0:1.718673188.
+DEBUG (6): NEW MESSAGE 
+DEBUG (5): source_id=1, seq_num=4, forwarder_id=5, counter=4.
+DEBUG (5): START Re-BROADCASTING ... 0:0:1.957081260.
+
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 5, counter = 4 @ 0:0:1.960071965.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 5, counter = 4 @ 0:0:1.960071965.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 5, counter = 4 @ 0:0:1.960071965.
+DEBUG (5): source_id=1, seq_num=5, forwarder_id=5, counter=5.
+DEBUG (5): START Re-BROADCASTING ... 0:0:2.204151573.
+
+DEBUG (6): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 5, counter = 5 @ 0:0:2.211109540.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 5, counter = 5 @ 0:0:2.211109540.
+DEBUG (1): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 5, counter = 5 @ 0:0:2.211109540.
+DEBUG (4): source_id=1, seq_num=1, forwarder_id=4, counter=1.
+DEBUG (4): START Re-BROADCASTING ... 0:0:6.568399385.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 4, counter = 1 @ 0:0:6.576761153.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 4, counter = 1 @ 0:0:6.576761153.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 4, counter = 1 @ 0:0:6.576761153.
+DEBUG (4): source_id=1, seq_num=2, forwarder_id=4, counter=2.
+DEBUG (4): START Re-BROADCASTING ... 0:0:6.771524385.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 4, counter = 2 @ 0:0:6.783105738.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 4, counter = 2 @ 0:0:6.783105738.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 4, counter = 2 @ 0:0:6.783105738.
+DEBUG (4): source_id=1, seq_num=3, forwarder_id=4, counter=3.
+DEBUG (4): START Re-BROADCASTING ... 0:0:6.978555635.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 4, counter = 3 @ 0:0:6.980722370.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 4, counter = 3 @ 0:0:6.980722370.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 4, counter = 3 @ 0:0:6.980722370.
+DEBUG (4): source_id=1, seq_num=4, forwarder_id=4, counter=4.
+DEBUG (4): START Re-BROADCASTING ... 0:0:7.175821260.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 4, counter = 4 @ 0:0:7.185205360.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 4, counter = 4 @ 0:0:7.185205360.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 4, counter = 4 @ 0:0:7.185205360.
+DEBUG (4): source_id=1, seq_num=5, forwarder_id=4, counter=5.
+DEBUG (4): START Re-BROADCASTING ... 0:0:7.379922822.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 4, counter = 5 @ 0:0:7.383615428.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 4, counter = 5 @ 0:0:7.383615428.
+DEBUG (2): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 4, counter = 5 @ 0:0:7.383615428.
+DEBUG (6): source_id=1, seq_num=1, forwarder_id=6, counter=1.
+DEBUG (6): START Re-BROADCASTING ... 0:0:7.393614698.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 6, counter = 1 @ 0:0:7.402663107.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 6, counter = 1 @ 0:0:7.402663107.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 6, counter = 1 @ 0:0:7.402663107.
+DEBUG (7): source_id=1, seq_num=1, forwarder_id=7, counter=1.
+DEBUG (7): START Re-BROADCASTING ... 0:0:7.442452823.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 7, counter = 1 @ 0:0:7.443780330.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 1, forwarder_id = 7, counter = 1 @ 0:0:7.443780330.
+DEBUG (6): source_id=1, seq_num=2, forwarder_id=6, counter=2.
+DEBUG (6): START Re-BROADCASTING ... 0:0:7.695372510.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 6, counter = 2 @ 0:0:7.701460731.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 6, counter = 2 @ 0:0:7.701460731.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 6, counter = 2 @ 0:0:7.701460731.
+DEBUG (7): source_id=1, seq_num=2, forwarder_id=7, counter=2.
+DEBUG (7): START Re-BROADCASTING ... 0:0:7.785226260.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 7, counter = 2 @ 0:0:7.791268705.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 2, forwarder_id = 7, counter = 2 @ 0:0:7.791268705.
+DEBUG (6): source_id=1, seq_num=3, forwarder_id=6, counter=3.
+DEBUG (6): START Re-BROADCASTING ... 0:0:7.994200635.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 6, counter = 3 @ 0:0:7.995940127.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 6, counter = 3 @ 0:0:7.995940127.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 6, counter = 3 @ 0:0:7.995940127.
+DEBUG (7): source_id=1, seq_num=3, forwarder_id=7, counter=3.
+DEBUG (7): START Re-BROADCASTING ... 0:0:8.132882510.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 7, counter = 3 @ 0:0:8.141198502.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 3, forwarder_id = 7, counter = 3 @ 0:0:8.141198502.
+DEBUG (6): source_id=1, seq_num=4, forwarder_id=6, counter=4.
+DEBUG (6): START Re-BROADCASTING ... 0:0:8.288145948.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 6, counter = 4 @ 0:0:8.293898478.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 6, counter = 4 @ 0:0:8.293898478.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 6, counter = 4 @ 0:0:8.293898478.
+DEBUG (7): source_id=1, seq_num=4, forwarder_id=7, counter=4.
+DEBUG (7): START Re-BROADCASTING ... 0:0:8.482491885.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 7, counter = 4 @ 0:0:8.485680954.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 4, forwarder_id = 7, counter = 4 @ 0:0:8.485680954.
+DEBUG (6): source_id=1, seq_num=5, forwarder_id=6, counter=5.
+DEBUG (6): START Re-BROADCASTING ... 0:0:8.586974073.
+
+DEBUG (7): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 6, counter = 5 @ 0:0:8.597319471.
+DEBUG (5): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 6, counter = 5 @ 0:0:8.597319471.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 6, counter = 5 @ 0:0:8.597319471.
+DEBUG (7): source_id=1, seq_num=5, forwarder_id=7, counter=5.
+DEBUG (7): START Re-BROADCASTING ... 0:0:8.827218448.
+
+DEBUG (4): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 7, counter = 5 @ 0:0:8.832833649.
+DEBUG (3): RECEIVE MESSAGE : source_id = 1 , seq_num = 5, forwarder_id = 7, counter = 5 @ 0:0:8.832833649.
+Allocated variable RadioFloodingC$transmissions
+
+    NODE_1
+Transmisions : 6
+
+Allocated variable RadioFloodingC$receivings
+
+Receivings : 15
+
+Allocated variable RadioFloodingC$new_receivings
+
+New Receivings : 0
+
+
+
+Allocated variable RadioFloodingC$transmissions
+
+    NODE_2
+Transmisions : 5
+
+Allocated variable RadioFloodingC$receivings
+
+Receivings : 16
+
+Allocated variable RadioFloodingC$new_receivings
+
+New Receivings : 5
+
+
+
+Allocated variable RadioFloodingC$transmissions
+
+    NODE_3
+Transmisions : 5
+
+Allocated variable RadioFloodingC$receivings
+
+Receivings : 31
+
+Allocated variable RadioFloodingC$new_receivings
+
+New Receivings : 5
+
+
+
+Allocated variable RadioFloodingC$transmissions
+
+    NODE_4
+Transmisions : 5
+
+Allocated variable RadioFloodingC$receivings
+
+Receivings : 15
+
+Allocated variable RadioFloodingC$new_receivings
+
+New Receivings : 5
+
+
+
+Allocated variable RadioFloodingC$transmissions
+
+    NODE_5
+Transmisions : 5
+
+Allocated variable RadioFloodingC$receivings
+
+Receivings : 16
+
+Allocated variable RadioFloodingC$new_receivings
+
+New Receivings : 5
+
+
+
+Allocated variable RadioFloodingC$transmissions
+
+    NODE_6
+Transmisions : 5
+
+Allocated variable RadioFloodingC$receivings
+
+Receivings : 10
+
+Allocated variable RadioFloodingC$new_receivings
+
+New Receivings : 5
+
+
+
+Allocated variable RadioFloodingC$transmissions
+
+    NODE_7
+Transmisions : 5
+
+Allocated variable RadioFloodingC$receivings
+
+Receivings : 15
+
+Allocated variable RadioFloodingC$new_receivings
+
+New Receivings : 5
+
+
+
