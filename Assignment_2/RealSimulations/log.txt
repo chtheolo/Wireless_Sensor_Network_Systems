@@ -1,0 +1,5 @@
+node_1 -> payload = 8 bytes
+
+node_3 -> payload = 18 bytes
+
+node_2 -> payload = 28 bytes
