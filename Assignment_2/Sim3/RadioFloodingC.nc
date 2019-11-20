@@ -133,9 +133,9 @@ implementation
 		StateMessages[TOS_NODE_ID]++;
 		counter++;
 		
-		/*if(StateMessages[TOS_NODE_ID] == 5) {
+		if(StateMessages[TOS_NODE_ID] == 5) {
 			call Timer0.stop();
-		}*/
+		}
 
 		dbg("BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu @ %s.\n\n", counter, StateMessages[TOS_NODE_ID], sim_time_string());
 		
