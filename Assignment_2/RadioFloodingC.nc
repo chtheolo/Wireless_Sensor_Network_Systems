@@ -73,7 +73,7 @@ implementation
 
 
 	
-/* ------------------------------------------------- TASKS ---------------------------------------------------- */
+/* ------------------------------------------------------- TASKS ---------------------------------------------------------- */
 	
 	task void init_StateMessages() {
 		for (start=0; start < NEIGHBOR_SIZE; start++) {
@@ -82,7 +82,7 @@ implementation
 	}
 
 
-/* ------------------------------------------------- BOOTED --------------------------------------------------- */		
+/* -------------------------------------------------------- BOOTED -------------------------------------------------------- */		
 	event void Boot.booted() {
 		i=0;
 		send=0;
@@ -97,14 +97,9 @@ implementation
 
 		call RadioAMControl.start();
 		call SerialAMControl.start();
-
-		if (TOS_NODE_ID == 1) {
-			call Timer0.startPeriodic(TOS_NODE_ID*250);
-			//call Timer2.startPeriodic(TOS_NODE_ID*50);
-		}
 	}
 	
-/* ------------------------------------------------- RADIO CONTROL ------------------------------------------------ */	
+/* ------------------------------------------------- RADIO CONTROL ---------------------------------------------------------- */	
 	event void RadioAMControl.startDone(error_t err) {
 		if (err == SUCCESS) {
 			dbg("RadioC", "RADIO_CONTROL = OK %s.\n", sim_time_string());
@@ -116,7 +111,7 @@ implementation
 	
 	event void RadioAMControl.stopDone(error_t err) { /* do nothing */ }
 
-/* ------------------------------------------------- SERIAL CONTROL ------------------------------------------------ */
+/* ---------------------------------------------------- SERIAL CONTROL -------------------------------------------------------- */
 	event void SerialAMControl.startDone(error_t err) {
 		if (err == SUCCESS) {
 			dbg("RadioC", "SERIAL_CONTROL = OK %s.\n", sim_time_string());
@@ -200,7 +195,7 @@ implementation
 		}
 	}
 
-/* ----------------------------------------- Timer2 => SERIAL SEND : MOTE -> PC ----------------------------------------- */ 
+/* ----------------------------------------- Timer2 => SERIAL SEND : MOTE -> PC ------------------------------------------- */ 
 	event void Timer2.fired() {
 		if (!serial_busy) {
 
@@ -222,7 +217,7 @@ implementation
 		}
 	}
 	
-/* -------------------------------------------- RADIO RECEIVE MESSAGES ------------------------------------------------- */
+/* -------------------------------------------- RADIO RECEIVE MESSAGES ---------------------------------------------------- */
 	event message_t* RadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (flooding_msg_t)) {
 			r_pkt = (flooding_msg_t*) payload;
@@ -267,7 +262,7 @@ implementation
 		return msg;
 	}
 
-/* -------------------------------------------- RECEIVE SERIAL MESSAGE ------------------------------------------------------ */
+/* ------------------------------------------- RECEIVE SERIAL MESSAGE ----------------------------------------------------- */
 	event message_t* SerialReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (serial_msg_t)) {
 			s_pkt = (serial_msg_t*) payload;
@@ -279,7 +274,7 @@ implementation
 		return msg;
 	}
 	
-/* ------------------------------------------- RADIO DONE + SERIAL DONE ----------------------------------------------------- */
+/* ------------------------------------------------- RADIO DONE ----------------------------------------------------------- */
 	event void RadioAMSend.sendDone(message_t* msg, error_t err) {
 		if (&pkt == msg) {
 			busy = FALSE;
@@ -299,7 +294,7 @@ implementation
 		}		
 	}
 
-/* .......................................................................................................................... */
+/* ---------------------------------------------------- SERIAL DONE -------------------------------------------------------- */
 	event void SerialAMSend.sendDone(message_t* msg, error_t err) {
 		if (&serial_pkt == msg) {
 			serial_busy = FALSE;

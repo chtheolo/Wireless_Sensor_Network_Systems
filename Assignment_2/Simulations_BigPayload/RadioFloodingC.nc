@@ -44,7 +44,7 @@ implementation
 	uint16_t seq_num = 0;
 	//uint16_t forwarder_id;
 	uint16_t counter = 0;
-	uint16_t counter1 = 0;
+	/*uint16_t counter1 = 0;
 	uint16_t counter2 = 0;
 	uint16_t counter3 = 0;
 	uint16_t counter4 = 0;
@@ -53,7 +53,7 @@ implementation
 	uint16_t counter7 = 0;
 	uint16_t counter8 = 0;
 	uint16_t counter9 = 0;
-	uint16_t counter10 = 0;
+	uint16_t counter10 = 0;*/
 	
 /* ---------------HELPING VARIABLES ----------------- */
 
@@ -115,7 +115,7 @@ implementation
 		call SerialAMControl.start();
 
 		if (TOS_NODE_ID == 1) {
-			call Timer0.startPeriodic(TOS_NODE_ID*50);
+			call Timer0.startPeriodic(5000);
 			//call Timer2.startPeriodic(TOS_NODE_ID*50);
 		}
 	}
@@ -148,7 +148,7 @@ implementation
 	event void Timer0.fired() {
 		StateMessages[TOS_NODE_ID]++;
 		counter++;
-		counter1++;
+		/*counter1++;
 		counter2++;
 		counter3++;
 		counter4++;
@@ -157,7 +157,7 @@ implementation
 		counter7++;
 		counter8++;
 		counter9++;
-		counter10++;
+		counter10++;*/
 		
 		if(StateMessages[TOS_NODE_ID] == 10) {
 			call Timer0.stop();
@@ -184,7 +184,7 @@ implementation
 		bcast_pkt->seq_num = StateMessages[TOS_NODE_ID];
 		bcast_pkt->forwarder_id = TOS_NODE_ID;
 		bcast_pkt->counter = counter;
-		bcast_pkt->counter1 = counter1;
+		/*bcast_pkt->counter1 = counter1;
 		bcast_pkt->counter2 = counter2;
 		bcast_pkt->counter3 = counter3;
 		bcast_pkt->counter4 = counter4;
@@ -193,7 +193,7 @@ implementation
 		bcast_pkt->counter2 = counter7;
 		bcast_pkt->counter3 = counter8;
 		bcast_pkt->counter4 = counter9;
-		bcast_pkt->counter5 = counter10;
+		bcast_pkt->counter5 = counter10;*/
 		if (!busy) {
 			memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
 
@@ -204,7 +204,7 @@ implementation
 				startTime = call Timer2.getNow();
 				call Timer2.startOneShot(10);
 				
-				call Leds.led0Toggle(); // red
+				//call Leds.led0Toggle(); // red
 				dbg("BlinkC", "Led 0 Toggle @%s\n", sim_time_string());
 				busy = TRUE;
 				send++;
@@ -290,16 +290,16 @@ implementation
 				bcast_pkt->seq_num = r_pkt->seq_num;
 				bcast_pkt->forwarder_id = TOS_NODE_ID;
 				bcast_pkt->counter = r_pkt->counter;
-				bcast_pkt->counter1 = counter1;
-				bcast_pkt->counter2 = counter2;
-				bcast_pkt->counter3 = counter3;
-				bcast_pkt->counter4 = counter4;
-				bcast_pkt->counter5 = counter5;
-				bcast_pkt->counter1 = counter6;
-				bcast_pkt->counter2 = counter7;
-				bcast_pkt->counter3 = counter8;
-				bcast_pkt->counter4 = counter9;
-				bcast_pkt->counter5 = counter10;
+				/*bcast_pkt->counter1 = r_pkt->counter1;
+				bcast_pkt->counter2 = r_pkt->counter2;
+				bcast_pkt->counter3 = r_pkt->counter3;
+				bcast_pkt->counter4 = r_pkt->counter4;
+				bcast_pkt->counter5 = r_pkt->counter5;
+				bcast_pkt->counter1 = r_pkt->counter6;
+				bcast_pkt->counter2 = r_pkt->counter7;
+				bcast_pkt->counter3 = r_pkt->counter8;
+				bcast_pkt->counter4 = r_pkt->counter9;
+				bcast_pkt->counter5 = r_pkt->counter10;*/
 
 				//array gia na vazw to xrono remaining toy kathe minimatos ,gia na kalw ton timer me auton ton xrono
 				

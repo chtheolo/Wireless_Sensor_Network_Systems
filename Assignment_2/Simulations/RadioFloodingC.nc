@@ -106,7 +106,7 @@ implementation
 		call SerialAMControl.start();
 
 		if (TOS_NODE_ID == 1) {
-			call Timer0.startPeriodic(TOS_NODE_ID*50);
+			call Timer0.startPeriodic(TOS_NODE_ID*250);
 			//call Timer2.startPeriodic(TOS_NODE_ID*50);
 		}
 	}
@@ -140,7 +140,7 @@ implementation
 		StateMessages[TOS_NODE_ID]++;
 		counter++;
 
-		if(StateMessages[TOS_NODE_ID] == 5) {
+		if(StateMessages[TOS_NODE_ID] == 1) {
 			call Timer0.stop();
 		}
 

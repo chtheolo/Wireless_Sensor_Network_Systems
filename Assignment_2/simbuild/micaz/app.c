@@ -4071,13 +4071,6 @@ static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOne
 uint8_t arg_0x40b543a8, 
 # 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
 uint32_t dt);
-
-
-
-
-static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(
-# 48 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
-uint8_t arg_0x40b543a8);
 # 82 "/opt/tinyos-2.1.2/tos/lib/timer/Counter.nc"
 static void /*HilTimerMilliC.CounterToLocalTimeC*/CounterToLocalTimeC$0$Counter$overflow(void );
 # 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
@@ -4161,7 +4154,7 @@ error_t error);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$sendDone(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40c09730, 
+am_id_t arg_0x40c092b0, 
 # 103 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 message_t * msg, 
 
@@ -4174,7 +4167,7 @@ error_t error);
 # 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$send(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40c0cca0, 
+uint8_t arg_0x40c0a8a8, 
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4188,7 +4181,7 @@ uint8_t len);
 #line 100
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40c0cca0, 
+uint8_t arg_0x40c0a8a8, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4204,7 +4197,7 @@ static error_t SerialActiveMessageC$SplitControl$start(void );
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t SerialActiveMessageC$AMSend$send(
 # 49 "/opt/tinyos-2.1.2/tos/lib/tossim/SerialActiveMessageC.nc"
-am_id_t arg_0x40c27e08, 
+am_id_t arg_0x40c27b18, 
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -4296,7 +4289,7 @@ error_t error);
 #line 75
 static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$send(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40c0cca0, 
+uint8_t arg_0x40c0a8a8, 
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4310,7 +4303,7 @@ uint8_t len);
 #line 100
 static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$default$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40c0cca0, 
+uint8_t arg_0x40c0a8a8, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -5402,7 +5395,7 @@ static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$s
 
 
 
-static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(uint8_t num);
+
 
 
 
@@ -5429,8 +5422,6 @@ static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$d
 static inline void /*HilTimerMilliC.CounterToLocalTimeC*/CounterToLocalTimeC$0$Counter$overflow(void );
 # 64 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
 static void RadioFloodingC$Timer0$startPeriodic(uint32_t dt);
-#line 78
-static void RadioFloodingC$Timer0$stop(void );
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
 static error_t RadioFloodingC$init_StateMessages$postTask(void );
 # 126 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
@@ -5580,7 +5571,7 @@ static inline void RadioFloodingC$init_StateMessages$runTask(void );
 
 
 static inline void RadioFloodingC$Boot$booted(void );
-#line 109
+#line 108
 static inline void RadioFloodingC$RadioAMControl$startDone(error_t err);
 
 
@@ -5606,15 +5597,15 @@ static inline void RadioFloodingC$SerialAMControl$stopDone(error_t err);
 
 
 static inline void RadioFloodingC$Timer0$fired(void );
-#line 182
+#line 181
 static inline void RadioFloodingC$Timer1$fired(void );
-#line 205
+#line 204
 static inline void RadioFloodingC$Timer2$fired(void );
-#line 227
+#line 226
 static inline message_t *RadioFloodingC$RadioReceive$receive(message_t *msg, void *payload, uint8_t len);
-#line 286
+#line 283
 static void RadioFloodingC$RadioAMSend$sendDone(message_t *msg, error_t err);
-#line 306
+#line 303
 static inline void RadioFloodingC$SerialAMSend$sendDone(message_t *msg, error_t err);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*RadioFloodingAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$sendDone(
@@ -5672,7 +5663,7 @@ static inline void /*RadioFloodingAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueE
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40c09730, 
+am_id_t arg_0x40c092b0, 
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -5689,7 +5680,7 @@ uint8_t len);
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40c0cca0, 
+uint8_t arg_0x40c0a8a8, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -5891,7 +5882,7 @@ static inline void /*RadioFloodingAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEnt
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$send(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40c09730, 
+am_id_t arg_0x40c092b0, 
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -5908,7 +5899,7 @@ uint8_t len);
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40c0cca0, 
+uint8_t arg_0x40c0a8a8, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -6577,9 +6568,9 @@ inline static void RadioFloodingC$Leds$led2Toggle(void ){
 #line 100
 }
 #line 100
-# 227 "RadioFloodingC.nc"
+# 226 "RadioFloodingC.nc"
 static inline message_t *RadioFloodingC$RadioReceive$receive(message_t *msg, void *payload, uint8_t len)
-#line 227
+#line 226
 {
   if (len == sizeof(flooding_msg_t )) {
       RadioFloodingC$r_pkt[sim_node()] = (flooding_msg_t *)payload;
@@ -6611,7 +6602,6 @@ static inline message_t *RadioFloodingC$RadioReceive$receive(message_t *msg, voi
 
 
 
-
           if (RadioFloodingC$Timer1$isRunning() == TRUE) {
               RadioFloodingC$t0[sim_node()] = RadioFloodingC$Timer1$gett0();
               RadioFloodingC$dt[sim_node()] = RadioFloodingC$Timer1$getdt();
@@ -6622,7 +6612,6 @@ static inline message_t *RadioFloodingC$RadioReceive$receive(message_t *msg, voi
             }
         }
     }
-
   return msg;
 }
 
@@ -6895,9 +6884,9 @@ inline static error_t RadioFloodingC$RadioAMControl$start(void ){
 #line 104
 }
 #line 104
-# 109 "RadioFloodingC.nc"
+# 108 "RadioFloodingC.nc"
 static inline void RadioFloodingC$RadioAMControl$startDone(error_t err)
-#line 109
+#line 108
 {
   if (err == SUCCESS) {
       sim_log_debug(185U, "RadioC", "RADIO_CONTROL = OK %s.\n", sim_time_string());
@@ -6922,9 +6911,9 @@ static inline void TossimPacketModelC$startDoneTask$runTask(void )
   TossimPacketModelC$Control$startDone(SUCCESS);
 }
 
-# 118 "RadioFloodingC.nc"
+# 117 "RadioFloodingC.nc"
 static inline void RadioFloodingC$RadioAMControl$stopDone(error_t err)
-#line 118
+#line 117
 {
 }
 
@@ -7216,9 +7205,9 @@ static inline void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone
 }
 
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
-inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t arg_0x40c0cca0, message_t * msg, error_t error){
+inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t arg_0x40c0a8a8, message_t * msg, error_t error){
 #line 100
-  switch (arg_0x40c0cca0) {
+  switch (arg_0x40c0a8a8) {
 #line 100
     case 0U:
 #line 100
@@ -7228,7 +7217,7 @@ inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t
 #line 100
     default:
 #line 100
-      /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(arg_0x40c0cca0, msg, error);
+      /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(arg_0x40c0a8a8, msg, error);
 #line 100
       break;
 #line 100
@@ -7304,9 +7293,9 @@ inline static error_t RadioFloodingC$SerialAMControl$start(void ){
 #line 104
 }
 #line 104
-# 121 "RadioFloodingC.nc"
+# 120 "RadioFloodingC.nc"
 static inline void RadioFloodingC$SerialAMControl$startDone(error_t err)
-#line 121
+#line 120
 {
   if (err == SUCCESS) {
       sim_log_debug(186U, "RadioC", "SERIAL_CONTROL = OK %s.\n", sim_time_string());
@@ -7331,9 +7320,9 @@ static inline void SerialActiveMessageC$startDone$runTask(void )
   SerialActiveMessageC$SplitControl$startDone(SUCCESS);
 }
 
-# 130 "RadioFloodingC.nc"
+# 129 "RadioFloodingC.nc"
 static inline void RadioFloodingC$SerialAMControl$stopDone(error_t err)
-#line 130
+#line 129
 {
 }
 
@@ -7352,9 +7341,9 @@ static inline void SerialActiveMessageC$stopDone$runTask(void )
   SerialActiveMessageC$SplitControl$stopDone(SUCCESS);
 }
 
-# 306 "RadioFloodingC.nc"
+# 303 "RadioFloodingC.nc"
 static inline void RadioFloodingC$SerialAMSend$sendDone(message_t *msg, error_t err)
-#line 306
+#line 303
 {
   if (&RadioFloodingC$serial_pkt[sim_node()] == msg) {
       RadioFloodingC$serial_busy[sim_node()] = FALSE;
@@ -7384,9 +7373,9 @@ static inline void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$default$se
 }
 
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
-inline static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$sendDone(uint8_t arg_0x40c0cca0, message_t * msg, error_t error){
+inline static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$sendDone(uint8_t arg_0x40c0a8a8, message_t * msg, error_t error){
 #line 100
-  switch (arg_0x40c0cca0) {
+  switch (arg_0x40c0a8a8) {
 #line 100
     case 0U:
 #line 100
@@ -7396,7 +7385,7 @@ inline static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$sendDone(u
 #line 100
     default:
 #line 100
-      /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$default$sendDone(arg_0x40c0cca0, msg, error);
+      /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$default$sendDone(arg_0x40c0a8a8, msg, error);
 #line 100
       break;
 #line 100
@@ -7430,13 +7419,13 @@ uint8_t len)
 }
 
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$send(am_id_t arg_0x40c09730, am_addr_t addr, message_t * msg, uint8_t len){
+inline static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$send(am_id_t arg_0x40c092b0, am_addr_t addr, message_t * msg, uint8_t len){
 #line 80
   unsigned char __nesc_result;
 #line 80
 
 #line 80
-  __nesc_result = SerialActiveMessageC$AMSend$send(arg_0x40c09730, addr, msg, len);
+  __nesc_result = SerialActiveMessageC$AMSend$send(arg_0x40c092b0, addr, msg, len);
 #line 80
 
 #line 80
@@ -7720,13 +7709,13 @@ inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$errorTask$postTask
 }
 #line 67
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(am_id_t arg_0x40c09730, am_addr_t addr, message_t * msg, uint8_t len){
+inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(am_id_t arg_0x40c092b0, am_addr_t addr, message_t * msg, uint8_t len){
 #line 80
   unsigned char __nesc_result;
 #line 80
 
 #line 80
-  __nesc_result = TossimActiveMessageC$AMSend$send(arg_0x40c09730, addr, msg, len);
+  __nesc_result = TossimActiveMessageC$AMSend$send(arg_0x40c092b0, addr, msg, len);
 #line 80
 
 #line 80
@@ -8619,29 +8608,16 @@ inline static error_t RadioFloodingC$RadioAMSend$send(am_addr_t addr, message_t 
 #line 80
 }
 #line 80
-# 164 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
-static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(uint8_t num)
-{
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num].isrunning = FALSE;
-}
-
-# 78 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static void RadioFloodingC$Timer0$stop(void ){
-#line 78
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(0U);
-#line 78
-}
-#line 78
-# 133 "RadioFloodingC.nc"
+# 132 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Timer0$fired(void )
-#line 133
+#line 132
 {
   RadioFloodingC$StateMessages[sim_node()][TOS_NODE_ID]++;
   RadioFloodingC$counter[sim_node()]++;
 
-  if (RadioFloodingC$StateMessages[sim_node()][TOS_NODE_ID] == 5) {
-      RadioFloodingC$Timer0$stop();
-    }
+
+
+
 
   sim_log_debug(187U, "BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu @ %s.\n\n", RadioFloodingC$counter[sim_node()], RadioFloodingC$StateMessages[sim_node()][TOS_NODE_ID], sim_time_string());
 
@@ -8685,7 +8661,7 @@ static inline void RadioFloodingC$Timer0$fired(void )
 
 
 static inline void RadioFloodingC$Timer1$fired(void )
-#line 182
+#line 181
 {
   if (!RadioFloodingC$busy[sim_node()]) {
       RadioFloodingC$bcast_pkt[sim_node()] = (flooding_msg_t *)RadioFloodingC$Packet$getPayload(&RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$send[sim_node()]], sizeof(flooding_msg_t ));
@@ -8863,9 +8839,9 @@ inline static void * RadioFloodingC$SerialPacket$getPayload(message_t * msg, uin
 #line 126
 }
 #line 126
-# 205 "RadioFloodingC.nc"
+# 204 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Timer2$fired(void )
-#line 205
+#line 204
 {
   if (!RadioFloodingC$serial_busy[sim_node()]) {
 
@@ -9856,11 +9832,10 @@ static inline void RadioFloodingC$Boot$booted(void )
   RadioFloodingC$Leds$led1Off();
   RadioFloodingC$Leds$led2Off();
 
+  RadioFloodingC$init_StateMessages$postTask();
 
   RadioFloodingC$RadioAMControl$start();
   RadioFloodingC$SerialAMControl$start();
-
-  RadioFloodingC$init_StateMessages$postTask();
 
   if (TOS_NODE_ID == 1) {
       RadioFloodingC$Timer0$startPeriodic(TOS_NODE_ID * 250);
@@ -11698,9 +11673,9 @@ static am_addr_t SerialActiveMessageC$AMPacket$destination(message_t *amsg)
   return __nesc_ntoh_uint16(header->dest.nxdata);
 }
 
-# 286 "RadioFloodingC.nc"
+# 283 "RadioFloodingC.nc"
 static void RadioFloodingC$RadioAMSend$sendDone(message_t *msg, error_t err)
-#line 286
+#line 283
 {
   if (&RadioFloodingC$pkt[sim_node()] == msg) {
       RadioFloodingC$busy[sim_node()] = FALSE;

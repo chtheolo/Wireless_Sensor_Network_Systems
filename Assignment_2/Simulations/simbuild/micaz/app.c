@@ -5616,15 +5616,15 @@ static inline void RadioFloodingC$SerialAMControl$stopDone(error_t err);
 
 
 static inline void RadioFloodingC$Timer0$fired(void );
-#line 186
+#line 190
 static inline void RadioFloodingC$Timer1$fired(void );
-#line 210
+#line 214
 static inline void RadioFloodingC$Timer2$fired(void );
-#line 232
+#line 236
 static inline message_t *RadioFloodingC$RadioReceive$receive(message_t *msg, void *payload, uint8_t len);
-#line 293
+#line 297
 static void RadioFloodingC$RadioAMSend$sendDone(message_t *msg, error_t err);
-#line 316
+#line 317
 static inline void RadioFloodingC$SerialAMSend$sendDone(message_t *msg, error_t err);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*RadioFloodingAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$sendDone(
@@ -6528,9 +6528,9 @@ inline static void * RadioFloodingC$Packet$getPayload(message_t * msg, uint8_t l
 #line 126
 }
 #line 126
-# 232 "RadioFloodingC.nc"
+# 236 "RadioFloodingC.nc"
 static inline message_t *RadioFloodingC$RadioReceive$receive(message_t *msg, void *payload, uint8_t len)
-#line 232
+#line 236
 {
   if (len == sizeof(flooding_msg_t )) {
       RadioFloodingC$receivings[sim_node()]++;
@@ -7305,9 +7305,9 @@ static inline void SerialActiveMessageC$stopDone$runTask(void )
   SerialActiveMessageC$SplitControl$stopDone(SUCCESS);
 }
 
-# 316 "RadioFloodingC.nc"
+# 317 "RadioFloodingC.nc"
 static inline void RadioFloodingC$SerialAMSend$sendDone(message_t *msg, error_t err)
-#line 316
+#line 317
 {
   if (&RadioFloodingC$serial_pkt[sim_node()] == msg) {
       RadioFloodingC$serial_busy[sim_node()] = FALSE;
@@ -7657,20 +7657,7 @@ inline static void SimSchedulerBasicP$TaskBasic$runTask(uint8_t arg_0x407141b8){
 #line 75
 }
 #line 75
-# 164 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
-static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(uint8_t num)
-{
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num].isrunning = FALSE;
-}
-
-# 78 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static void RadioFloodingC$Timer0$stop(void ){
-#line 78
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(0U);
-#line 78
-}
-#line 78
-# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+#line 67
 inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$errorTask$postTask(void ){
 #line 67
   unsigned char __nesc_result;
@@ -8585,12 +8572,29 @@ inline static error_t RadioFloodingC$RadioAMSend$send(am_addr_t addr, message_t 
 #line 80
 }
 #line 80
+# 164 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
+static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(uint8_t num)
+{
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num].isrunning = FALSE;
+}
+
+# 78 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static void RadioFloodingC$Timer0$stop(void ){
+#line 78
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(0U);
+#line 78
+}
+#line 78
 # 139 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Timer0$fired(void )
 #line 139
 {
   RadioFloodingC$StateMessages[sim_node()][TOS_NODE_ID]++;
   RadioFloodingC$counter[sim_node()]++;
+
+  if (RadioFloodingC$StateMessages[sim_node()][TOS_NODE_ID] == 1) {
+      RadioFloodingC$Timer0$stop();
+    }
 
   sim_log_debug(187U, "BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu @ %s.\n\n", RadioFloodingC$counter[sim_node()], RadioFloodingC$StateMessages[sim_node()][TOS_NODE_ID], sim_time_string());
 
@@ -8636,7 +8640,7 @@ static inline void RadioFloodingC$Timer0$fired(void )
 
 
 static inline void RadioFloodingC$Timer1$fired(void )
-#line 186
+#line 190
 {
   if (!RadioFloodingC$busy[sim_node()]) {
       RadioFloodingC$bcast_pkt[sim_node()] = (flooding_msg_t *)RadioFloodingC$Packet$getPayload(&RadioFloodingC$PacketBuffer[sim_node()][RadioFloodingC$send[sim_node()]], sizeof(flooding_msg_t ));
@@ -8815,9 +8819,9 @@ inline static void * RadioFloodingC$SerialPacket$getPayload(message_t * msg, uin
 #line 126
 }
 #line 126
-# 210 "RadioFloodingC.nc"
+# 214 "RadioFloodingC.nc"
 static inline void RadioFloodingC$Timer2$fired(void )
-#line 210
+#line 214
 {
   if (!RadioFloodingC$serial_busy[sim_node()]) {
 
@@ -9840,7 +9844,7 @@ static inline void RadioFloodingC$Boot$booted(void )
   RadioFloodingC$SerialAMControl$start();
 
   if (TOS_NODE_ID == 1) {
-      RadioFloodingC$Timer0$startPeriodic(TOS_NODE_ID * 50);
+      RadioFloodingC$Timer0$startPeriodic(TOS_NODE_ID * 250);
     }
 }
 
@@ -11675,17 +11679,14 @@ static am_addr_t SerialActiveMessageC$AMPacket$destination(message_t *amsg)
   return __nesc_ntoh_uint16(header->dest.nxdata);
 }
 
-# 293 "RadioFloodingC.nc"
+# 297 "RadioFloodingC.nc"
 static void RadioFloodingC$RadioAMSend$sendDone(message_t *msg, error_t err)
-#line 293
+#line 297
 {
   if (&RadioFloodingC$pkt[sim_node()] == msg) {
       RadioFloodingC$busy[sim_node()] = FALSE;
       RadioFloodingC$startTime[sim_node()] = RadioFloodingC$Timer2$getNow();
 
-      if (RadioFloodingC$StateMessages[sim_node()][TOS_NODE_ID] == 5) {
-          RadioFloodingC$Timer0$stop();
-        }
 
 
       if (RadioFloodingC$source_id[sim_node()] != TOS_NODE_ID) {
