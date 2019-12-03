@@ -42,22 +42,22 @@ implementation
 	message_t pkt, serial_pkt, query;
 	
 /* ----------------- msg payload -------------------- */ 
-	uint16_t source_id ;
-	uint16_t seq_num = 0;
+	//uint16_t source_id ;
+	//uint16_t seq_num = 0;
 	//uint16_t forwarder_id;
 	uint16_t counter = 0;
 
 /* --------------- serial query payload -------------- */
 	uint16_t query_id;
-	uint16_t sampling_period;
+	//uint16_t sampling_period;
 	uint16_t query_lifetime;
-	uint16_t propagation_mode;
+	//uint16_t propagation_mode;
 	
 /* --------------- HELPING VARIABLES ----------------- */
 
 /*  8-bit  */
-	uint8_t i;
-	uint8_t k;
+	//uint8_t i;
+	//uint8_t k;
 	uint8_t HoldTimer;
 	uint8_t send,save;
 	uint8_t number_Of_queries;
@@ -68,7 +68,7 @@ implementation
 	//uint16_t arrivedTime;
 	uint16_t query_pos;
 	uint16_t sendQuery;
-	uint16_t neighbor_id;
+	//uint16_t neighbor_id;
 	uint16_t runningTime;
 	uint16_t checkTimer;
 	uint16_t timerStartAt;
@@ -99,6 +99,11 @@ implementation
 		}
 	}
 
+	task void QueryScheduling() {
+		/* vale edw ton kwdika gia to query scheduling, den xreiazetai na uparxei 2 fores o idios kwdikas pleon + tha aposumforizeis ton epe3ergasth*/
+	}
+
+
 /* --------------------------------------------------------- BOOTED -------------------------------------------------------- */		
 	event void Boot.booted() {
 		i=0;
@@ -109,7 +114,6 @@ implementation
 		source_id=0;
 		number_Of_queries=0;
 
-
 		call Leds.led0Off();
 		call Leds.led1Off();
 		call Leds.led2Off();
@@ -119,7 +123,6 @@ implementation
 
 		call RadioAMControl.start();
 		call SerialAMControl.start();
-
 	}
 	
 /* ------------------------------------------------- RADIO CONTROL ---------------------------------------------------------- */	
@@ -332,7 +335,7 @@ implementation
 
 					bcast_pkt->source_id = r_pkt->source_id;
 					bcast_pkt->query_id = r_pkt->query_id;
-					bcast_pkt->forwarder_id = r_pkt->forwarder_id;
+					bcast_pkt->forwarder_id = TOS_NODE_ID;
 					bcast_pkt->sampling_period = r_pkt->sampling_period;
 					bcast_pkt->query_lifetime = r_pkt->query_lifetime;
 					bcast_pkt->propagation_mode = r_pkt->propagation_mode;
@@ -355,6 +358,7 @@ implementation
 	event message_t* SerialReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (query_msg_t)) {
 			s_pkt = (query_msg_t*) payload;
+			call Leds.led2On();
 
 			if (number_Of_queries < 3) {
 				number_Of_queries++;
@@ -365,11 +369,16 @@ implementation
 					query_pos++;
 				}
 				
+				sendQuery = query_pos;
+				query_lifetime = s_pkt->query_lifetime;
+
 				ActiveQueryQ[query_pos][0] = TOS_NODE_ID;
 				ActiveQueryQ[query_pos][1] = query_id;
 				ActiveQueryQ[query_pos][2] = s_pkt->sampling_period;
 				ActiveQueryQ[query_pos][4] = s_pkt->propagation_mode;
 				ActiveQueryQ[query_pos][5] = 1;
+
+				post QueryScheduling();
 
 				if (call Timer3.isRunning() == TRUE) {
 					checkTimer = call Timer3.getNow();
@@ -399,13 +408,12 @@ implementation
 				}
 			}	
 			
-			sendQuery = query_pos;
-			query_lifetime = s_pkt->query_lifetime;
-			call Timer0.startOneShot(TOS_NODE_ID* 50);
+			//call Timer0.startOneShot(TOS_NODE_ID* 50);
 			//call Timer2.startPeriodic(1000);
-			call Timer2.startOneShot(1000);
+			//call Timer2.startOneShot(1000);
 			
 		}
+		call Leds.led2Off();
 		return msg;
 	}
 	
@@ -436,7 +444,7 @@ implementation
 		if (&serial_pkt == msg) {
 			serial_busy = FALSE;
 
-			call Leds.led1Off();
+			//call Leds.led1Off();
 			dbg("BroadcastingC", "Finish serial\n\n ");
 			
 		}
