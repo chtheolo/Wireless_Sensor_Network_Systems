@@ -91,7 +91,7 @@ implementation
 	//uint16_t NeighborsArray[NEIGHBOR_SIZE][2];
 
 	
-/* --------------------------------------------------------- TASKS --------------------------------------------------------- */
+/* %% ------------------------------------------------------ TASKS --------------------------------------------------- %% */
 	
 	task void init_StateMessages() {
 		for (start=0; start < SIZE; start++) {
@@ -105,50 +105,31 @@ implementation
 		}
 	}
 
-/* ----------- Query Scheduling ------------ */
+/* -------------------------------------------------- Query Scheduling --------------------------------------------------- */
 	task void QueryScheduling() {
 		if (call Timer3.isRunning() == TRUE) {
 			checkTimer = call Timer3.getNow();
 			runningTime = checkTimer - timerStartAt;
-			dt/*ActiveQueryQ[HoldTimer][3]*/ = ActiveQueryQ[HoldTimer][3] - runningTime; //remaining_time to expire.
+			dt = ActiveQueryQ[HoldTimer][3] - runningTime; //remaining_time to expire.
 
-			if (dt/*ActiveQueryQ[HoldTimer][3]*/ > ActiveQueryQ[query_pos][3]) {
-
+			if (dt > ActiveQueryQ[query_pos][3]) {
 				HoldTimer = query_pos;
 				call Timer3.startOneShot(ActiveQueryQ[HoldTimer][3]);
 				timerStartAt = call Timer3.getNow();
-
 				curQuery = HoldTimer;
-				
-				/*query_pos=0;
-				while( query_pos < 3) {
-					if (ActiveQueryQ[query_pos][5]==1 && query_pos != HoldTimer) {
-						ActiveQueryQ[query_pos][3] = ActiveQueryQ[query_pos][3] - runningTime; //remaining_timer to expire
-					}
-					query_pos++;
-				}*/
 			}
 			else {
-
-				//call Timer3.startOneShot(dt);
 				timerStartAt = call Timer3.getNow();
 				curQuery = sendQuery;
-
-				/*query_pos = 0;
-				while( query_pos < 3) {
-					if (ActiveQueryQ[query_pos][5]==1 && query_pos != sendQuery) {
-						ActiveQueryQ[query_pos][3] = ActiveQueryQ[query_pos][3] - runningTime; //remaining_timer to expire
-					}
-					query_pos++;
-				}*/
 			}
+
 			query_pos = 0;
-				while( query_pos < 3) {
-					if (ActiveQueryQ[query_pos][5]==1 && query_pos != curQuery) {
-						ActiveQueryQ[query_pos][3] = ActiveQueryQ[query_pos][3] - runningTime; //remaining_timer to expire
-					}
-					query_pos++;
+			while( query_pos < 3) {
+				if (ActiveQueryQ[query_pos][5]==1 && query_pos != curQuery) {
+					ActiveQueryQ[query_pos][3] = ActiveQueryQ[query_pos][3] - runningTime; //remaining_timer to expire
 				}
+				query_pos++;
+			}
 		}
 		else {
 			HoldTimer = query_pos;
@@ -156,6 +137,16 @@ implementation
 			call Leds.led0On();
 			timerStartAt = call Timer3.getNow();
 		}
+		
+		if (call Timer0.isRunning() == TRUE) {
+			t0 = call Timer0.gett0();
+			dt = call Timer0.getdt();
+			call Timer0.startOneShot(t0 + dt);
+		}
+		else {
+			call Timer0.startOneShot(TOS_NODE_ID * 50);
+		}
+		//call Timer0.startOneShot(TOS_NODE_ID* 50);
 	}
 
 
@@ -218,7 +209,7 @@ implementation
 		
 		StateMessages[TOS_NODE_ID] = query_id;
 
-		save = save%SIZE;
+		/*save = save%SIZE;
 		bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
 		if (bcast_pkt == NULL) {
 			return;
@@ -230,7 +221,7 @@ implementation
 		bcast_pkt->forwarder_id = TOS_NODE_ID;
 		bcast_pkt->sampling_period = ActiveQueryQ[sendQuery][2];  //sampling_period;
 		bcast_pkt->query_lifetime = query_lifetime;	  			  //query_lifetime;
-		bcast_pkt->propagation_mode = ActiveQueryQ[sendQuery][4]; //propagation_mode;
+		bcast_pkt->propagation_mode = ActiveQueryQ[sendQuery][4]; //propagation_mode;*/
 		
 		if (!busy) {
 			memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
@@ -357,15 +348,17 @@ implementation
 					ActiveQueryQ[query_pos][5] = 1;
 					//ActiveQueryQ[query_pos][6] = time_since_boot + call Timer4.getNow(); 
 
-					//sendQuery = query_pos;
-					if (call Timer1.isRunning() == TRUE) {
-						t0 = call Timer1.gett0();
-						dt = call Timer1.getdt();
-						call Timer1.startOneShot(t0 + dt);
-					}
-					else {
-						call Timer1.startOneShot(TOS_NODE_ID * 50);
-					}
+					post QueryScheduling();
+
+					sendQuery = query_pos;
+					//if (call Timer0.isRunning() == TRUE) {
+					//	t0 = call Timer0.gett0();
+					//	dt = call Timer0.getdt();
+					//	call Timer0.startOneShot(t0 + dt);
+					//}
+					//else {
+					//	call Timer0.startOneShot(TOS_NODE_ID * 50);
+					//}
 
 					save = save%SIZE;
 					bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
@@ -374,14 +367,14 @@ implementation
 					}
 					save++;
 
-					bcast_pkt->source_id = r_pkt->source_id;
-					bcast_pkt->query_id = r_pkt->query_id;
+					bcast_pkt->source_id = ActiveQueryQ[query_pos][0];	   		//r_pkt->source_id;
+					bcast_pkt->query_id = ActiveQueryQ[query_pos][1];         	//r_pkt->query_id;
 					bcast_pkt->forwarder_id = TOS_NODE_ID;
-					bcast_pkt->sampling_period = r_pkt->sampling_period;
-					bcast_pkt->query_lifetime = r_pkt->query_lifetime;
-					bcast_pkt->propagation_mode = r_pkt->propagation_mode;
+					bcast_pkt->sampling_period = ActiveQueryQ[query_pos][2]; 	//r_pkt->sampling_period;
+					bcast_pkt->query_lifetime = ActiveQueryQ[query_pos][3];		//r_pkt->query_lifetime;
+					bcast_pkt->propagation_mode = ActiveQueryQ[query_pos][4];	//r_pkt->propagation_mode;
 
-					post QueryScheduling();
+					
 				}	
 				//dbg("BlinkC", "Led 2 Toggle @%s\n", sim_time_string());
 			}
@@ -425,6 +418,19 @@ implementation
 
 				post QueryScheduling();
 
+				save = save%SIZE;
+				bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
+				if (bcast_pkt == NULL) {
+					return;
+				}
+				save++;
+
+				bcast_pkt->source_id = ActiveQueryQ[sendQuery][0];		  //TOS_NODE_ID;
+				bcast_pkt->query_id = ActiveQueryQ[sendQuery][1];		  //query_id;
+				bcast_pkt->forwarder_id = TOS_NODE_ID;
+				bcast_pkt->sampling_period = ActiveQueryQ[sendQuery][2];  //sampling_period;
+				bcast_pkt->query_lifetime = ActiveQueryQ[sendQuery][3];	  //query_lifetime;
+				bcast_pkt->propagation_mode = ActiveQueryQ[sendQuery][4]; //propagation_mode;
 			}	
 			
 			//call Timer0.startOneShot(TOS_NODE_ID* 50);
