@@ -18,6 +18,8 @@ module QueryPropagationC @safe()
 	uses interface Timer<TMilli> as Timer1;
 	uses interface Timer<TMilli> as Timer2;
 	uses interface Timer<TMilli> as Timer3;
+
+	//uses interface Read<uint16_t>;
  
 	uses interface Packet;
 	//uses interface AMPacket;
@@ -65,13 +67,17 @@ implementation
 /*  16-bit  */
 	uint16_t t0,dt;
 	uint16_t start;
-	//uint16_t arrivedTime;
+	uint16_t arrivedTime;
 	uint16_t query_pos;
+	uint16_t minQuery;
+	uint16_t expiredQuery;
 	uint16_t sendQuery;
+	uint16_t curQuery;
 	//uint16_t neighbor_id;
 	uint16_t runningTime;
 	uint16_t checkTimer;
 	uint16_t timerStartAt;
+
 
 /*  bool  */	
 	bool busy = FALSE;
@@ -80,7 +86,7 @@ implementation
 
 /* ----------------------- ARRAYS -------------------- */	
 	uint16_t StateMessages[SIZE];
-	uint16_t ActiveQueryQ[3][6];
+	uint16_t ActiveQueryQ[3][7];
 	message_t PacketBuffer[SIZE];
 	//uint16_t NeighborsArray[NEIGHBOR_SIZE][2];
 
@@ -99,19 +105,68 @@ implementation
 		}
 	}
 
+/* ----------- Query Scheduling ------------ */
 	task void QueryScheduling() {
-		/* vale edw ton kwdika gia to query scheduling, den xreiazetai na uparxei 2 fores o idios kwdikas pleon + tha aposumforizeis ton epe3ergasth*/
+		if (call Timer3.isRunning() == TRUE) {
+			checkTimer = call Timer3.getNow();
+			runningTime = checkTimer - timerStartAt;
+			dt/*ActiveQueryQ[HoldTimer][3]*/ = ActiveQueryQ[HoldTimer][3] - runningTime; //remaining_time to expire.
+
+			if (dt/*ActiveQueryQ[HoldTimer][3]*/ > ActiveQueryQ[query_pos][3]) {
+
+				HoldTimer = query_pos;
+				call Timer3.startOneShot(ActiveQueryQ[HoldTimer][3]);
+				timerStartAt = call Timer3.getNow();
+
+				curQuery = HoldTimer;
+				
+				/*query_pos=0;
+				while( query_pos < 3) {
+					if (ActiveQueryQ[query_pos][5]==1 && query_pos != HoldTimer) {
+						ActiveQueryQ[query_pos][3] = ActiveQueryQ[query_pos][3] - runningTime; //remaining_timer to expire
+					}
+					query_pos++;
+				}*/
+			}
+			else {
+
+				//call Timer3.startOneShot(dt);
+				timerStartAt = call Timer3.getNow();
+				curQuery = sendQuery;
+
+				/*query_pos = 0;
+				while( query_pos < 3) {
+					if (ActiveQueryQ[query_pos][5]==1 && query_pos != sendQuery) {
+						ActiveQueryQ[query_pos][3] = ActiveQueryQ[query_pos][3] - runningTime; //remaining_timer to expire
+					}
+					query_pos++;
+				}*/
+			}
+			query_pos = 0;
+				while( query_pos < 3) {
+					if (ActiveQueryQ[query_pos][5]==1 && query_pos != curQuery) {
+						ActiveQueryQ[query_pos][3] = ActiveQueryQ[query_pos][3] - runningTime; //remaining_timer to expire
+					}
+					query_pos++;
+				}
+		}
+		else {
+			HoldTimer = query_pos;
+			call Timer3.startOneShot(ActiveQueryQ[HoldTimer][3]); //end query lifetime when timer3 fire
+			call Leds.led0On();
+			timerStartAt = call Timer3.getNow();
+		}
 	}
 
 
 /* --------------------------------------------------------- BOOTED -------------------------------------------------------- */		
 	event void Boot.booted() {
-		i=0;
+		//i=0;
 		send=0;
 		save=0;
 		query_id=0;
 		query_pos=0;
-		source_id=0;
+		//source_id=0;
 		number_Of_queries=0;
 
 		call Leds.led0Off();
@@ -123,6 +178,7 @@ implementation
 
 		call RadioAMControl.start();
 		call SerialAMControl.start();
+
 	}
 	
 /* ------------------------------------------------- RADIO CONTROL ---------------------------------------------------------- */	
@@ -151,7 +207,7 @@ implementation
 
 /* -------------------------------------------- Timer0 =>  SOURCE  BROADCAST ------------------------------------------------- */ 	
 	event void Timer0.fired() {
-		StateMessages[TOS_NODE_ID] = query_id;
+		
 		//call Leds.led1On();
 		
 		/*if(StateMessages[TOS_NODE_ID] == 5) {
@@ -160,6 +216,8 @@ implementation
 
 		//dbg("BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu @ %s.\n\n", counter, StateMessages[TOS_NODE_ID], sim_time_string());
 		
+		StateMessages[TOS_NODE_ID] = query_id;
+
 		save = save%SIZE;
 		bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
 		if (bcast_pkt == NULL) {
@@ -223,9 +281,9 @@ implementation
 				return;
 			}
 			
-			s_pkt->sampling_period = sampling_period;
-			s_pkt->query_lifetime = call Timer3.getNow();// query_lifetime;
-			s_pkt->propagation_mode = propagation_mode;
+			s_pkt->sampling_period = ActiveQueryQ[sendQuery][2]; 	//sampling_period;
+			s_pkt->query_lifetime =call Timer3.getNow();        	// query_lifetime;
+			s_pkt->propagation_mode = ActiveQueryQ[sendQuery][4];	//propagation_mode;
 
 			dbg("BroadcastingC", "The query_lifetime = %hu \n\n", s_pkt->query_lifetime);
 
@@ -245,22 +303,30 @@ implementation
 		ActiveQueryQ[HoldTimer][5] = 0;
 
 		if (number_Of_queries > 0) {
+			expiredQuery = HoldTimer;
+			minQuery = 0;
 			query_pos = 0;
-			HoldTimer = 0;
 			while (query_pos < 3) {
-				if (ActiveQueryQ[query_pos][5] == 1 && ActiveQueryQ[query_pos][3] <= ActiveQueryQ[HoldTimer][3]) {
-					HoldTimer = query_pos;
+				if (ActiveQueryQ[query_pos][5] == 1) {
+					ActiveQueryQ[query_pos][3] = ActiveQueryQ[query_pos][3] - ActiveQueryQ[expiredQuery][3];
+					if (ActiveQueryQ[query_pos][3] <= ActiveQueryQ[minQuery][3] && ActiveQueryQ[query_pos][3] != 0) {
+						HoldTimer = query_pos;
+					}
+				}
+				else {
+					minQuery++;
 				}
 				query_pos++;
 			}			
 			call Timer3.startOneShot(ActiveQueryQ[HoldTimer][3]);
+			timerStartAt = call Timer3.getNow();
 		}
 		else {
 			call Leds.led0Off();
 			call Timer2.stop();
 		}
 	}
-	
+
 /* --------------------------------------------- RADIO RECEIVE MESSAGES ----------------------------------------------------- */
 	event message_t* RadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (query_flooding_msg_t)) {
@@ -286,35 +352,10 @@ implementation
 					ActiveQueryQ[query_pos][0] = r_pkt->source_id;
 					ActiveQueryQ[query_pos][1] = r_pkt->query_id;
 					ActiveQueryQ[query_pos][2] = r_pkt->sampling_period;
+					ActiveQueryQ[query_pos][3] = r_pkt->query_lifetime;
 					ActiveQueryQ[query_pos][4] = r_pkt->propagation_mode;
 					ActiveQueryQ[query_pos][5] = 1;
-
-					if (call Timer3.isRunning() == TRUE) {
-						checkTimer = call Timer3.getNow();
-						runningTime = checkTimer - timerStartAt;
-						dt = ActiveQueryQ[HoldTimer][3] - timerStartAt;
-						if (dt > r_pkt->query_lifetime) {
-							call Timer3.startOneShot(r_pkt->query_lifetime);
-	
-							ActiveQueryQ[HoldTimer][3] = dt - r_pkt->query_lifetime; //save the remaining time of this query
-							ActiveQueryQ[query_pos][3] = r_pkt->query_lifetime;
-					
-							HoldTimer = query_pos;
-
-						}
-						else {
-							//remaining_time = query_lifetime - dt;
-							ActiveQueryQ[query_pos][3] = r_pkt->query_lifetime - dt;			
-						}
-					}
-					else {
-						ActiveQueryQ[query_pos][3] = r_pkt->query_lifetime;
-						HoldTimer = query_pos;
-						
-						call Timer3.startOneShot(r_pkt->query_lifetime); //end query lifetime when timer3 fire
-						call Leds.led0On();
-						timerStartAt = call Timer3.getNow();
-					}
+					//ActiveQueryQ[query_pos][6] = time_since_boot + call Timer4.getNow(); 
 
 					//sendQuery = query_pos;
 					if (call Timer1.isRunning() == TRUE) {
@@ -339,6 +380,8 @@ implementation
 					bcast_pkt->sampling_period = r_pkt->sampling_period;
 					bcast_pkt->query_lifetime = r_pkt->query_lifetime;
 					bcast_pkt->propagation_mode = r_pkt->propagation_mode;
+
+					post QueryScheduling();
 				}	
 				//dbg("BlinkC", "Led 2 Toggle @%s\n", sim_time_string());
 			}
@@ -358,7 +401,7 @@ implementation
 	event message_t* SerialReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (query_msg_t)) {
 			s_pkt = (query_msg_t*) payload;
-			call Leds.led2On();
+			//call Leds.led2On();
 
 			if (number_Of_queries < 3) {
 				number_Of_queries++;
@@ -375,45 +418,20 @@ implementation
 				ActiveQueryQ[query_pos][0] = TOS_NODE_ID;
 				ActiveQueryQ[query_pos][1] = query_id;
 				ActiveQueryQ[query_pos][2] = s_pkt->sampling_period;
+				ActiveQueryQ[query_pos][3] = s_pkt->query_lifetime;
 				ActiveQueryQ[query_pos][4] = s_pkt->propagation_mode;
 				ActiveQueryQ[query_pos][5] = 1;
+				//ActiveQueryQ[query_pos][6] = time_since_boot + call Timer4.getNow();
 
 				post QueryScheduling();
 
-				if (call Timer3.isRunning() == TRUE) {
-					checkTimer = call Timer3.getNow();
-					runningTime = checkTimer - timerStartAt;
-					dt = ActiveQueryQ[HoldTimer][3] - runningTime;
-					if (dt > s_pkt->query_lifetime) {
-						call Timer3.startOneShot(s_pkt->query_lifetime);
-
-						ActiveQueryQ[HoldTimer][3] = dt - s_pkt->query_lifetime; //save the remaining time of this query
-						ActiveQueryQ[query_pos][3] = s_pkt->query_lifetime;
-			
-						HoldTimer = query_pos;
-					}
-					else {
-						//remaining_time = query_lifetime - dt;
-						ActiveQueryQ[query_pos][3] = s_pkt->query_lifetime - dt;			
-					}
-				}
-				else {
-					//call Leds.led2On();
-					ActiveQueryQ[query_pos][3] = s_pkt->query_lifetime;
-					HoldTimer = query_pos;
-					
-					call Timer3.startOneShot(s_pkt->query_lifetime); //end query lifetime when timer3 fire
-					call Leds.led0On();
-					timerStartAt = call Timer3.getNow();
-				}
 			}	
 			
 			//call Timer0.startOneShot(TOS_NODE_ID* 50);
 			//call Timer2.startPeriodic(1000);
-			//call Timer2.startOneShot(1000);
+			call Timer2.startOneShot(1000);
 			
 		}
-		call Leds.led2Off();
 		return msg;
 	}
 	

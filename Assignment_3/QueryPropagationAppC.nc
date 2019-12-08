@@ -12,6 +12,8 @@ implementation
 	components new TimerMilliC() as Timer2;
 	components new TimerMilliC() as Timer3;
 	
+	//components new  HamamatsuS1087ParC() as Sensor;
+
 	components QueryPropagationC as App;
 	
 	components ActiveMessageC;	
@@ -24,6 +26,7 @@ implementation
 
 	App.Boot -> MainC;
 	App.Leds -> LedsC;
+	//App.Read -> Sensor;
 
 	App.Timer0 -> Timer0;
 	App.Timer1 -> Timer1;
