@@ -18,8 +18,6 @@ module QueryPropagationC @safe()
 	uses interface Timer<TMilli> as Timer1;
 	uses interface Timer<TMilli> as Timer2;
 	uses interface Timer<TMilli> as Timer3;
-	uses interface Timer<TMilli> as Timer4;
-	uses interface Timer<TMilli> as Timer5;
 
 	uses interface Read<uint16_t>;
 
@@ -136,7 +134,7 @@ implementation
 			}
 
 			query_pos = 0;
-			while( query_pos < 3) {
+			while(query_pos < 3) {
 				if (ActiveQueryQ[query_pos][7]==1 && query_pos != curQuery) {
 					ActiveQueryQ[query_pos][5] = ActiveQueryQ[query_pos][5] - runningTime; //remaining_timer to expire
 				}
@@ -158,16 +156,6 @@ implementation
 		}
 		else {
 			call Timer0.startOneShot(TOS_NODE_ID * 50);
-			//if (call Timer1.isRunning() != TRUE) {
-			//	call Timer1.startPeriodic(ActiveQueryQ[sendQuery][4]);
-			//}
-			//else if (call Timer4.isRunning() != TRUE) {
-			//	call Timer4.startPeriodic(ActiveQueryQ[sendQuery][4]);
-			//}
-			//else if (call Timer5.isRunning() != TRUE) {
-			//	call Timer5.startPeriodic(ActiveQueryQ[sendQuery][4]);
-			//}
-			
 			//post MeasurementScheduling();
 		}
 
@@ -183,6 +171,7 @@ implementation
 				Hold_Sampling_Timer = sendQuery;
 				call Timer1.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
 				time4MeasurementStartAt = call Timer1.getNow();
+				curQuery = Hold_Sampling_Timer;
 			}
 			else {
 				time4MeasurementStartAt = call Timer1.getNow();
@@ -301,24 +290,11 @@ implementation
 /* -------------------------------------- Timer1 =>  START READING VALUES FROM SENSOR ---------------------------------------- */ 	
 	event void Timer1.fired() {
 		call Read.read(); /* initiate read op */
-		if (ActiveQueryQ[timer1_call][7] == 0) {
+		if (ActiveQueryQ[Hold_Sampling_Timer][7] == 0) {
 			call Timer1.stop();
 		}
 	}
 
-	event void Timer4.fired() {
-		call Read.read();
-		if (ActiveQueryQ[timer4_call][7] == 0) {
-			call Timer4.stop();
-		}
-	}
-
-	event void Timer5.fired() {
-		call Read.read();
-		if (ActiveQueryQ[timer5_call][7] == 0) {
-			call Timer5.stop();
-		}
-	}
 
 /* ---------------------------------------------- READ VALUES DONE, SO SEND ----------------------------------------------- */
 	event void Read.readDone(error_t result, uint16_t data) {
@@ -337,10 +313,39 @@ implementation
 				ucast_pkt->sensor_data = data;
 				
 				data_id++;
+				if (number_Of_queries > 0) {
+					expiredQuery = Hold_Sampling_Timer;
+					runningTime = TimeToMeasure[expiredQuery];
+					minPeriod = 0;
+					start = 0;
+					while(start < 3) {
+						if (ActiveQueryQ[start][7] == 1) {
+							if (start == expiredQuery) {
+								TimeToMeasure[start] = ActiveQueryQ[start][4]; // if finished, initialize again the sampling period
+							}
+							else {
+								TimeToMeasure[start] -= runningTime;
+							}
+							if (TimeToMeasure[start] <= TimeToMeasure[minPeriod] /*&& TimeToMeasure[start] != 0*/) {
+								Hold_Sampling_Timer = start;
+							}
+						}
+						else {
+							minPeriod++; // if in first positions there is no active query,then move on and minPeriod moves on too
+						}
+						start++;
+					}
+					//if (ActiveQueryQ[expiredQuery][7] == 1) {
+					//	TimeToMeasure[expiredQuery] = ActiveQueryQ[expiredQuery][4]; // update the TimeToMeasure
+					//}
+
+					call Timer1.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
+					time4MeasurementStartAt = call Timer1.getNow();
+				}
 
 				//post NextSampling();
 
-				if (call SamplingRadioAMSend.send(ActiveQueryQ[sendQuery][2], &pkt, sizeof (sampling_msg_t)) == SUCCESS){
+				if (call SamplingRadioAMSend.send(ActiveQueryQ[expiredQuery][2], &pkt, sizeof (sampling_msg_t)) == SUCCESS){
 					busy = TRUE;
 					call Leds.led2On();
 				}
@@ -468,19 +473,20 @@ implementation
 					
 					TimeToMeasure[query_pos] = ActiveQueryQ[query_pos][4];
 
-					if (call Timer1.isRunning() != TRUE) {
-						timer1_call = sendQuery;
-						call Timer1.startPeriodic(ActiveQueryQ[sendQuery][4]);
-					}
-					else if (call Timer4.isRunning() != TRUE) {
-						timer4_call = sendQuery;
-						call Timer4.startPeriodic(ActiveQueryQ[sendQuery][4]);
-					}
-					else if (call Timer5.isRunning() != TRUE) {
-						timer5_call = sendQuery;
-						call Timer5.startPeriodic(ActiveQueryQ[sendQuery][4]);
-					}
-					//post MeasurementScheduling();
+					timer1_call = sendQuery;
+					//if (call Timer1.isRunning() != TRUE) {
+					//	timer1_call = sendQuery;
+					//	call Timer1.startPeriodic(ActiveQueryQ[sendQuery][4]);
+					//}
+					//else if (call Timer4.isRunning() != TRUE) {
+					//	timer4_call = sendQuery;
+					//	call Timer4.startPeriodic(ActiveQueryQ[sendQuery][4]);
+					//}
+					//else if (call Timer5.isRunning() != TRUE) {
+					//	timer5_call = sendQuery;
+					//	call Timer5.startPeriodic(ActiveQueryQ[sendQuery][4]);
+					//}
+					post MeasurementScheduling();
 
 				}	
 				//dbg("BlinkC", "Led 2 Toggle @%s\n", sim_time_string());
