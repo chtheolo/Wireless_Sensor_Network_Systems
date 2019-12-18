@@ -18,6 +18,7 @@ module QueryPropagationC @safe()
 	uses interface Timer<TMilli> as Timer1;
 	uses interface Timer<TMilli> as Timer2;
 	uses interface Timer<TMilli> as Timer3;
+	uses interface Timer<TMilli> as Timer4;
 
 	uses interface Read<uint16_t>;
 
@@ -66,6 +67,7 @@ implementation
 
 /*  8-bit  */
 	uint8_t send,save;
+	uint8_t sampling_send, sampling_save;
 	uint8_t number_Of_queries;
 
 /*  16-bit  */
@@ -85,8 +87,6 @@ implementation
 	uint16_t Hold_Sampling_Timer;
 	uint16_t minPeriod;
 	uint16_t timer1_call;
-	uint16_t timer4_call;
-	uint16_t timer5_call;
 
 /*  bool  */	
 	bool busy = FALSE;
@@ -115,8 +115,7 @@ implementation
 
 /* -------------------------------------------------- Query Scheduling --------------------------------------------------- */
 	task void QueryScheduling() {
-
-/*__________check if i am alone or other queries also running_________ */
+		/* check if i am alone or other queries also running */
 		if (call Timer3.isRunning() == TRUE) {
 			checkTimer = call Timer3.getNow();
 			runningTime = checkTimer - timerStartAt;
@@ -126,16 +125,16 @@ implementation
 				HoldTimer = query_pos;
 				call Timer3.startOneShot(ActiveQueryQ[HoldTimer][5]);
 				timerStartAt = call Timer3.getNow();
-				curQuery = HoldTimer;
+				//curQuery = HoldTimer;
 			}
 			else {
 				timerStartAt = call Timer3.getNow();
-				curQuery = sendQuery;
+				//curQuery = sendQuery;
 			}
 
 			query_pos = 0;
 			while(query_pos < 3) {
-				if (ActiveQueryQ[query_pos][7]==1 && query_pos != curQuery) {
+				if (ActiveQueryQ[query_pos][7]==1 && query_pos != sendQuery /*curQuery*/) {
 					ActiveQueryQ[query_pos][5] = ActiveQueryQ[query_pos][5] - runningTime; //remaining_timer to expire
 				}
 				query_pos++;
@@ -144,8 +143,8 @@ implementation
 		else {
 			HoldTimer = query_pos;
 			call Timer3.startOneShot(ActiveQueryQ[HoldTimer][5]); //end query lifetime when timer3 fire
-			call Leds.led0On();
 			timerStartAt = call Timer3.getNow();
+			call Leds.led0On();
 		}
 		/* __________________________________________________ */
 
@@ -194,6 +193,7 @@ implementation
 		}
 	}
 
+/* ---------------------------------------------------- Next Sampling ------------------------------------------------------ */
 	task void NextSampling() {
 		if (number_Of_queries > 0) {
 			start = 0;
@@ -230,6 +230,8 @@ implementation
 		query_id=0;
 		query_pos=0;
 		//source_id=0;
+		sampling_save = 0;
+		sampling_send = 0;
 		number_Of_queries=0;
 
 		call Leds.led0Off();
@@ -279,10 +281,9 @@ implementation
 			//dbg("BroadcastingC", "source_id=%hu, seq_num=%hu, forwarder_id=%hu, counter=%hu.\n", bcast_pkt->source_id, bcast_pkt->seq_num, bcast_pkt->forwarder_id, bcast_pkt->counter);
 			
 			if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (query_flooding_msg_t)) == SUCCESS){
-				//call Timer2.startOneShot(10);
 				busy = TRUE;
 				call Leds.led1On();
-				//dbg("BroadcastingC", "START BROADCASTING ... %s.\n\n", sim_time_string());
+				//dbg("BroadcastingC", "START QUERY BROADCASTING ... %s.\n\n", sim_time_string());
 			}
 		}
 	}
@@ -295,8 +296,7 @@ implementation
 		}
 	}
 
-
-/* ---------------------------------------------- READ VALUES DONE, SO SEND ----------------------------------------------- */
+/* ---------------------------------------------- READ VALUES DONE, SO SEND -------------------------------------------------- */
 	event void Read.readDone(error_t result, uint16_t data) {
 		if(result == SUCCESS){
 			if (!busy) {
@@ -308,9 +308,11 @@ implementation
 				//memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
 
 				ucast_pkt->source_id = TOS_NODE_ID;
-				ucast_pkt->forwarder_id = TOS_NODE_ID;
 				ucast_pkt->data_id = data_id;
+				ucast_pkt->forwarder_id = TOS_NODE_ID;
 				ucast_pkt->sensor_data = data;
+				ucast_pkt->destination_id = ActiveQueryQ[Hold_Sampling_Timer][0];
+				ucast_pkt->query_id = ActiveQueryQ[Hold_Sampling_Timer][1];
 				
 				data_id++;
 				if (number_Of_queries > 0) {
@@ -335,9 +337,6 @@ implementation
 						}
 						start++;
 					}
-					//if (ActiveQueryQ[expiredQuery][7] == 1) {
-					//	TimeToMeasure[expiredQuery] = ActiveQueryQ[expiredQuery][4]; // update the TimeToMeasure
-					//}
 
 					call Timer1.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
 					time4MeasurementStartAt = call Timer1.getNow();
@@ -365,9 +364,9 @@ implementation
 				return;
 			}
 			
-			s_pkt->sampling_period = ActiveQueryQ[sendQuery][4]; 	//sampling_period;
-			s_pkt->query_lifetime =call Timer3.getNow();        	// query_lifetime;
-			s_pkt->propagation_mode = ActiveQueryQ[sendQuery][6];	//propagation_mode;
+			s_pkt->sampling_period = r_sampling_pkt->source_id; //ActiveQueryQ[sendQuery][4]; //sampling_period;
+			s_pkt->query_lifetime = r_sampling_pkt->sensor_data;       	// query_lifetime;
+			s_pkt->propagation_mode = r_sampling_pkt->query_id; //ActiveQueryQ[sendQuery][6];	//propagation_mode;
 
 			dbg("BroadcastingC", "The query_lifetime = %hu \n\n", s_pkt->query_lifetime);
 
@@ -410,13 +409,47 @@ implementation
 			//call Timer2.stop();
 		}
 	}
+
+/* ---------------------------------------- Timer4 => Re-UNICAST MEASUREMENTS --------------------------------------------- */
+	event void Timer4.fired() {
+		ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
+		if (ucast_pkt == NULL) {
+			return;
+		}
+
+		memcpy(&pkt, &SamplingPacketBuffer[sampling_send], sizeof(message_t));
+
+		if (call SamplingRadioAMSend.send(ActiveQueryQ[expiredQuery][2], &pkt, sizeof (sampling_msg_t)) == SUCCESS){
+			busy = TRUE;
+			call Leds.led2On();
+		}
+
+	} 
+
 /* ----------------------------------------- SAMPLING RADIO RECEIVE MESSAGES ------------------------------------------------ */
 	event message_t* SamplingRadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof(sampling_msg_t)) {
-			//call Leds.led2Toggle();
 			r_sampling_pkt = (sampling_msg_t*) payload;
-			if (r_sampling_pkt->source_id != TOS_NODE_ID) {
-				dbg("ReceiveC", "Do nothing!\n");
+			if (r_sampling_pkt->destination_id != TOS_NODE_ID) {
+
+				sampling_save = sampling_save%SIZE;
+				ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
+				if (ucast_pkt == NULL) {
+					return;
+				}
+				sampling_save++;
+
+				ucast_pkt->source_id = r_sampling_pkt->source_id;
+				ucast_pkt->data_id = r_sampling_pkt->data_id;
+				ucast_pkt->forwarder_id = TOS_NODE_ID;
+				ucast_pkt->sensor_data = r_sampling_pkt->sensor_data;
+				ucast_pkt->destination_id = r_sampling_pkt->destination_id;
+				ucast_pkt->query_id = r_sampling_pkt->query_id;
+
+				call Timer4.startOneShot(TOS_NODE_ID * 40);
+			}
+			else {
+				call Timer2.startOneShot(20);
 			}
 		}
 		return msg;
@@ -455,6 +488,7 @@ implementation
 
 					post QueryScheduling();
 
+					// .. maybe this part is unnecessary
 					save = save%SIZE;
 					bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
 					if (bcast_pkt == NULL) {
@@ -469,23 +503,12 @@ implementation
 					bcast_pkt->sampling_period = ActiveQueryQ[query_pos][4]; 	//r_pkt->sampling_period;
 					bcast_pkt->query_lifetime = ActiveQueryQ[query_pos][5];		//r_pkt->query_lifetime;
 					bcast_pkt->propagation_mode = ActiveQueryQ[query_pos][6];	//r_pkt->propagation_mode;
-
+					// ..
 					
 					TimeToMeasure[query_pos] = ActiveQueryQ[query_pos][4];
 
 					timer1_call = sendQuery;
-					//if (call Timer1.isRunning() != TRUE) {
-					//	timer1_call = sendQuery;
-					//	call Timer1.startPeriodic(ActiveQueryQ[sendQuery][4]);
-					//}
-					//else if (call Timer4.isRunning() != TRUE) {
-					//	timer4_call = sendQuery;
-					//	call Timer4.startPeriodic(ActiveQueryQ[sendQuery][4]);
-					//}
-					//else if (call Timer5.isRunning() != TRUE) {
-					//	timer5_call = sendQuery;
-					//	call Timer5.startPeriodic(ActiveQueryQ[sendQuery][4]);
-					//}
+					
 					post MeasurementScheduling();
 
 				}	
@@ -502,7 +525,7 @@ implementation
 					query_pos++;
 				}
 			}
-		}
+		} 
 		return msg;
 	}
 
@@ -519,9 +542,6 @@ implementation
 				while(ActiveQueryQ[query_pos][7] == 1 && query_pos < 3) {
 					query_pos++;
 				}
-				
-				sendQuery = query_pos;
-				query_lifetime = s_pkt->query_lifetime;
 
 				ActiveQueryQ[query_pos][0] = TOS_NODE_ID;
 				ActiveQueryQ[query_pos][1] = query_id;
@@ -532,6 +552,7 @@ implementation
 				ActiveQueryQ[query_pos][6] = s_pkt->propagation_mode; //4
 				ActiveQueryQ[query_pos][7] = 1; // 5
 				//ActiveQueryQ[query_pos][6] = 0; // 6
+				sendQuery = query_pos;
 
 				post QueryScheduling();
 
@@ -551,11 +572,6 @@ implementation
 				bcast_pkt->propagation_mode = ActiveQueryQ[sendQuery][6]; //propagation_mode;
 				//bcast_pkt->hops = ActiveQueryQ[query_pos][6];			  //hops;
 			}	
-			
-			//call Timer0.startOneShot(TOS_NODE_ID* 50);
-			//call Timer2.startPeriodic(1000);
-			call Timer2.startOneShot(1000);
-			
 		}
 		return msg;
 	}
@@ -576,6 +592,7 @@ implementation
 			busy = FALSE;
 
 			call Leds.led2Off(); // blue
+			sampling_send++;
 	
 			//post NextSampling();
 
