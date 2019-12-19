@@ -19,6 +19,7 @@ module QueryPropagationC @safe()
 	uses interface Timer<TMilli> as Timer2;
 	uses interface Timer<TMilli> as Timer3;
 	uses interface Timer<TMilli> as Timer4;
+	uses interface Timer<TMilli> as Timer5;
 
 	uses interface Read<uint16_t>;
 
@@ -86,7 +87,7 @@ implementation
 	uint16_t time4MeasurementStartAt;
 	uint16_t Hold_Sampling_Timer;
 	uint16_t minPeriod;
-	uint16_t timer1_call;
+	uint16_t sendTofather;
 
 /*  bool  */	
 	bool busy = FALSE;
@@ -121,8 +122,8 @@ implementation
 			runningTime = checkTimer - timerStartAt;
 			dt = ActiveQueryQ[HoldTimer][5] - runningTime; //remaining_time to expire.
 
-			if (dt > ActiveQueryQ[query_pos][5]) {
-				HoldTimer = query_pos;
+			if (dt > ActiveQueryQ[/*query_pos*/sendQuery][5]) {
+				HoldTimer = sendQuery; //query_pos;
 				call Timer3.startOneShot(ActiveQueryQ[HoldTimer][5]);
 				timerStartAt = call Timer3.getNow();
 				//curQuery = HoldTimer;
@@ -141,7 +142,7 @@ implementation
 			}
 		}
 		else {
-			HoldTimer = query_pos;
+			HoldTimer = sendQuery; //query_pos;
 			call Timer3.startOneShot(ActiveQueryQ[HoldTimer][5]); //end query lifetime when timer3 fire
 			timerStartAt = call Timer3.getNow();
 			call Leds.led0On();
@@ -155,7 +156,6 @@ implementation
 		}
 		else {
 			call Timer0.startOneShot(TOS_NODE_ID * 50);
-			//post MeasurementScheduling();
 		}
 
 	}
@@ -166,56 +166,29 @@ implementation
 			checkTimer = call Timer1.getNow();
 			runningTime = checkTimer - time4MeasurementStartAt;
 			dt = TimeToMeasure[Hold_Sampling_Timer] - runningTime;
+			
 			if (dt > TimeToMeasure[sendQuery]) {
 				Hold_Sampling_Timer = sendQuery;
 				call Timer1.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
 				time4MeasurementStartAt = call Timer1.getNow();
-				curQuery = Hold_Sampling_Timer;
+				//curQuery = Hold_Sampling_Timer;
 			}
 			else {
 				time4MeasurementStartAt = call Timer1.getNow();
-				curQuery = sendQuery;
+				//curQuery = sendQuery;
 			}
 
-			start=0;
-			while( start < 3) {
-				if (ActiveQueryQ[start][7]==1 && start != curQuery) {
-					TimeToMeasure[start] = TimeToMeasure[start] - runningTime; //remaining_timer to expire
+			query_pos = 0; //start=0;
+			while( query_pos < 3) {
+				if (ActiveQueryQ[query_pos][7]==1 && query_pos != sendQuery /*curQuery*/) {
+					TimeToMeasure[query_pos] = TimeToMeasure[query_pos] - runningTime; 		 //remaining_timer to expire
 				}
-				start++;
+				query_pos++;
 			}
 		}
 		else {
 			Hold_Sampling_Timer = sendQuery;
-			//TimeToMeasure[Hold_Sampling_Timer] = ActiveQueryQ[sendQuery][4];
 			call Timer1.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
-			time4MeasurementStartAt = call Timer1.getNow();
-		}
-	}
-
-/* ---------------------------------------------------- Next Sampling ------------------------------------------------------ */
-	task void NextSampling() {
-		if (number_Of_queries > 0) {
-			start = 0;
-			minPeriod = 0;
-			expiredQuery = Hold_Sampling_Timer;
-			while(start < 3) {
-				if (ActiveQueryQ[start][7] == 1) {
-					TimeToMeasure[start] -= TimeToMeasure[expiredQuery];
-					if (TimeToMeasure[start] <= TimeToMeasure[minPeriod] && TimeToMeasure[start] != 0) {
-						minPeriod = start;
-					}
-				}
-				else {
-					minPeriod++; // if in first positions there is no active query,then move on and minPeriod moves on too
-				}
-				start++;
-			}
-			if (ActiveQueryQ[expiredQuery][7] == 1) {
-				TimeToMeasure[expiredQuery] = ActiveQueryQ[expiredQuery][4]; // update the TimeToMeasure
-			}
-
-			call Timer1.startOneShot(TimeToMeasure[minPeriod]);
 			time4MeasurementStartAt = call Timer1.getNow();
 		}
 	}
@@ -229,7 +202,6 @@ implementation
 		data_id=0;
 		query_id=0;
 		query_pos=0;
-		//source_id=0;
 		sampling_save = 0;
 		sampling_send = 0;
 		number_Of_queries=0;
@@ -273,7 +245,7 @@ implementation
 	event void Timer0.fired() {
 		//dbg("BroadcastingC", "New Attempt for BROADCASTING  counter = %hu with seq_num = %hu @ %s.\n\n", counter, StateMessages[TOS_NODE_ID], sim_time_string());
 		
-		StateMessages[TOS_NODE_ID] = query_id;
+		StateMessages[TOS_NODE_ID] = ActiveQueryQ[sendQuery][1]; //query_id;
 		
 		if (!busy) {
 			memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
@@ -301,11 +273,12 @@ implementation
 		if(result == SUCCESS){
 			if (!busy) {
 
-				ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&pkt/*PacketBuffer[send]*/, sizeof (sampling_msg_t)));
+				sampling_save = sampling_save%SIZE;
+				ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
 				if (ucast_pkt == NULL) {
 					return;
 				}
-				//memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
+				sampling_save++;
 
 				ucast_pkt->source_id = TOS_NODE_ID;
 				ucast_pkt->data_id = data_id;
@@ -313,13 +286,20 @@ implementation
 				ucast_pkt->sensor_data = data;
 				ucast_pkt->destination_id = ActiveQueryQ[Hold_Sampling_Timer][0];
 				ucast_pkt->query_id = ActiveQueryQ[Hold_Sampling_Timer][1];
+
+				sendTofather = ActiveQueryQ[Hold_Sampling_Timer][2];
 				
 				data_id++;
+
+				call Timer5.startOneShot(TOS_NODE_ID * 45);
+
 				if (number_Of_queries > 0) {
+				
 					expiredQuery = Hold_Sampling_Timer;
 					runningTime = TimeToMeasure[expiredQuery];
 					minPeriod = 0;
 					start = 0;
+					
 					while(start < 3) {
 						if (ActiveQueryQ[start][7] == 1) {
 							if (start == expiredQuery) {
@@ -342,15 +322,12 @@ implementation
 					time4MeasurementStartAt = call Timer1.getNow();
 				}
 
-				//post NextSampling();
-
-				if (call SamplingRadioAMSend.send(ActiveQueryQ[expiredQuery][2], &pkt, sizeof (sampling_msg_t)) == SUCCESS){
+				/*if (call SamplingRadioAMSend.send(ActiveQueryQ[expiredQuery][2], &pkt, sizeof (sampling_msg_t)) == SUCCESS){
 					busy = TRUE;
 					call Leds.led2On();
-				}
+				}*/
 			}
 		}
-
 	}
 
 /* ----------------------------------------- Timer2 => SERIAL SEND : MOTE -> PC -------------------------------------------- */ 
@@ -419,12 +396,30 @@ implementation
 
 		memcpy(&pkt, &SamplingPacketBuffer[sampling_send], sizeof(message_t));
 
-		if (call SamplingRadioAMSend.send(ActiveQueryQ[expiredQuery][2], &pkt, sizeof (sampling_msg_t)) == SUCCESS){
+		if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (sampling_msg_t)) == SUCCESS){
 			busy = TRUE;
 			call Leds.led2On();
 		}
 
 	} 
+
+/* ---------------------------------------- Timer5 => UNICAST MEASUREMENTS --------------------------------------------- */
+	event void Timer5.fired() {
+		ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
+		if (ucast_pkt == NULL) {
+			return;
+		}
+
+		memcpy(&pkt, &SamplingPacketBuffer[sampling_send], sizeof(message_t));
+
+		if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (sampling_msg_t)) == SUCCESS){
+			busy = TRUE;
+			call Leds.led2On();
+		}
+
+	} 
+
+
 
 /* ----------------------------------------- SAMPLING RADIO RECEIVE MESSAGES ------------------------------------------------ */
 	event message_t* SamplingRadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
@@ -441,12 +436,21 @@ implementation
 
 				ucast_pkt->source_id = r_sampling_pkt->source_id;
 				ucast_pkt->data_id = r_sampling_pkt->data_id;
-				ucast_pkt->forwarder_id = TOS_NODE_ID;
+				ucast_pkt->forwarder_id = r_sampling_pkt->forwarder_id; //TOS_NODE_ID
 				ucast_pkt->sensor_data = r_sampling_pkt->sensor_data;
 				ucast_pkt->destination_id = r_sampling_pkt->destination_id;
 				ucast_pkt->query_id = r_sampling_pkt->query_id;
 
-				call Timer4.startOneShot(TOS_NODE_ID * 40);
+				query_pos = 0;
+				while (ActiveQueryQ[query_pos][0] != r_sampling_pkt->source_id && ActiveQueryQ[query_pos][1] != r_sampling_pkt->query_id && query_pos < 3) {
+					query_pos++;
+				}
+				if (query_pos < 4) {
+					sendTofather = ActiveQueryQ[query_pos][2];
+				}
+				
+
+				call Timer4.startOneShot(TOS_NODE_ID * 20);
 			}
 			else {
 				call Timer2.startOneShot(20);
@@ -475,20 +479,24 @@ implementation
 					while(ActiveQueryQ[query_pos][7] == 1 && query_pos < 3) {
 						query_pos++;
 					}
-					sendQuery = query_pos;
 
 					ActiveQueryQ[query_pos][0] = r_pkt->source_id;
 					ActiveQueryQ[query_pos][1] = r_pkt->query_id;
-					ActiveQueryQ[query_pos][2] = r_pkt->forwarder_id;
+					ActiveQueryQ[query_pos][2] = r_pkt->forwarder_id; 
 					ActiveQueryQ[query_pos][3] = r_pkt->hops+1;
 					ActiveQueryQ[query_pos][4] = r_pkt->sampling_period;  // 2
 					ActiveQueryQ[query_pos][5] = r_pkt->query_lifetime; // 3 
 					ActiveQueryQ[query_pos][6] = r_pkt->propagation_mode; //4
 					ActiveQueryQ[query_pos][7] = 1; // 5
 
+					sendQuery = query_pos;
+
 					post QueryScheduling();
 
-					// .. maybe this part is unnecessary
+					TimeToMeasure[query_pos] = ActiveQueryQ[query_pos][4];
+					
+					post MeasurementScheduling();
+
 					save = save%SIZE;
 					bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
 					if (bcast_pkt == NULL) {
@@ -503,13 +511,6 @@ implementation
 					bcast_pkt->sampling_period = ActiveQueryQ[query_pos][4]; 	//r_pkt->sampling_period;
 					bcast_pkt->query_lifetime = ActiveQueryQ[query_pos][5];		//r_pkt->query_lifetime;
 					bcast_pkt->propagation_mode = ActiveQueryQ[query_pos][6];	//r_pkt->propagation_mode;
-					// ..
-					
-					TimeToMeasure[query_pos] = ActiveQueryQ[query_pos][4];
-
-					timer1_call = sendQuery;
-					
-					post MeasurementScheduling();
 
 				}	
 				//dbg("BlinkC", "Led 2 Toggle @%s\n", sim_time_string());
@@ -529,15 +530,15 @@ implementation
 		return msg;
 	}
 
-/* -------------------------------------------- RECEIVE SERIAL MESSAGE ------------------------------------------------------ */
+/* -------------------------------------------- QUERY RECEIVE SERIAL MESSAGE ------------------------------------------------------ */
 	event message_t* SerialReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (query_msg_t)) {
 			s_pkt = (query_msg_t*) payload;
 			
 			if (number_Of_queries < 3) {
 				number_Of_queries++;
-
 				query_id++;
+
 				query_pos = 0;
 				while(ActiveQueryQ[query_pos][7] == 1 && query_pos < 3) {
 					query_pos++;
@@ -545,13 +546,15 @@ implementation
 
 				ActiveQueryQ[query_pos][0] = TOS_NODE_ID;
 				ActiveQueryQ[query_pos][1] = query_id;
-				ActiveQueryQ[query_pos][2] = r_pkt->forwarder_id;
-				ActiveQueryQ[query_pos][3] = r_pkt->hops+1;
+				ActiveQueryQ[query_pos][2] = TOS_NODE_ID;			
+				ActiveQueryQ[query_pos][3] = 0;						// every query that starts from me is 0 hop
 				ActiveQueryQ[query_pos][4] = s_pkt->sampling_period; //2
 				ActiveQueryQ[query_pos][5] = s_pkt->query_lifetime; //3
 				ActiveQueryQ[query_pos][6] = s_pkt->propagation_mode; //4
 				ActiveQueryQ[query_pos][7] = 1; // 5
-				//ActiveQueryQ[query_pos][6] = 0; // 6
+
+				
+				
 				sendQuery = query_pos;
 
 				post QueryScheduling();
@@ -566,11 +569,10 @@ implementation
 				bcast_pkt->source_id = ActiveQueryQ[sendQuery][0];		  //TOS_NODE_ID;
 				bcast_pkt->query_id = ActiveQueryQ[sendQuery][1];		  //query_id;
 				bcast_pkt->forwarder_id = TOS_NODE_ID;
-				bcast_pkt->hops = ActiveQueryQ[query_pos][3];			  //hops;
+				bcast_pkt->hops = ActiveQueryQ[sendQuery][3];			  //hops;
 				bcast_pkt->sampling_period = ActiveQueryQ[sendQuery][4];  //sampling_period;
 				bcast_pkt->query_lifetime = ActiveQueryQ[sendQuery][5];	  //query_lifetime;
 				bcast_pkt->propagation_mode = ActiveQueryQ[sendQuery][6]; //propagation_mode;
-				//bcast_pkt->hops = ActiveQueryQ[query_pos][6];			  //hops;
 			}	
 		}
 		return msg;
@@ -584,6 +586,9 @@ implementation
 			//dbg("BlinkC", "Led 0 Toggle @%s\n", sim_time_string());
 			call Leds.led1Off(); // yellow
 			send++;
+			if (send > SIZE) {
+				send = 0;
+			}
 		}		
 	}
 
@@ -593,8 +598,9 @@ implementation
 
 			call Leds.led2Off(); // blue
 			sampling_send++;
-	
-			//post NextSampling();
+			if (sampling_send > SIZE) {
+				sampling_send = 0;
+			}
 
 			//dbg("BlinkC", "Led 0 Toggle @%s\n", sim_time_string());
 		}		
@@ -604,10 +610,7 @@ implementation
 	event void SerialAMSend.sendDone(message_t* msg, error_t err) {
 		if (&serial_pkt == msg) {
 			serial_busy = FALSE;
-
-			//call Leds.led1Off();
-			dbg("BroadcastingC", "Finish serial\n\n ");
-			
+			dbg("BroadcastingC", "Serial message Done\n\n ");
 		}
 	}
 /* ---------------------------------------------------------------------------------------------------------------------------- */	

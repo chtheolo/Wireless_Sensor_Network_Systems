@@ -13,6 +13,7 @@ implementation
 	components new TimerMilliC() as Timer2;
 	components new TimerMilliC() as Timer3;
 	components new TimerMilliC() as Timer4;
+	components new TimerMilliC() as Timer5;
 	
 	components new  HamamatsuS1087ParC() as Sensor;
 
@@ -39,6 +40,7 @@ implementation
 	App.Timer2 -> Timer2;
 	App.Timer3 -> Timer3;
 	App.Timer4 -> Timer4;
+	App.Timer5 -> Timer5;
 
 	App.SerialReceive -> SerialAMReceiverC;
 	App.SerialPacket -> SerialAMSenderC;
