@@ -16,13 +16,31 @@ class AppMsg(tos.Packet):
         tos.Packet.__init__(self, 
                                 [('sampling_period', 'int', 2),
                                  ('query_lifetime','int', 2),
-                                 ('propagation_mode', 'int', 1)], 
+                                 ('propagation_mode', 'int', 2)], 
+                                packet)
+
+class SamplingMsg(tos.Packet):
+    def __init__(self, packet = None):
+        tos.Packet.__init__(self, 
+                                [('source_id', 'int', 2),
+                                 ('data_id', 'int', 2),
+                                 ('forwarder_id', 'int', 2),
+                                 ('sensor_data', 'int', 2),
+                                 ('destination_id','int', 2),
+                                 ('sequence_number', 'int', 2)], 
                                 packet)
 
 def receiver(rx_queue):
     while True:
-        msg = rx_queue.get()
-        print('TelosB -> PC: ', str(msg.sampling_period), str(msg.query_lifetime), str(msg.propagation_mode))
+        sampling_msg = rx_queue.get()
+        print('TelosB -> PC: ')
+        print('Sampling_Source_Node: ', str(sampling_msg.source_id))
+        print('Sampling Data_ID: ', str(sampling_msg.data_id))
+        print('Forwarder_id: ', str(sampling_msg.forwarder_id))
+        print('Sensor_data: ', str(sampling_msg.sensor_data))
+        print('Destination_ID: ', str(sampling_msg.destination_id))
+        print('Query_id: ', str(sampling_msg.sequence_number))
+        print('\n')
 
 def transmitter(tx_queue):
     while True:
@@ -70,7 +88,9 @@ class SerialManager(object):
                 if pkt and pkt.type == AM_QUERY_MSG:
                     print(pkt)
                     msg = AppMsg(pkt.data)
-                    self.rx_queue.put(msg)
+                    sampling_msg = SamplingMsg(pkt.data)
+                    #self.rx_queue.put(msg)
+                    self.rx_queue.put(sampling_msg)
                 if not self.tx_queue.empty():
                     tx_pkt = self.tx_queue.get()
                     self.am.write(tx_pkt, self.am_channel)
