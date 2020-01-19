@@ -6,6 +6,7 @@ import sys
 import tos
 import threading
 import Queue
+
 #import time
 
 AM_QUERY_MSG = 6
@@ -19,18 +20,18 @@ class AppMsg(tos.Packet):
         tos.Packet.__init__(self, 
                                 [('sampling_period', 'int', 2),
                                  ('query_lifetime','int', 2),
-                                 ('propagation_mode', 'int', 2)], 
+                                 ('propagation_mode', 'int', 1)], 
                                 packet)
 
 class SamplingMsg(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self, 
-                                [('source_id', 'int', 2),
-                                 ('data_id', 'int', 2),
-                                 ('forwarder_id', 'int', 2),
+                                [('source_id', 'int', 1),
+                                 ('data_id', 'int', 1),
+                                 ('forwarder_id', 'int', 1),
                                  ('sensor_data', 'int', 2),
-                                 ('destination_id','int', 2),
-                                 ('sequence_number', 'int', 2),
+                                 ('destination_id','int', 1),
+                                 ('sequence_number', 'int', 1),
                                  ('mode', 'int', 1)],
                                  #('ContributedNodes', 'int', 20)], #'blob' 
                                 packet)
@@ -38,18 +39,17 @@ class SamplingMsg(tos.Packet):
 class StatsSamplingMsg(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self, 
-                                [('source_id', 'int', 2),
-                                 ('data_id', 'int', 2),
-                                 ('forwarder_id', 'int', 2),
-                                 ('hops', 'int', 2),
+                                [('source_id', 'int', 1),
+                                 ('data_id', 'int', 1),
+                                 ('forwarder_id', 'int', 1),
+                                 ('hops', 'int', 1),
                                  ('min', 'int', 2),
                                  ('max', 'int', 2),
                                  ('average', 'int', 2),
-                                 ('destination_id','int', 2),
-                                 ('sequence_number', 'int', 2),
-                                 ('sum_contributed_ids', 'int', 1),
+                                 ('destination_id','int', 1),
+                                 ('sequence_number', 'int',1),
+                                 ('contributed_ids', 'blob', 5), #'blob' 
                                  ('mode', 'int', 1)],
-                                 #('ContributedNodes', 'int', 20)], #'blob' 
                                 packet)
 
 def receiver(rx_queue):
@@ -60,6 +60,7 @@ def receiver(rx_queue):
         print('Mode: ', str(sampling_msg.mode))
 
         if sampling_msg.mode == 0:
+
             print('TelosB -> PC: ')
             print('Sampling_Source_Node: ', str(sampling_msg.source_id))
             print('Sampling Data_ID: ', str(sampling_msg.data_id))
@@ -68,8 +69,11 @@ def receiver(rx_queue):
             print('Destination_ID: ', str(sampling_msg.destination_id))
             print('Query_id: ', str(sampling_msg.sequence_number))
             #print('Contributed Nodes: ', str(sampling_msg.ContributedNodes))
+
             print('\n')
+            
         elif sampling_msg.mode == 1:
+
             print('TelosB -> PC: ')
             print('Sampling_Source_Node: ', str(sampling_msg.source_id))
             print('Sampling Data_ID: ', str(sampling_msg.data_id))
@@ -80,7 +84,9 @@ def receiver(rx_queue):
             print('Average: ', str(sampling_msg.average))
             print('Destination_ID: ', str(sampling_msg.destination_id))
             print('Query_id: ', str(sampling_msg.sequence_number))
-            #print('Contributed Nodes: ', str(sampling_msg.ContributedNodes))
+            print('Contributed Nodes: ')
+            print(sampling_msg.contributed_ids)
+        
             print('\n')
 
 
@@ -128,14 +134,14 @@ class SerialManager(object):
         while True:
             try:
                 pkt = self.am.read(timeout=0.5)
-                #print(pkt)
-                if pkt is not None and len(pkt.data) == 13:
-                    print(pkt)
+                
+                if pkt is not None and len(pkt.data) == 8:
+                    print(pkt.data)
                     msg = SamplingMsg(pkt.data)
                     sampling_msg = SamplingMsg(pkt.data)
                     #self.rx_queue.put(msg)
                     self.rx_queue.put(sampling_msg)
-                elif pkt is not None and len(pkt.data) == 20:
+                elif pkt is not None and len(pkt.data) == 18:
                     print(pkt)
                     msg = StatsSamplingMsg(pkt.data)
                     sampling_msg = StatsSamplingMsg(pkt.data)

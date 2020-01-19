@@ -7745,13 +7745,13 @@ static inline void QueryPropagationC__Timer5__fired(void );
 static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(message_t *msg, void *payload, uint8_t len);
 #line 493
 static inline message_t *QueryPropagationC__RadioReceive__receive(message_t *msg, void *payload, uint8_t len);
-#line 576
+#line 585
 static inline message_t *QueryPropagationC__SerialReceive__receive(message_t *msg, void *payload, uint8_t len);
-#line 627
+#line 636
 static void QueryPropagationC__RadioAMSend__sendDone(message_t *msg, error_t err);
-#line 640
+#line 649
 static void QueryPropagationC__SamplingRadioAMSend__sendDone(message_t *msg, error_t err);
-#line 655
+#line 664
 static inline void QueryPropagationC__SerialAMSend__sendDone(message_t *msg, error_t err);
 # 113 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
 static void CC2420CsmaP__SplitControl__startDone(error_t error);
@@ -17022,9 +17022,9 @@ inline static bool RealMainP__Scheduler__runNextTask(void ){
 #line 65
 }
 #line 65
-# 655 "QueryPropagationC.nc"
+# 664 "QueryPropagationC.nc"
 static inline void QueryPropagationC__SerialAMSend__sendDone(message_t *msg, error_t err)
-#line 655
+#line 664
 {
   if (&QueryPropagationC__serial_pkt == msg) {
       QueryPropagationC__serial_busy = FALSE;
@@ -18177,9 +18177,9 @@ inline static error_t QueryPropagationC__QueryScheduling__postTask(void ){
 #line 67
 }
 #line 67
-# 576 "QueryPropagationC.nc"
+# 585 "QueryPropagationC.nc"
 static inline message_t *QueryPropagationC__SerialReceive__receive(message_t *msg, void *payload, uint8_t len)
-#line 576
+#line 585
 {
   if (len == sizeof(query_msg_t )) {
       QueryPropagationC__s_pkt = (query_msg_t *)payload;
@@ -20702,18 +20702,27 @@ static inline message_t *QueryPropagationC__RadioReceive__receive(message_t *msg
 
 
       QueryPropagationC__query_pos = 0;
-      while (__nesc_ntoh_uint16(QueryPropagationC__QuerySendersHistory[QueryPropagationC__query_pos].source_id.nxdata) != __nesc_ntoh_uint16(QueryPropagationC__r_pkt->source_id.nxdata) && QueryPropagationC__query_pos < 5) {
+
+      while (QueryPropagationC__query_pos < 5 && __nesc_ntoh_uint16(QueryPropagationC__QuerySendersHistory[QueryPropagationC__query_pos].source_id.nxdata) != __nesc_ntoh_uint16(QueryPropagationC__r_pkt->source_id.nxdata)) {
           QueryPropagationC__query_pos++;
         }
+
+
+
+
+
+
+
 
       if (QueryPropagationC__query_pos == 5) {
           QueryPropagationC__next = QueryPropagationC__next % 5;
           __nesc_hton_uint16(QueryPropagationC__QuerySendersHistory[QueryPropagationC__next].source_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC__r_pkt->source_id.nxdata));
           QueryPropagationC__query_pos = QueryPropagationC__next;
-          QueryPropagationC__next++;
         }
 
+
       if (QueryPropagationC__query_pos < 5 && __nesc_ntoh_uint16(QueryPropagationC__r_pkt->sequence_number.nxdata) > __nesc_ntoh_uint16(QueryPropagationC__QuerySendersHistory[QueryPropagationC__query_pos].sequence_number.nxdata)) {
+          QueryPropagationC__next++;
           __nesc_hton_uint16(QueryPropagationC__QuerySendersHistory[QueryPropagationC__query_pos].sequence_number.nxdata, __nesc_ntoh_uint16(QueryPropagationC__r_pkt->sequence_number.nxdata));
 
           if (QueryPropagationC__number_Of_queries < 3) {
@@ -20774,7 +20783,7 @@ static inline message_t *QueryPropagationC__RadioReceive__receive(message_t *msg
           }
         }
     }
-#line 572
+#line 581
   return msg;
 }
 
@@ -31784,9 +31793,9 @@ static error_t /*Msp430Uart1P.UartP*/Msp430UartP__0__UartStream__send(uint8_t id
   return SUCCESS;
 }
 
-# 640 "QueryPropagationC.nc"
+# 649 "QueryPropagationC.nc"
 static void QueryPropagationC__SamplingRadioAMSend__sendDone(message_t *msg, error_t err)
-#line 640
+#line 649
 {
   if (&QueryPropagationC__pkt == msg) {
       QueryPropagationC__unicast_busy = FALSE;
@@ -31799,9 +31808,9 @@ static void QueryPropagationC__SamplingRadioAMSend__sendDone(message_t *msg, err
     }
 }
 
-#line 627
+#line 636
 static void QueryPropagationC__RadioAMSend__sendDone(message_t *msg, error_t err)
-#line 627
+#line 636
 {
   if (&QueryPropagationC__pkt == msg) {
       QueryPropagationC__busy = FALSE;
@@ -32833,7 +32842,7 @@ static void QueryPropagationC__Read__readDone(error_t result, uint16_t data)
 
           QueryPropagationC__sendTofather = __nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__Hold_Sampling_Timer].forwarder_id.nxdata);
 
-          QueryPropagationC__Timer5__startOneShot(TOS_NODE_ID * 45);
+          QueryPropagationC__Timer5__startOneShot(TOS_NODE_ID * 50);
         }
 
       QueryPropagationC__data_id++;

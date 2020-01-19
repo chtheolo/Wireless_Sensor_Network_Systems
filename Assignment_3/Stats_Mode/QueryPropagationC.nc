@@ -7,6 +7,7 @@
 #include "StatsSamplingPacket.h"
 #include "ActiveQueryQueue.h"
 #include "SendersHistory.h"
+#include "Contributed_Nodes.h"
 #include "ChildrenNodes.h"
 
 #define NUMBER_OF_MSGS 20
@@ -22,12 +23,12 @@ module QueryPropagationC @safe()
 {
 	uses interface Boot;
 	uses interface Leds;
-	uses interface Timer<TMilli> as Timer0;
-	uses interface Timer<TMilli> as Timer1;
-	uses interface Timer<TMilli> as Timer2;
-	uses interface Timer<TMilli> as Timer3;
-	uses interface Timer<TMilli> as Timer4;
-	uses interface Timer<TMilli> as Timer5;
+	uses interface Timer<TMilli> as TimerQueryBroadcast;
+	uses interface Timer<TMilli> as TimerReadSensor;
+	uses interface Timer<TMilli> as TimerSendPCSerial;
+	uses interface Timer<TMilli> as TimerQueryFired;
+	uses interface Timer<TMilli> as TimerSimpleMeasurementUcast;
+	uses interface Timer<TMilli> as TimerStatsMeasurement_ReUcastSimple;
 
 	uses interface Read<uint16_t>;
 
@@ -72,36 +73,33 @@ implementation
 	uint8_t stats_sampling_save;				/* UNICAST - indicates free pos to save the msg in StatsSamplingPacketBuffer[] */
 	uint8_t number_Of_queries;					/* Counter to save the number of active queries */
 	uint8_t next;								/* Dipicts the next free pos in QuerySendersHistory[] */
-	//uint8_t number_of_children;					/* The number of children nodes for a node */
-	//uint8_t received_child_msg;					/* A variable to check how many nodes from your children send you UNICAST msg */
-	//uint8_t pos_child;							/* Variable used as a pointer to array Children_Nodes[] */
 	uint8_t WaitingTime;						/* The amount of time, waiting for your children, before forwarding STATS values*/
 	uint8_t remindQuery;
 	uint8_t divideNumber;
+	uint8_t start; //8
+	uint8_t HoldTimer; //8
+	uint8_t query_pos; // 8
+	uint8_t minQuery; // 8
+	uint8_t expiredQuery; // 8
+	uint8_t sendQuery; // 8
+	uint8_t Hold_Sampling_Timer;  //8
+	uint8_t sequence_number; // 8
+	uint8_t data_id; // 8
+	uint8_t s_data_id; // 8
+	uint8_t forwarder_id; // 8
+	uint8_t destination_id; // 8
+	uint8_t hops; // 8
+	uint8_t source_id;
 
 /*  16-bit  */
 	uint16_t t0,dt;
-	uint16_t start; //8
-	uint16_t HoldTimer; //8
-	uint16_t query_pos; // 8
-	uint16_t minQuery; // 8
-	uint16_t expiredQuery; // 8
-	uint16_t sendQuery; // 8
 	uint16_t runningTime;
 	uint16_t checkTimer;
 	uint16_t timerStartAt;
 	uint16_t time4MeasurementStartAt;
-	uint16_t Hold_Sampling_Timer;  //8
 	uint16_t minPeriod; 
 	uint16_t sendTofather;
 	uint16_t sensor_data;
-	uint16_t source_id;
-	uint16_t sequence_number; // 8
-	uint16_t data_id; // 8
-	uint16_t s_data_id; // 8
-	uint16_t forwarder_id;
-	uint16_t destination_id;
-	uint16_t hops; // 8
 	uint16_t min;
 	uint16_t max;
 	uint16_t average;
@@ -118,6 +116,7 @@ implementation
 	message_t PacketBuffer[SIZE], SamplingPacketBuffer[SIZE], StatsSamplingPacketBuffer[SIZE];
 	ActiveQueryQueue_t AQQ[NUMBER_OF_QUERIES];
 	SendersHistory_t QuerySendersHistory[LAST_SENDERS];
+	contributed_nodes_t ContributedNodes[LAST_SENDERS];
 	ChildrenNodes_t Children_Nodes[LAST_SENDERS];
 
 	
@@ -142,21 +141,27 @@ implementation
 		}
 	}
 
+	task void init_ContributedNodes() {
+		for (start = 0; start < LAST_SENDERS; start++) {
+			ContributedNodes[start].node_id = 0;
+		}
+	}
+
 /* ------------------------------------- Query Scheduling --------------------------- */
 	task void QueryScheduling() {
 		/* check if i am alone or other queries also running */
-		if (call Timer3.isRunning() == TRUE) {
-			checkTimer = call Timer3.getNow();
+		if (call TimerQueryFired.isRunning() == TRUE) {
+			checkTimer = call TimerQueryFired.getNow();
 			runningTime = checkTimer - timerStartAt;
 			dt = AQQ[HoldTimer].query_lifetime - runningTime; //remaining_time to expire.
 
 			if (dt > AQQ[sendQuery].query_lifetime) {
 				HoldTimer = sendQuery; 
-				call Timer3.startOneShot(AQQ[HoldTimer].query_lifetime);
-				timerStartAt = call Timer3.getNow();
+				call TimerQueryFired.startOneShot(AQQ[HoldTimer].query_lifetime);
+				timerStartAt = call TimerQueryFired.getNow();
 			}
 			else {
-				timerStartAt = call Timer3.getNow();
+				timerStartAt = call TimerQueryFired.getNow();
 			}
 
 			query_pos = 0;
@@ -169,37 +174,37 @@ implementation
 		}
 		else {
 			HoldTimer = sendQuery; //query_pos;
-			call Timer3.startOneShot(AQQ[HoldTimer].query_lifetime); //end query lifetime when timer3 fire
-			timerStartAt = call Timer3.getNow();
+			call TimerQueryFired.startOneShot(AQQ[HoldTimer].query_lifetime); //end query lifetime when TimerQueryFired fire
+			timerStartAt = call TimerQueryFired.getNow();
 			call Leds.led0On();
 		}
 		/* __________________________________________________ */
 
-		if (call Timer0.isRunning() == TRUE) {
-			t0 = call Timer0.gett0();
-			dt = call Timer0.getdt();
-			call Timer0.startOneShot(t0 + dt);
+		if (call TimerQueryBroadcast.isRunning() == TRUE) {
+			t0 = call TimerQueryBroadcast.gett0();
+			dt = call TimerQueryBroadcast.getdt();
+			call TimerQueryBroadcast.startOneShot(t0 + dt);
 		}
 		else {
-			call Timer0.startOneShot(TOS_NODE_ID * 30);
+			call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);
 		}
 
 	}
 
 /* ------------------------------- Measurement Scheduling -------------------------------- */
 	task void MeasurementScheduling() {
-		if (call Timer1.isRunning() == TRUE) {
-			checkTimer = call Timer1.getNow();
+		if (call TimerReadSensor.isRunning() == TRUE) {
+			checkTimer = call TimerReadSensor.getNow();
 			runningTime = checkTimer - time4MeasurementStartAt;
 			dt = TimeToMeasure[Hold_Sampling_Timer] - runningTime;
 			
 			if (dt > TimeToMeasure[sendQuery]) {
 				Hold_Sampling_Timer = sendQuery;
-				call Timer1.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
-				time4MeasurementStartAt = call Timer1.getNow();
+				call TimerReadSensor.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
+				time4MeasurementStartAt = call TimerReadSensor.getNow();
 			}
 			else {
-				time4MeasurementStartAt = call Timer1.getNow();
+				time4MeasurementStartAt = call TimerReadSensor.getNow();
 			}
 
 			query_pos = 0; //start=0;
@@ -212,14 +217,25 @@ implementation
 		}
 		else {
 			Hold_Sampling_Timer = sendQuery;
-			call Timer1.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
-			time4MeasurementStartAt = call Timer1.getNow();
+			call TimerReadSensor.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
+			time4MeasurementStartAt = call TimerReadSensor.getNow();
 		}
 	}
 
+	//task void DelayMeasurementScheduling() {
+	//	if (call TimerSendPCSerial.isRunning() == TRUE) {
+	//		dtDelay = call TimerSendPCSerial.getNow();
+	//		runningTime = dtDelay - startDelay;
+	//		dt = AQQ[remindQuery].
+	//	}
+	//	else {
+	//		
+	//	}
+	//}
+
 	task void SendSerial() {
-		if (!serial_busy) {
-									/* SIMPLE mode == 1 */
+
+		if (!serial_busy) {			/* SIMPLE mode == 1 */
 			if (AQQ[remindQuery].propagation_mode == 0) {
 				s_sampling_pkt = (sampling_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (sampling_msg_t) ));
 				if (s_sampling_pkt == NULL) {
@@ -258,9 +274,18 @@ implementation
 				s_stats_sampling_pkt->average = average;
 				s_stats_sampling_pkt->destination_id = destination_id;
 				s_stats_sampling_pkt->sequence_number = sequence_number;
-				s_stats_sampling_pkt->sum_contributed_ids = 4;
 				s_stats_sampling_pkt->mode = 1;
-				//memcpy(s_sampling_pkt->ContributedNodes, ContributedNodes, SIZE * sizeof(uint16_t));
+				memcpy(s_stats_sampling_pkt->contributed_ids, ContributedNodes /*r_stats_sampling_pkt->contributed_ids*/, LAST_SENDERS * sizeof(nx_uint8_t));
+
+				query_pos = 0;
+				while(query_pos < LAST_SENDERS) {
+					if (s_stats_sampling_pkt->contributed_ids[query_pos] == 0) {
+						s_stats_sampling_pkt->contributed_ids[query_pos] = TOS_NODE_ID;
+						break;
+					}
+					query_pos++;	
+				}
+				
 				
 				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
 					dbg("BroadcastingC", "Start sending serial packet\n\n ");
@@ -285,9 +310,6 @@ implementation
 		sequence_number = 0;
 		number_Of_queries = 0;
 
-		//received_child_msg = 0;
-		//number_of_children = 0;
-//
 		call Leds.led0Off();
 		call Leds.led1Off();
 		call Leds.led2Off();
@@ -295,6 +317,7 @@ implementation
 		post init_StateMessages();
 		post init_ActiveQueryQ();
 		post init_Children_Nodes();
+		post init_ContributedNodes();
 
 		call RadioAMControl.start();
 		call SerialAMControl.start();
@@ -324,11 +347,10 @@ implementation
 	
 	event void SerialAMControl.stopDone(error_t err) { /* do nothing */ }
 
-/* -------------------------------------------- Timer0 =>  SOURCE QUERY BROADCAST ------------------------------------------------- */ 	
-	event void Timer0.fired() {
-		/** if i am the query message source then save that info to SH
-		  * the array SendersHistory is used to remember the last 5 last
-		  * nodes that send a query, in order to recognize the new message
+/* -------------------------------------------- TimerQueryBroadcast =>  SOURCE QUERY BROADCAST ------------------------------------------------- */ 	
+	event void TimerQueryBroadcast.fired() {
+		/** if i am the query message source then save that info to SH the array SendersHistory is used to remember the last 5 last
+		  * nodes that send a query, in order to recognize the new message.
 		  */
 		if (TOS_NODE_ID == bcast_pkt->source_id) {
 			start = 0;
@@ -363,15 +385,15 @@ implementation
 		}
 	}
 
-/* -------------------------------------- Timer1 =>  START READING VALUES FROM SENSOR ---------------------------------------- */ 	
-	event void Timer1.fired() {
+/* -------------------------------------- TimerReadSensor =>  START READING VALUES FROM SENSOR ---------------------------------------- */ 	
+	event void TimerReadSensor.fired() {
 		
 		/* initiate read op */
 		call Read.read(); 
 
 		/* if the state == 0 then the query has expired */
 		if (AQQ[Hold_Sampling_Timer].state == 0) {
-			call Timer1.stop();
+			call TimerReadSensor.stop();
 		}
 	}
 
@@ -393,11 +415,10 @@ implementation
 				destination_id = AQQ[Hold_Sampling_Timer].source_id;
 				sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
 
-
 				if (AQQ[Hold_Sampling_Timer].propagation_mode == 0) {  // SIMPLE mode == 0
 					sensor_data = data;
 
-					call Timer2.startOneShot(20);  // to serial send valto kalutera se ena task
+					call TimerSendPCSerial.startOneShot(20);  // to serial send valto kalutera se ena task
 				}
 				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
 					hops = AQQ[Hold_Sampling_Timer].hops;
@@ -405,8 +426,10 @@ implementation
 					max = data;
 					average = data;
 
-					call Timer2.startOneShot(WaitingTime + OFFSET);
-					startDelay = call Timer2.getNow();
+					post DelayMeasurementScheduling();
+
+					call TimerSendPCSerial.startOneShot(WaitingTime + OFFSET);
+					startDelay = call TimerSendPCSerial.getNow();
 				}		
 			}
 			else { /* ELSE IF  NOT ORIGINATOR NODE, then forward the values */ 
@@ -430,7 +453,7 @@ implementation
 					ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
 					ucast_pkt->mode = 0;
 
-					call Timer5.startOneShot(TOS_NODE_ID * 20);  					   // Timer for Unicast Message - TOS_NODE_ID * 20				
+					call TimerStatsMeasurement_ReUcastSimple.startOneShot(TOS_NODE_ID * 20);  					   // Timer for Unicast Message - TOS_NODE_ID * 20				
 				}
 				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
 
@@ -450,11 +473,19 @@ implementation
 					stats_ucast_pkt->average = data;
 					stats_ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
 					stats_ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
-					stats_ucast_pkt->sum_contributed_ids = TOS_NODE_ID;
+					stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
+					//query_pos = 1;
+					//while (query_pos < LAST_SENDERS) {
+					//	if (ContributedNodes[query_pos].node_id == 0) {
+					//		ContributedNodes[query_pos] = TOS_NODE_ID;
+					//		break;
+					//	}
+					//	query_pos++;
+					//}
 					stats_ucast_pkt->mode = 1;
 
-					call Timer5.startOneShot(/*TOS_NODE_ID * OFFSET*/ WaitingTime /*+ OFFSET*/);                // Timer for Unicast Message - TOS_NODE_ID * 20
-					startDelay = call Timer5.getNow();
+					call TimerStatsMeasurement_ReUcastSimple.startOneShot(WaitingTime);
+					startDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();
 				}
 			}
 			data_id++;
@@ -484,19 +515,19 @@ implementation
 					start++;
 				}
 
-				call Timer1.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
-				time4MeasurementStartAt = call Timer1.getNow();
+				call TimerReadSensor.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
+				time4MeasurementStartAt = call TimerReadSensor.getNow();
 			}
 		}
 	}
 
-/* ----------------------------------------- Timer2 => SERIAL SEND : MOTE -> PC -------------------------------------------- */ 
-	event void Timer2.fired() {
+/* ----------------------------------------- TimerSendPCSerial => SERIAL SEND : MOTE -> PC -------------------------------------------- */ 
+	event void TimerSendPCSerial.fired() {
 		post SendSerial();
 	}
 
-/* ------------------------------------------- Timer3 => Query_Lifetime END ------------------------------------------------- */ 
-	event void Timer3.fired() {
+/* ------------------------------------------- TimerQueryFired => Query_Lifetime END ------------------------------------------------- */ 
+	event void TimerQueryFired.fired() {
 		dbg("QueryC", "The query_%hu expired! @ %s", sim_time_string());
 
 		/*Disable the expired query*/
@@ -528,16 +559,16 @@ implementation
 				}
 				query_pos++;
 			}			
-			call Timer3.startOneShot(AQQ[HoldTimer].query_lifetime);
-			timerStartAt = call Timer3.getNow();
+			call TimerQueryFired.startOneShot(AQQ[HoldTimer].query_lifetime);
+			timerStartAt = call TimerQueryFired.getNow();
 		}
 		else {
 			call Leds.led0Off();
 		}
 	}
 
-/* ---------------------------------------- Timer4 => Re-UNICAST MEASUREMENTS --------------------------------------------- */
-	event void Timer4.fired() {
+/* ---------------------------------------- TimerSimpleMeasurementUcast => Re-UNICAST MEASUREMENTS --------------------------------------------- */
+	event void TimerSimpleMeasurementUcast.fired() {
 		if (!unicast_busy) {
 			ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
 			if (ucast_pkt == NULL) {
@@ -553,8 +584,8 @@ implementation
 		}
 	} 
 
-/* ---------------------------------------- Timer5 => UNICAST MEASUREMENTS --------------------------------------------- */
-	event void Timer5.fired() {
+/* ---------------------------------------- TimerStatsMeasurement_ReUcastSimple => UNICAST MEASUREMENTS --------------------------------------------- */
+	event void TimerStatsMeasurement_ReUcastSimple.fired() {
 		if (!unicast_busy) {
 
 			if (AQQ[remindQuery].propagation_mode == 0) {
@@ -621,9 +652,9 @@ implementation
 					sendTofather = AQQ[query_pos].forwarder_id;
 				}
 				
-				call Timer4.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
+				call TimerSimpleMeasurementUcast.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
 			}
-			else {  /* if i am the one who send the query (TOS_NODE_ID == destination_id )then call Timer2 to print the values*/
+			else {  /* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
 				source_id = r_sampling_pkt->source_id;
 				s_data_id =  r_sampling_pkt->data_id;
 				forwarder_id = r_sampling_pkt->forwarder_id;
@@ -632,7 +663,7 @@ implementation
 				sequence_number = r_sampling_pkt->sequence_number;
 				//mode = 0;
 
-				call Timer2.startOneShot(20);
+				call TimerSendPCSerial.startOneShot(20);
 			}
 		} 
 		else if (len == sizeof(stats_sampling_msg_t)) {				/** ELSE if i receive a STATS sampling message */
@@ -661,7 +692,7 @@ implementation
 			/** SUCCESS - find the N nodes from hops */
 			if (query_pos < NUMBER_OF_QUERIES) {
 				divideNumber = r_stats_sampling_pkt->hops - AQQ[query_pos].hops;
-				average = (max - min) / divideNumber;
+				average = (max - min) / divideNumber+1;
 
 				/** Save the father node */
 				sendTofather = AQQ[query_pos].forwarder_id;
@@ -711,10 +742,17 @@ implementation
 				stats_ucast_pkt->average = average;
 				stats_ucast_pkt->destination_id = r_stats_sampling_pkt->destination_id;
 				stats_ucast_pkt->sequence_number = r_stats_sampling_pkt->sequence_number;
-				stats_ucast_pkt->sum_contributed_ids = r_stats_sampling_pkt->sum_contributed_ids + TOS_NODE_ID;
+				query_pos = 0;
+				while (query_pos < LAST_SENDERS) {
+					if (r_stats_sampling_pkt->contributed_ids[query_pos] == 0) {
+						stats_ucast_pkt->contributed_ids[query_pos] = TOS_NODE_ID;
+						break;
+					}
+					query_pos++;
+				}
 				stats_ucast_pkt->mode = 1;
 
-				dtDelay = call Timer5.getNow();
+				dtDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();
 				WaitingTime = dtDelay - startDelay; 
 
 			}
@@ -726,10 +764,10 @@ implementation
 				destination_id = r_stats_sampling_pkt->destination_id;
 				sequence_number = r_stats_sampling_pkt->sequence_number;
 
-				dtDelay = call Timer2.getNow();
+				memcpy(ContributedNodes, r_stats_sampling_pkt->contributed_ids, LAST_SENDERS * sizeof(nx_uint8_t));
+
+				dtDelay = call TimerSendPCSerial.getNow();
 				WaitingTime = dtDelay - startDelay;
-	
-				//call Timer2.startOneShot(20);//WaitingTime);  // Mote to PC timer
 			}
 		}
 		return msg;
@@ -830,37 +868,35 @@ implementation
 					start++;
 				}
 
-				if (start < NUMBER_OF_QUERIES && r_pkt->hops == AQQ[start].hops+1) {  /* if my distance (hops) + 1 == node distance (hops) -> then that node is my child */
-					start = 0;
-					while (Children_Nodes[start].state == 1 && start < LAST_SENDERS){
-						start++;
-					}
-
-					/* if start counter is smaller than the size LAST_SENDERS then we found an empty seat in our Children_Nodes[] array. */
-					if (start < LAST_SENDERS) {  
-						Children_Nodes[start].node_id = r_pkt->forwarder_id; 			/* my childs id*/
-						Children_Nodes[start].source_id = r_pkt->source_id;				/* the query source id */
-						Children_Nodes[start].sequence_number = r_pkt->sequence_number;	/* the query sequence number */
-						Children_Nodes[start].state = 1;  								/* active child for that query */
-						Children_Nodes[start].waiting_time = 200;//r_pkt->forwarder_id * OFFSET;			/* the time offset id * 20  */
-					}
-
-					
-
-					/** Every time i receive a query broadcast, i calculate the 
-					  * waiting time. The waiting time for the first iteration 
-					  * independs on the number of my children nodes. I have to 
-					  * see what children do i have for that query.
-					  */
-					start =0;
-					WaitingTime = OFFSET; 				/* find if i have children in my list for that query msg, and calculate the WaitingTime */
-					while (start < LAST_SENDERS) {  
-						if (Children_Nodes[start].state == 1 && Children_Nodes[start].source_id == r_pkt->source_id && Children_Nodes[start].sequence_number == r_pkt->sequence_number){
-							WaitingTime += Children_Nodes[start].waiting_time;	
-						}
-						start++;
-					}
-				}
+				//if (start < NUMBER_OF_QUERIES && r_pkt->hops == AQQ[start].hops+1) {  /* if my distance (hops) + 1 == node distance (hops) -> then that node is my child */
+				//	start = 0;
+				//	while (Children_Nodes[start].state == 1 && start < LAST_SENDERS){
+				//		start++;
+				//	}
+//
+//				//	/* if start counter is smaller than the size LAST_SENDERS then we found an empty seat in our Children_Nodes[] array. */
+//				//	if (start < LAST_SENDERS) {  
+//				//		Children_Nodes[start].node_id = r_pkt->forwarder_id; 			/* my childs id*/
+//				//		Children_Nodes[start].source_id = r_pkt->source_id;				/* the query source id */
+//				//		Children_Nodes[start].sequence_number = r_pkt->sequence_number;	/* the query sequence number */
+//				//		Children_Nodes[start].state = 1;  								/* active child for that query */
+//				//		Children_Nodes[start].waiting_time = 200;//r_pkt->forwarder_id * OFFSET;			/* the time offset id * 20  */
+//				//	}
+//
+//				//	/** Every time i receive a query broadcast, i calculate the 
+//				//	  * waiting time. The waiting time for the first iteration 
+//				//	  * independs on the number of my children nodes. I have to 
+//				//	  * see what children do i have for that query.
+//				//	  */
+//				//	start =0;
+//				//	WaitingTime = OFFSET; 				/* find if i have children in my list for that query msg, and calculate the WaitingTime */
+//				//	while (start < LAST_SENDERS) {  
+//				//		if (Children_Nodes[start].state == 1 && Children_Nodes[start].source_id == r_pkt->source_id && Children_Nodes[start].sequence_number == r_pkt->sequence_number){
+//				//			WaitingTime += Children_Nodes[start].waiting_time;	
+//				//		}
+//				//		start++;
+//				//	}
+				//}
 			}
 		} 
 		return msg;

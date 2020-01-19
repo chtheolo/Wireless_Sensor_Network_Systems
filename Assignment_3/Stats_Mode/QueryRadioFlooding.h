@@ -6,13 +6,13 @@ enum {
 };
 
 typedef nx_struct query_flooding_msg {
-	nx_uint16_t source_id;
-	nx_uint16_t sequence_number;
-	nx_uint16_t forwarder_id;
-	nx_uint16_t hops;
+	nx_uint8_t source_id;
+	nx_uint8_t sequence_number;
+	nx_uint8_t forwarder_id;
+	nx_uint8_t hops;
 	nx_uint16_t sampling_period;
 	nx_uint16_t query_lifetime;
-	nx_uint16_t propagation_mode;
+	nx_uint8_t propagation_mode;
 } query_flooding_msg_t;
 
 #endif

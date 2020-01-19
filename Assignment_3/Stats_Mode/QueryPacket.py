@@ -7,14 +7,14 @@
 import tinyos.message.Message
 
 # The default size of this message type in bytes.
-DEFAULT_MESSAGE_SIZE = 6
+DEFAULT_MESSAGE_SIZE = 5
 
 # The Active Message type associated with this message.
 AM_TYPE = 6
 
 class QueryPacket(tinyos.message.Message.Message):
-    # Create a new QueryPacket of size 6.
-    def __init__(self, data="", addr=None, gid=None, base_offset=0, data_length=6):
+    # Create a new QueryPacket of size 5.
+    def __init__(self, data="", addr=None, gid=None, base_offset=0, data_length=5):
         tinyos.message.Message.Message.__init__(self, data, addr, gid, base_offset, data_length)
         self.amTypeSet(AM_TYPE)
     
@@ -158,9 +158,9 @@ class QueryPacket(tinyos.message.Message.Message):
     
     #
     # Accessor methods for field: propagation_mode
-    #   Field type: int
+    #   Field type: short
     #   Offset (bits): 32
-    #   Size (bits): 16
+    #   Size (bits): 8
     #
 
     #
@@ -188,26 +188,26 @@ class QueryPacket(tinyos.message.Message.Message):
         return 32
     
     #
-    # Return the value (as a int) of the field 'propagation_mode'
+    # Return the value (as a short) of the field 'propagation_mode'
     #
     def get_propagation_mode(self):
-        return self.getUIntElement(self.offsetBits_propagation_mode(), 16, 1)
+        return self.getUIntElement(self.offsetBits_propagation_mode(), 8, 1)
     
     #
     # Set the value of the field 'propagation_mode'
     #
     def set_propagation_mode(self, value):
-        self.setUIntElement(self.offsetBits_propagation_mode(), 16, value, 1)
+        self.setUIntElement(self.offsetBits_propagation_mode(), 8, value, 1)
     
     #
     # Return the size, in bytes, of the field 'propagation_mode'
     #
     def size_propagation_mode(self):
-        return (16 / 8)
+        return (8 / 8)
     
     #
     # Return the size, in bits, of the field 'propagation_mode'
     #
     def sizeBits_propagation_mode(self):
-        return 16
+        return 8
     

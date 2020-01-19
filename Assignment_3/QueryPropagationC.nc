@@ -314,7 +314,7 @@ implementation
 
 				sendTofather = AQQ[Hold_Sampling_Timer].forwarder_id;	
 
-				call Timer5.startOneShot(TOS_NODE_ID * 45);
+				call Timer5.startOneShot(TOS_NODE_ID * 50);
 			}
 
 			data_id++;
@@ -498,18 +498,20 @@ implementation
 
 			// Check if i have already taken a query message from this source_id
 			query_pos = 0;
-			while (QuerySendersHistory[query_pos].source_id != r_pkt->source_id && query_pos < LAST_SENDERS) {
+			while (query_pos < LAST_SENDERS && QuerySendersHistory[query_pos].source_id != r_pkt->source_id) {
 				query_pos++;
 			}
 
 			if (query_pos == LAST_SENDERS) {  // if reached the end of the array, means that its the first time receving query message from that source_id
 				next = next%LAST_SENDERS;
+				QuerySendersHistory[next].source_id = 0;
+				QuerySendersHistory[next].sequence_number = 0;
 				QuerySendersHistory[next].source_id = r_pkt->source_id;
 				query_pos = next;
-				next++;
 			}
 
 			if (query_pos < LAST_SENDERS && r_pkt->sequence_number > QuerySendersHistory[query_pos].sequence_number) {
+				next++;
 				QuerySendersHistory[query_pos].sequence_number = r_pkt->sequence_number;
 
 				if (number_Of_queries < NUMBER_OF_QUERIES) {
