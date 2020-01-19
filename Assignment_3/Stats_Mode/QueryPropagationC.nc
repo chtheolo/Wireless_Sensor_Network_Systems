@@ -73,7 +73,7 @@ implementation
 	uint8_t stats_sampling_save;				/* UNICAST - indicates free pos to save the msg in StatsSamplingPacketBuffer[] */
 	uint8_t number_Of_queries;					/* Counter to save the number of active queries */
 	uint8_t next;								/* Dipicts the next free pos in QuerySendersHistory[] */
-	uint8_t WaitingTime;						/* The amount of time, waiting for your children, before forwarding STATS values*/
+	//uint8_t WaitingTime;						/* The amount of time, waiting for your children, before forwarding STATS values*/
 	uint8_t remindQuery;
 	uint8_t divideNumber;
 	uint8_t start; //8
@@ -90,6 +90,8 @@ implementation
 	uint8_t destination_id; // 8
 	uint8_t hops; // 8
 	uint8_t source_id;
+	uint8_t Hold_Waiting_Timer;
+	uint8_t nextChild;							/* circular pointer for adding children in AQQ.children[] */
 
 /*  16-bit  */
 	uint16_t t0,dt;
@@ -112,13 +114,12 @@ implementation
 	bool serial_busy = FALSE;
 
 /* ----------------------- ARRAYS -------------------- */	
-	uint16_t TimeToMeasure[3]/*, ContributedNodes[SIZE]*/;
 	message_t PacketBuffer[SIZE], SamplingPacketBuffer[SIZE], StatsSamplingPacketBuffer[SIZE];
 	ActiveQueryQueue_t AQQ[NUMBER_OF_QUERIES];
 	SendersHistory_t QuerySendersHistory[LAST_SENDERS];
 	contributed_nodes_t ContributedNodes[LAST_SENDERS];
 	ChildrenNodes_t Children_Nodes[LAST_SENDERS];
-
+	uint16_t TimeToMeasure[3];
 	
 /* %% ------------------------------------------------------ TASKS --------------------------------------------------- %% */
 	
@@ -135,11 +136,11 @@ implementation
 		}
 	}
 
-	task void init_Children_Nodes() {
-		for (start = 0; start < LAST_SENDERS; start++) {
-			Children_Nodes[start].state = 0;
-		}
-	}
+	//task void init_Children_Nodes() {
+	//	for (start = 0; start < LAST_SENDERS; start++) {
+	//		Children_Nodes[start].state = 0;
+	//	}
+	//}
 
 	task void init_ContributedNodes() {
 		for (start = 0; start < LAST_SENDERS; start++) {
@@ -222,19 +223,63 @@ implementation
 		}
 	}
 
-	//task void DelayMeasurementScheduling() {
-	//	if (call TimerSendPCSerial.isRunning() == TRUE) {
-	//		dtDelay = call TimerSendPCSerial.getNow();
-	//		runningTime = dtDelay - startDelay;
-	//		dt = AQQ[remindQuery].
-	//	}
-	//	else {
-	//		
-	//	}
-	//}
+	task void DelayMeasurementScheduling() {
+		if (AQQ[remindQuery].source_id == TOS_NODE_ID) {											/****** ORIGINATOR NODE ******/
+			if (call TimerSendPCSerial.isRunning() == TRUE && Hold_Waiting_Timer != remindQuery) {  /** if the new waiting time calculation is for a new query then schedule */
+				checkTimer = call TimerSendPCSerial.getNow();
+				runningTime = checkTimer - AQQ[Hold_Waiting_Timer].startDelay;
+				dt = AQQ[remindQuery].RemaingTime - runningTime;
+				AQQ[remindQuery].startDelay = call TimerSendPCSerial.getNow();						/* keep what time the new q ask for timer */
+
+				if (dt > AQQ[remindQuery].WaitingTime) {											/*If WT for new q is smaller than one that hold the timer */
+					Hold_Waiting_Timer = remindQuery;
+					call TimerSendPCSerial.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+				}
+
+				query_pos = 0;
+				while( query_pos < NUMBER_OF_QUERIES) {
+					if (AQQ[query_pos].state == 1 && query_pos != remindQuery) {
+						AQQ[query_pos].RemaingTime -= runningTime;									/*remaing time */
+					}
+					query_pos++;
+				}
+			}
+			else {																					/** else if the new waiting time calculation is for the same query */
+				Hold_Waiting_Timer = remindQuery;
+				call TimerSendPCSerial.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+				AQQ[Hold_Waiting_Timer].startDelay = call TimerSendPCSerial.getNow();
+			}
+		}
+		else {																						/***** MIDDLE NODE ******/
+			if (call TimerStatsMeasurement_ReUcastSimple.isRunning() == TRUE && Hold_Waiting_Timer != remindQuery) {  /** if the new waiting time calculation is for a new query then schedule */
+				checkTimer = call TimerStatsMeasurement_ReUcastSimple.getNow();
+				runningTime = checkTimer - AQQ[Hold_Waiting_Timer].startDelay;
+				dt = AQQ[remindQuery].RemaingTime - runningTime;
+				AQQ[remindQuery].startDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();						/* keep what time the new q ask for timer */
+
+				if (dt > AQQ[remindQuery].WaitingTime) {											/*If WT for new q is smaller than one that hold the timer */
+					Hold_Waiting_Timer = remindQuery;
+					call TimerStatsMeasurement_ReUcastSimple.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+				}
+
+				query_pos = 0;
+				while( query_pos < NUMBER_OF_QUERIES) {
+					if (AQQ[query_pos].state == 1 && query_pos != remindQuery) {
+						AQQ[query_pos].RemaingTime -= runningTime;									/*remaing time */
+					}
+					query_pos++;
+				}
+			}
+			else {																					/** else if the new waiting time calculation is for the same query */
+				Hold_Waiting_Timer = remindQuery;
+				call TimerStatsMeasurement_ReUcastSimple.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+				AQQ[Hold_Waiting_Timer].startDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();
+			}
+		}
+		
+	}
 
 	task void SendSerial() {
-
 		if (!serial_busy) {			/* SIMPLE mode == 1 */
 			if (AQQ[remindQuery].propagation_mode == 0) {
 				s_sampling_pkt = (sampling_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (sampling_msg_t) ));
@@ -295,7 +340,6 @@ implementation
 		}
 	}
 
-
 /* --------------------------------------------------------- BOOTED -------------------------------------------------------- */		
 	event void Boot.booted() {
 		
@@ -304,7 +348,7 @@ implementation
 		next = 0;
 		data_id = 0;
 		query_pos = 0;
-		WaitingTime = OFFSET;
+		nextChild = 0;
 		sampling_save = 0;
 		sampling_send = 0;
 		sequence_number = 0;
@@ -316,7 +360,7 @@ implementation
 
 		post init_StateMessages();
 		post init_ActiveQueryQ();
-		post init_Children_Nodes();
+		//post init_Children_Nodes();
 		post init_ContributedNodes();
 
 		call RadioAMControl.start();
@@ -356,17 +400,13 @@ implementation
 			start = 0;
 			query_pos = 0;
 			while (start < LAST_SENDERS) {
-
 				if (QuerySendersHistory[start].source_id == TOS_NODE_ID) {
-
 					QuerySendersHistory[start].sequence_number = bcast_pkt->sequence_number;
 					query_pos++;
 					break;
 				}
-
 				start++;
 			}
-
 			if (query_pos == 0) {
 				next = next % LAST_SENDERS;
 				QuerySendersHistory[next].source_id = bcast_pkt->source_id;
@@ -386,11 +426,9 @@ implementation
 	}
 
 /* -------------------------------------- TimerReadSensor =>  START READING VALUES FROM SENSOR ---------------------------------------- */ 	
-	event void TimerReadSensor.fired() {
-		
+	event void TimerReadSensor.fired() {	
 		/* initiate read op */
 		call Read.read(); 
-
 		/* if the state == 0 then the query has expired */
 		if (AQQ[Hold_Sampling_Timer].state == 0) {
 			call TimerReadSensor.stop();
@@ -400,8 +438,7 @@ implementation
 /* ---------------------------------------------- READ VALUES DONE, SO SEND -------------------------------------------------- */
 	event void Read.readDone(error_t result, uint16_t data) {
 		if(result == SUCCESS){
-
-			/** Save the position in order to check the propagation_mode when a Timer fired */
+			/** Save what query we are handling */
 			remindQuery = Hold_Sampling_Timer;
 
 			/* IF i am the query originator */
@@ -409,9 +446,7 @@ implementation
 				source_id = TOS_NODE_ID;
 				s_data_id = data_id;
 				forwarder_id = TOS_NODE_ID;
-
-				/*  . . .  */   		/* independs on the propagation_mode */
-
+							/*  . . .  */   	/* independs on the propagation_mode */
 				destination_id = AQQ[Hold_Sampling_Timer].source_id;
 				sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
 
@@ -427,9 +462,6 @@ implementation
 					average = data;
 
 					post DelayMeasurementScheduling();
-
-					call TimerSendPCSerial.startOneShot(WaitingTime + OFFSET);
-					startDelay = call TimerSendPCSerial.getNow();
 				}		
 			}
 			else { /* ELSE IF  NOT ORIGINATOR NODE, then forward the values */ 
@@ -474,18 +506,9 @@ implementation
 					stats_ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
 					stats_ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
 					stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
-					//query_pos = 1;
-					//while (query_pos < LAST_SENDERS) {
-					//	if (ContributedNodes[query_pos].node_id == 0) {
-					//		ContributedNodes[query_pos] = TOS_NODE_ID;
-					//		break;
-					//	}
-					//	query_pos++;
-					//}
 					stats_ucast_pkt->mode = 1;
 
-					call TimerStatsMeasurement_ReUcastSimple.startOneShot(WaitingTime);
-					startDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();
+					post DelayMeasurementScheduling();
 				}
 			}
 			data_id++;
@@ -505,7 +528,7 @@ implementation
 							TimeToMeasure[start] = TimeToMeasure[start] - runningTime;
 						}
 
-						if (TimeToMeasure[start] <= TimeToMeasure[minPeriod] && TimeToMeasure[start] != 0) {
+						if (TimeToMeasure[start] <= TimeToMeasure[minPeriod] && TimeToMeasure[start] != 0) {	/*find the min but exclude the 0 time */
 							Hold_Sampling_Timer = start;
 						}
 					}
@@ -524,9 +547,37 @@ implementation
 /* ----------------------------------------- TimerSendPCSerial => SERIAL SEND : MOTE -> PC -------------------------------------------- */ 
 	event void TimerSendPCSerial.fired() {
 		post SendSerial();
+
+		if (number_Of_queries > 0) {
+			start = 0;
+			minPeriod = 0;
+			while (start < NUMBER_OF_QUERIES) {
+
+				if (start == 0) {
+					while (minPeriod < NUMBER_OF_QUERIES && AQQ[minPeriod].state == 0) {
+						minPeriod++;
+					}
+				}
+
+				if (AQQ[start].state == 1) {
+					AQQ[start].RemaingTime -= AQQ[Hold_Waiting_Timer].RemaingTime;
+					if (AQQ[start].RemaingTime <= AQQ[minPeriod].RemaingTime && AQQ[start].RemaingTime != 0) {
+						minPeriod = start;
+					}
+				}
+
+				start++;
+			}
+
+			if (minPeriod != Hold_Waiting_Timer) {
+				Hold_Waiting_Timer = minPeriod;
+				call TimerSendPCSerial.startOneShot(AQQ[Hold_Waiting_Timer].RemaingTime);
+				AQQ[Hold_Waiting_Timer].startDelay = call TimerSendPCSerial.getNow();
+			}
+		}
 	}
 
-/* ------------------------------------------- TimerQueryFired => Query_Lifetime END ------------------------------------------------- */ 
+/* ------------------------------------------- TimerQueryFired => Query_Lifetime END -------------------------------------------------- */ 
 	event void TimerQueryFired.fired() {
 		dbg("QueryC", "The query_%hu expired! @ %s", sim_time_string());
 
@@ -619,14 +670,11 @@ implementation
 
 /* ----------------------------------------- SAMPLING RADIO RECEIVE MESSAGES ------------------------------------------------ */
 	event message_t* SamplingRadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
-
 		/** If i receive a SIMPLE sampling message */
 		if (len == sizeof(sampling_msg_t)) {
 			r_sampling_pkt = (sampling_msg_t*) payload;
 
-			/** If i receive a msg and i am the MIDDLE node then
-			  * i will re-unicast the msg to my father 
-			  */
+			/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
 			if (r_sampling_pkt->destination_id != TOS_NODE_ID) {
 
 				sampling_save = sampling_save%SIZE;
@@ -661,29 +709,20 @@ implementation
 				sensor_data = r_sampling_pkt->sensor_data;
 				destination_id = r_sampling_pkt->destination_id;
 				sequence_number = r_sampling_pkt->sequence_number;
-				//mode = 0;
 
 				call TimerSendPCSerial.startOneShot(20);
 			}
 		} 
 		else if (len == sizeof(stats_sampling_msg_t)) {				/** ELSE if i receive a STATS sampling message */
-
 			r_stats_sampling_pkt = (stats_sampling_msg_t*) payload;
 
 			if (min > r_stats_sampling_pkt->min) {
 				min = r_stats_sampling_pkt->min;
 			}
-
 			if (max < r_stats_sampling_pkt->max) {
 				max = r_stats_sampling_pkt->max;
 			}
 
-			/** In order to find the hops distance from the query originator
-			  * search AQQ[] in order to find the query originator and the 
-			  *	the sequence number. IF SUCCESS then get the correct hops 
-			  *	distance in order to find the divideNumber. Alongside i will
-			  * find my Father node in order to forward the msg.
-			  */
 			query_pos = 0;
 			while (AQQ[query_pos].source_id != r_stats_sampling_pkt->destination_id && AQQ[query_pos].sequence_number != r_stats_sampling_pkt->sequence_number && query_pos < NUMBER_OF_QUERIES) {
 				query_pos++;
@@ -692,38 +731,12 @@ implementation
 			/** SUCCESS - find the N nodes from hops */
 			if (query_pos < NUMBER_OF_QUERIES) {
 				divideNumber = r_stats_sampling_pkt->hops - AQQ[query_pos].hops;
-				average = (max - min) / divideNumber+1;
+				average = (max - min) / (divideNumber+1);
 
 				/** Save the father node */
 				sendTofather = AQQ[query_pos].forwarder_id;
-			}
-
-			/** Calculate again the Waiting Time in order to forward the data from all the network. */
-
-			/** Search for that query in my child list, and calculate the wating_time for every child */  
-			//start = 0;
-			//while (start < LAST_SENDERS) {		/* if the node that send that query msg is in my child list */ 
-			//	if (r_stats_sampling_pkt->forwarder_id == Children_Nodes[start].node_id && r_stats_sampling_pkt->destination_id == Children_Nodes[start].source_id && r_stats_sampling_pkt->sequence_number == Children_Nodes[start].sequence_number) {
-			//		Children_Nodes[start].waiting_time = divideNumber * OFFSET; //r_stats_sampling_pkt->sum_contributed_ids * OFFSET;
-			//		break;
-			//	}
-			//	start++;
-			//}
-
-			// an auto to paidi den to exw sthn lista mou ??
-
-			/** Re-calculate the TOTAL WaitingTime by adding the time that i should wait for every child that belongs in that query. */
-			//start =0;
-			//WaitingTime = OFFSET; // 0;
-			//while (start < LAST_SENDERS) {
-			//	if (Children_Nodes[start].state == 1 && Children_Nodes[start].source_id == r_stats_sampling_pkt->destination_id && r_stats_sampling_pkt->sequence_number == Children_Nodes[start].sequence_number){
-			//		WaitingTime += Children_Nodes[start].waiting_time;	
-			//	}
-			//	start++;
-			//}		
-
+			}	
 			/** If MIDDLE NODE then RE-UNICAST to my father. */
-
 			if (r_stats_sampling_pkt->destination_id != TOS_NODE_ID) {
 
 				stats_sampling_save = stats_sampling_save%SIZE;
@@ -742,22 +755,21 @@ implementation
 				stats_ucast_pkt->average = average;
 				stats_ucast_pkt->destination_id = r_stats_sampling_pkt->destination_id;
 				stats_ucast_pkt->sequence_number = r_stats_sampling_pkt->sequence_number;
-				query_pos = 0;
-				while (query_pos < LAST_SENDERS) {
-					if (r_stats_sampling_pkt->contributed_ids[query_pos] == 0) {
-						stats_ucast_pkt->contributed_ids[query_pos] = TOS_NODE_ID;
+				start = 0;
+				while (start < LAST_SENDERS) {
+					if (r_stats_sampling_pkt->contributed_ids[start] == 0) {
+						stats_ucast_pkt->contributed_ids[start] = TOS_NODE_ID;
 						break;
 					}
-					query_pos++;
+					start++;
 				}
 				stats_ucast_pkt->mode = 1;
 
 				dtDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();
-				WaitingTime = dtDelay - startDelay; 
-
+				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay; /** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
+				AQQ[query_pos].RemaingTime = AQQ[query_pos].WaitingTime;
 			}
 			else { 			/*If ORIGINATOR NODE, then send to serial*/
-
 				source_id = r_stats_sampling_pkt->source_id;
 				s_data_id =  r_stats_sampling_pkt->data_id;
 				forwarder_id = r_stats_sampling_pkt->forwarder_id;
@@ -767,7 +779,7 @@ implementation
 				memcpy(ContributedNodes, r_stats_sampling_pkt->contributed_ids, LAST_SENDERS * sizeof(nx_uint8_t));
 
 				dtDelay = call TimerSendPCSerial.getNow();
-				WaitingTime = dtDelay - startDelay;
+				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay; /** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
 			}
 		}
 		return msg;
@@ -784,21 +796,16 @@ implementation
 				query_pos++;
 			}
 
-			/** If reached the end of the array,means that it is the  
-			  * first time receving a query message from that source_id
-			  */
+			/** If reached the end of the array,means that it is the first time receving a query message from that source_id. */
 			if (query_pos == LAST_SENDERS) { 
 				next = next%LAST_SENDERS;
-				//QuerySendersHistory[next].source_id = 0;
 				QuerySendersHistory[next].sequence_number = 0;
 				QuerySendersHistory[next].source_id = r_pkt->source_id;
 				query_pos = next;
 			}
 
-			/** I found that the source_id and now i check the 
-			  * sequence number to define if it is a unique msg
-			  */
-			if (r_pkt->sequence_number > QuerySendersHistory[query_pos].sequence_number &&  query_pos < LAST_SENDERS) { //************
+			/** I found that the source_id and now i check the sequence number to define if it is a unique msg. */
+			if (r_pkt->sequence_number > QuerySendersHistory[query_pos].sequence_number &&  query_pos < LAST_SENDERS) { // query_pos < LS is unnecessary
 				next++;
 				QuerySendersHistory[query_pos].sequence_number = r_pkt->sequence_number;
 
@@ -816,19 +823,20 @@ implementation
 						AQQ[query_pos].source_id = r_pkt->source_id; 
 						AQQ[query_pos].sequence_number = r_pkt->sequence_number;
 						AQQ[query_pos].forwarder_id = r_pkt->forwarder_id; // father
+						AQQ[query_pos].father_node = r_pkt->forwarder_id;
 						AQQ[query_pos].hops = r_pkt->hops + 1;
 						AQQ[query_pos].sampling_period = r_pkt->sampling_period;
 						AQQ[query_pos].query_lifetime = r_pkt->query_lifetime;
 						AQQ[query_pos].propagation_mode = r_pkt->propagation_mode;
+						AQQ[query_pos].WaitingTime = OFFSET;
+						AQQ[query_pos].RemaingTime = OFFSET;
 						AQQ[query_pos].state = 1;
 					} 
 					
 					sendQuery = query_pos;
-
 					post QueryScheduling();
 
 					TimeToMeasure[sendQuery] = AQQ[sendQuery].sampling_period;
-					
 					post MeasurementScheduling();
 
 					save = save%SIZE;
@@ -841,68 +849,36 @@ implementation
 					bcast_pkt->source_id = AQQ[sendQuery].source_id;
 					bcast_pkt->sequence_number = AQQ[sendQuery].sequence_number;
 					bcast_pkt->forwarder_id = TOS_NODE_ID;
+					bcast_pkt->father_node = AQQ[sendQuery].father_node;
 					bcast_pkt->hops = AQQ[sendQuery].hops;
 					bcast_pkt->sampling_period = AQQ[sendQuery].sampling_period;
 					bcast_pkt->query_lifetime = AQQ[sendQuery].query_lifetime;
 					bcast_pkt->propagation_mode = AQQ[sendQuery].propagation_mode;
 				}	
-			} /** If i have seen that msg before, i try to find if this msg belongs to a child node */
+			} /** If i have reveived that msg before, i try to find if this msg belongs to a child node */
 			else if (r_pkt->sequence_number == QuerySendersHistory[query_pos].sequence_number && query_pos < NUMBER_OF_QUERIES) {
-
-				//query_pos = 0;
-				//while(/*AQQ[query_pos].state == 1 &&*/ query_pos < NUMBER_OF_QUERIES) {
-				//	if (r_pkt->source_id == AQQ[query_pos].source_id && r_pkt->hops < AQQ[query_pos].hops) {
-				//		AQQ[query_pos].forwarder_id = r_pkt->forwarder_id;
-				//		AQQ[query_pos].hops = r_pkt->hops+1;
-				//	}
-				//	query_pos++;
-				//}
-				
 				/* Find if that query is active on my system. */
 				start = 0;
 				while (start < NUMBER_OF_QUERIES) {
 					if (AQQ[start].source_id == r_pkt->source_id && AQQ[start].sequence_number == r_pkt->sequence_number){
-						WaitingTime = AQQ[start].sampling_period / 2;
+						AQQ[start].WaitingTime = AQQ[start].sampling_period / 2;				/*And set for that query an upper bound for waiting time. */
+						AQQ[start].RemaingTime = AQQ[start].WaitingTime;
 						break;
 					}
 					start++;
 				}
 
-				//if (start < NUMBER_OF_QUERIES && r_pkt->hops == AQQ[start].hops+1) {  /* if my distance (hops) + 1 == node distance (hops) -> then that node is my child */
-				//	start = 0;
-				//	while (Children_Nodes[start].state == 1 && start < LAST_SENDERS){
-				//		start++;
-				//	}
-//
-//				//	/* if start counter is smaller than the size LAST_SENDERS then we found an empty seat in our Children_Nodes[] array. */
-//				//	if (start < LAST_SENDERS) {  
-//				//		Children_Nodes[start].node_id = r_pkt->forwarder_id; 			/* my childs id*/
-//				//		Children_Nodes[start].source_id = r_pkt->source_id;				/* the query source id */
-//				//		Children_Nodes[start].sequence_number = r_pkt->sequence_number;	/* the query sequence number */
-//				//		Children_Nodes[start].state = 1;  								/* active child for that query */
-//				//		Children_Nodes[start].waiting_time = 200;//r_pkt->forwarder_id * OFFSET;			/* the time offset id * 20  */
-//				//	}
-//
-//				//	/** Every time i receive a query broadcast, i calculate the 
-//				//	  * waiting time. The waiting time for the first iteration 
-//				//	  * independs on the number of my children nodes. I have to 
-//				//	  * see what children do i have for that query.
-//				//	  */
-//				//	start =0;
-//				//	WaitingTime = OFFSET; 				/* find if i have children in my list for that query msg, and calculate the WaitingTime */
-//				//	while (start < LAST_SENDERS) {  
-//				//		if (Children_Nodes[start].state == 1 && Children_Nodes[start].source_id == r_pkt->source_id && Children_Nodes[start].sequence_number == r_pkt->sequence_number){
-//				//			WaitingTime += Children_Nodes[start].waiting_time;	
-//				//		}
-//				//		start++;
-//				//	}
-				//}
+				if (r_pkt->father_node == TOS_NODE_ID) {	/* if this node that send me a bcast, has chosen me as his father, then save him in my child list. */
+					nextChild = nextChild%LAST_SENDERS;
+					AQQ[start].children[nextChild] = r_pkt->forwarder_id;
+					nextChild++;
+				} 
 			}
 		} 
 		return msg;
 	}
 
-/* -------------------------------------------- QUERY RECEIVE SERIAL MESSAGE ------------------------------------------------------ */
+/* -------------------------------------------- QUERY SERIAL RECEIVE MESSAGE ------------------------------------------------------ */
 	event message_t* SerialReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof (query_msg_t)) {
 			s_pkt = (query_msg_t*) payload;
@@ -919,18 +895,19 @@ implementation
 				AQQ[query_pos].source_id = TOS_NODE_ID; 
 				AQQ[query_pos].sequence_number = sequence_number;
 				AQQ[query_pos].forwarder_id = TOS_NODE_ID;
+				AQQ[query_pos].father_node = TOS_NODE_ID;
 				AQQ[query_pos].hops = 0;
 				AQQ[query_pos].sampling_period = s_pkt->sampling_period;
 				AQQ[query_pos].query_lifetime = s_pkt->query_lifetime;
 				AQQ[query_pos].propagation_mode = s_pkt->propagation_mode;
+				AQQ[query_pos].WaitingTime = OFFSET;
+				AQQ[query_pos].RemaingTime = OFFSET;
 				AQQ[query_pos].state = 1;
 
 				sendQuery = query_pos;
-
 				post QueryScheduling();
 
-				TimeToMeasure[sendQuery] = AQQ[sendQuery].sampling_period;
-
+				TimeToMeasure[sendQuery] = AQQ[sendQuery].sampling_period;		/* save the sampling period */
 				post MeasurementScheduling();
 
 				// prepare to re-Broadcast
@@ -943,7 +920,8 @@ implementation
 
 				bcast_pkt->source_id = AQQ[sendQuery].source_id;
 				bcast_pkt->sequence_number = AQQ[sendQuery].sequence_number;
-				bcast_pkt->forwarder_id = AQQ[sendQuery].forwarder_id;		//TOS_NODE_ID;
+				bcast_pkt->forwarder_id = AQQ[sendQuery].forwarder_id;
+				bcast_pkt->father_node = AQQ[sendQuery].father_node;
 				bcast_pkt->hops = 0;//AQQ[sendQuery].hops;
 				bcast_pkt->sampling_period = AQQ[sendQuery].sampling_period;
 				bcast_pkt->query_lifetime = AQQ[sendQuery].query_lifetime;
