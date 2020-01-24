@@ -8,16 +8,13 @@
 #include "ActiveQueryQueue.h"
 #include "SendersHistory.h"
 #include "Contributed_Nodes.h"
-#include "ChildrenNodes.h"
+#include "QueryCancel.h"
 
 #define NUMBER_OF_MSGS 20
 #define SIZE 10
 #define NUMBER_OF_QUERIES 3
 #define LAST_SENDERS 5
 #define OFFSET 20
-
-
-// ftia3e ena pianaka ston opoio na vlepeis apo poiouw perase to paketo 
 
 module QueryPropagationC @safe()
 {
@@ -27,8 +24,9 @@ module QueryPropagationC @safe()
 	uses interface Timer<TMilli> as TimerReadSensor;
 	uses interface Timer<TMilli> as TimerSendPCSerial;
 	uses interface Timer<TMilli> as TimerQueryFired;
-	uses interface Timer<TMilli> as TimerSimpleMeasurementUcast;
-	uses interface Timer<TMilli> as TimerStatsMeasurement_ReUcastSimple;
+	uses interface Timer<TMilli> as TimerReUnicast;
+	uses interface Timer<TMilli> as TimerQueryCancelResponse;
+	uses interface Timer<TMilli> as Timer_StatsUnicast_Unicast;
 
 	uses interface Read<uint16_t>;
 
@@ -53,16 +51,11 @@ implementation
 {
 /* --------------- POINTERS TO BUFFERS -------------- */
 	query_flooding_msg_t *r_pkt, *bcast_pkt;
+	query_cancel_msg_t *srl_query_cancel, *rcv_query_cacnel, *bcast_query_cancel, *ucast_query_cancel;
 	sampling_msg_t *r_sampling_pkt, *s_sampling_pkt, *ucast_pkt;
 	stats_sampling_msg_t *r_stats_sampling_pkt, *s_stats_sampling_pkt, *stats_ucast_pkt;
 	query_msg_t* s_pkt;
-
 	message_t pkt, serial_pkt;
-
-/* --------------- serial query payload -------------- */
-	
-	//uint16_t query_lifetime;
-	//uint16_t propagation_mode;
 	
 /* --------------- HELPING VARIABLES ----------------- */
 
@@ -73,16 +66,14 @@ implementation
 	uint8_t stats_sampling_save;				/* UNICAST - indicates free pos to save the msg in StatsSamplingPacketBuffer[] */
 	uint8_t number_Of_queries;					/* Counter to save the number of active queries */
 	uint8_t next;								/* Dipicts the next free pos in QuerySendersHistory[] */
-	//uint8_t WaitingTime;						/* The amount of time, waiting for your children, before forwarding STATS values*/
-	uint8_t remindQuery;
-	uint8_t divideNumber;
-	uint8_t start; //8
-	uint8_t HoldTimer; //8
-	uint8_t query_pos; // 8
-	uint8_t minQuery; // 8
-	uint8_t expiredQuery; // 8
-	uint8_t sendQuery; // 8
-	uint8_t Hold_Sampling_Timer;  //8
+	uint8_t remindQuery;						/* Helping variable to keep the query in which we are working for. */
+	uint8_t start; 								/* Counter used for accessing elements from arrays, e.g. AQQ[]*/
+	uint8_t HoldTimer;							/* Variable in which we store the query that last called the TimerQueryFired().*/
+	uint8_t query_pos;							/* Counter used for accessing elements from arrays, e.g. AQQ[]*/
+	uint8_t minQuery;							/* Variable to keep the query with min time to fire. */
+	uint8_t expiredQuery;						/* It shows the query whose lifetime has just ended. */
+	uint8_t sendQuery;							/* It indicates the query which is ready to be broadcast. */
+	uint8_t Hold_Sampling_Timer;				/* Variable in which we store the query that last called the TimerReadSensor().*/
 	uint8_t sequence_number; // 8
 	uint8_t data_id; // 8
 	uint8_t s_data_id; // 8
@@ -92,6 +83,10 @@ implementation
 	uint8_t source_id;
 	uint8_t Hold_Waiting_Timer;
 	uint8_t nextChild;							/* circular pointer for adding children in AQQ.children[] */
+	uint8_t sendTofather;
+	uint8_t query_cancel;
+	uint8_t send_qcancelTo_node;
+	uint8_t count_received_children;			/*A counter that informs in every iteration how many children send me a msg.*/
 
 /*  16-bit  */
 	uint16_t t0,dt;
@@ -100,7 +95,6 @@ implementation
 	uint16_t timerStartAt;
 	uint16_t time4MeasurementStartAt;
 	uint16_t minPeriod; 
-	uint16_t sendTofather;
 	uint16_t sensor_data;
 	uint16_t min;
 	uint16_t max;
@@ -114,15 +108,13 @@ implementation
 	bool serial_busy = FALSE;
 
 /* ----------------------- ARRAYS -------------------- */	
-	message_t PacketBuffer[SIZE], SamplingPacketBuffer[SIZE], StatsSamplingPacketBuffer[SIZE];
+	message_t PacketBuffer[SIZE], SamplingPacketBuffer[SIZE], StatsSamplingPacketBuffer[SIZE];//, QueryCancelBuffer[NUMBER_OF_QUERIES];
 	ActiveQueryQueue_t AQQ[NUMBER_OF_QUERIES];
 	SendersHistory_t QuerySendersHistory[LAST_SENDERS];
 	contributed_nodes_t ContributedNodes[LAST_SENDERS];
-	ChildrenNodes_t Children_Nodes[LAST_SENDERS];
 	uint16_t TimeToMeasure[3];
 	
 /* %% ------------------------------------------------------ TASKS --------------------------------------------------- %% */
-	
 	task void init_StateMessages() {
 		for (start=0; start < LAST_SENDERS; start++) {
 			QuerySendersHistory[start].source_id = 0;
@@ -136,19 +128,12 @@ implementation
 		}
 	}
 
-	//task void init_Children_Nodes() {
-	//	for (start = 0; start < LAST_SENDERS; start++) {
-	//		Children_Nodes[start].state = 0;
-	//	}
-	//}
-
 	task void init_ContributedNodes() {
 		for (start = 0; start < LAST_SENDERS; start++) {
 			ContributedNodes[start].node_id = 0;
 		}
 	}
-
-/* ------------------------------------- Query Scheduling --------------------------- */
+/* ------------------------------- Query Scheduling --------------------------- */
 	task void QueryScheduling() {
 		/* check if i am alone or other queries also running */
 		if (call TimerQueryFired.isRunning() == TRUE) {
@@ -174,7 +159,7 @@ implementation
 			}
 		}
 		else {
-			HoldTimer = sendQuery; //query_pos;
+			HoldTimer = sendQuery; 
 			call TimerQueryFired.startOneShot(AQQ[HoldTimer].query_lifetime); //end query lifetime when TimerQueryFired fire
 			timerStartAt = call TimerQueryFired.getNow();
 			call Leds.led0On();
@@ -191,7 +176,6 @@ implementation
 		}
 
 	}
-
 /* ------------------------------- Measurement Scheduling -------------------------------- */
 	task void MeasurementScheduling() {
 		if (call TimerReadSensor.isRunning() == TRUE) {
@@ -208,7 +192,7 @@ implementation
 				time4MeasurementStartAt = call TimerReadSensor.getNow();
 			}
 
-			query_pos = 0; //start=0;
+			query_pos = 0;
 			while( query_pos < NUMBER_OF_QUERIES) {
 				if (AQQ[query_pos].state == 1 && query_pos != sendQuery) {
 					TimeToMeasure[query_pos] = TimeToMeasure[query_pos] - runningTime; // remaining_timer to expire
@@ -222,7 +206,7 @@ implementation
 			time4MeasurementStartAt = call TimerReadSensor.getNow();
 		}
 	}
-
+/* ------------------------------- Delay Measurement Scheduling -------------------------------- */
 	task void DelayMeasurementScheduling() {
 		if (AQQ[remindQuery].source_id == TOS_NODE_ID) {											/****** ORIGINATOR NODE ******/
 			if (call TimerSendPCSerial.isRunning() == TRUE && Hold_Waiting_Timer != remindQuery) {  /** if the new waiting time calculation is for a new query then schedule */
@@ -251,15 +235,15 @@ implementation
 			}
 		}
 		else {																						/***** MIDDLE NODE ******/
-			if (call TimerStatsMeasurement_ReUcastSimple.isRunning() == TRUE && Hold_Waiting_Timer != remindQuery) {  /** if the new waiting time calculation is for a new query then schedule */
-				checkTimer = call TimerStatsMeasurement_ReUcastSimple.getNow();
+			if (call Timer_StatsUnicast_Unicast.isRunning() == TRUE && Hold_Waiting_Timer != remindQuery) {  /** if the new waiting time calculation is for a new query then schedule */
+				checkTimer = call Timer_StatsUnicast_Unicast.getNow();
 				runningTime = checkTimer - AQQ[Hold_Waiting_Timer].startDelay;
 				dt = AQQ[remindQuery].RemaingTime - runningTime;
-				AQQ[remindQuery].startDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();						/* keep what time the new q ask for timer */
+				AQQ[remindQuery].startDelay = call Timer_StatsUnicast_Unicast.getNow();						/* keep what time the new q ask for timer */
 
 				if (dt > AQQ[remindQuery].WaitingTime) {											/*If WT for new q is smaller than one that hold the timer */
 					Hold_Waiting_Timer = remindQuery;
-					call TimerStatsMeasurement_ReUcastSimple.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+					call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
 				}
 
 				query_pos = 0;
@@ -272,13 +256,12 @@ implementation
 			}
 			else {																					/** else if the new waiting time calculation is for the same query */
 				Hold_Waiting_Timer = remindQuery;
-				call TimerStatsMeasurement_ReUcastSimple.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
-				AQQ[Hold_Waiting_Timer].startDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();
+				call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+				AQQ[Hold_Waiting_Timer].startDelay = call Timer_StatsUnicast_Unicast.getNow();		/* Keep a flag, to remember when you start the clock */
 			}
-		}
-		
+		}	
 	}
-
+/* ------------------------------- Serial Send -------------------------------- */
 	task void SendSerial() {
 		if (!serial_busy) {			/* SIMPLE mode == 1 */
 			if (AQQ[remindQuery].propagation_mode == 0) {
@@ -294,8 +277,6 @@ implementation
 				s_sampling_pkt->destination_id = destination_id;
 				s_sampling_pkt->sequence_number = sequence_number;
 				s_sampling_pkt->mode = 0;
-
-				//memcpy(s_sampling_pkt->ContributedNodes, ContributedNodes, SIZE * sizeof(uint16_t));
 
 				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (sampling_msg_t)) == SUCCESS){
 					dbg("BroadcastingC", "Start sending serial packet\n\n ");
@@ -320,7 +301,8 @@ implementation
 				s_stats_sampling_pkt->destination_id = destination_id;
 				s_stats_sampling_pkt->sequence_number = sequence_number;
 				s_stats_sampling_pkt->mode = 1;
-				memcpy(s_stats_sampling_pkt->contributed_ids, ContributedNodes /*r_stats_sampling_pkt->contributed_ids*/, LAST_SENDERS * sizeof(nx_uint8_t));
+				
+				memcpy(s_stats_sampling_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
 
 				query_pos = 0;
 				while(query_pos < LAST_SENDERS) {
@@ -331,11 +313,51 @@ implementation
 					query_pos++;	
 				}
 				
-				
 				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
 					dbg("BroadcastingC", "Start sending serial packet\n\n ");
 					serial_busy = TRUE;
 				}
+			}
+		}
+	}
+/* ------------------------------- Query Canceling -------------------------------- */
+	task void QueryCancel() {
+		if (HoldTimer == query_cancel) {
+			checkTimer = call TimerQueryFired.getNow();
+			runningTime = checkTimer - timerStartAt;
+			AQQ[query_cancel].query_lifetime = runningTime;			/* save how much did it miss running */
+			call TimerQueryFired.stop();
+			call TimerQueryFired.startOneShot(10);
+		}
+		else {
+			AQQ[query_cancel].state = 0;
+		}
+
+		if (call TimerQueryBroadcast.isRunning() == TRUE) {
+			t0 = call TimerQueryBroadcast.gett0();
+			dt = call TimerQueryBroadcast.getdt();
+			call TimerQueryBroadcast.startOneShot(t0 + dt);
+		}
+		else {
+			call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);
+		}
+	}
+
+	task void QueryCancelConfirmation() {
+		if (!unicast_busy) {
+			ucast_query_cancel = (query_cancel_msg_t*) (call SamplingAMPacket.getPayload(&pkt, sizeof (query_cancel_msg_t)));
+			if (ucast_query_cancel == NULL) {
+				return;
+			}
+
+			ucast_query_cancel->source_id = AQQ[query_cancel].source_id;
+			ucast_query_cancel->sequence_number = AQQ[query_cancel].sequence_number;
+			ucast_query_cancel->propagation_mode = 2;
+			ucast_query_cancel->forwarder_id = TOS_NODE_ID;
+
+			if (call SamplingRadioAMSend.send(send_qcancelTo_node /*AQQ[query_cancel].father_node */, &pkt, sizeof (sampling_msg_t)) == SUCCESS){
+				unicast_busy = TRUE;
+				call Leds.led2On();
 			}
 		}
 	}
@@ -353,6 +375,7 @@ implementation
 		sampling_send = 0;
 		sequence_number = 0;
 		number_Of_queries = 0;
+		count_received_children = 0;
 
 		call Leds.led0Off();
 		call Leds.led1Off();
@@ -360,7 +383,6 @@ implementation
 
 		post init_StateMessages();
 		post init_ActiveQueryQ();
-		//post init_Children_Nodes();
 		post init_ContributedNodes();
 
 		call RadioAMControl.start();
@@ -417,10 +439,33 @@ implementation
 
 		if (!busy) {
 			memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
-			
-			if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (query_flooding_msg_t)) == SUCCESS){
-				busy = TRUE;
-				call Leds.led1On();
+
+			if (bcast_pkt->propagation_mode == 2) {
+				call TimerQueryCancelResponse.startOneShot(AQQ[query_cancel].WaitingTime);				/*Waiting upper bound before resending the query cancel */
+
+				if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (query_cancel_msg_t)) == SUCCESS){
+					busy = TRUE;
+					call Leds.led1On();
+				}
+			}
+			else {
+				if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (query_flooding_msg_t)) == SUCCESS){
+					busy = TRUE;
+					call Leds.led1On();
+				}
+			}		
+		}
+	}
+/* ------------------------- TimerQueryCancelResponse =>  WAITING UPPER BOUND TIME, WHO SEND CANCEL RESPONSE -------------------------- */ 
+	event void TimerQueryCancelResponse.fired() {
+		query_pos = 0;
+		start=0;
+		while (query_pos < LAST_SENDERS) {
+			if (AQQ[query_cancel].children[query_pos] != 0){
+				send_qcancelTo_node = AQQ[query_cancel].children[query_pos];
+				AQQ[query_cancel].children[query_pos] = 0;
+				post QueryCancelConfirmation();
+				break;
 			}
 		}
 	}
@@ -435,7 +480,7 @@ implementation
 		}
 	}
 
-/* ---------------------------------------------- READ VALUES DONE, SO SEND -------------------------------------------------- */
+/* --------------------------------------------------- READ VALUES DONE, SO SEND ------------------------------------------------------ */
 	event void Read.readDone(error_t result, uint16_t data) {
 		if(result == SUCCESS){
 			/** Save what query we are handling */
@@ -460,11 +505,12 @@ implementation
 					min = data;
 					max = data;
 					average = data;
+					//stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
 
 					post DelayMeasurementScheduling();
 				}		
 			}
-			else { /* ELSE IF  NOT ORIGINATOR NODE, then forward the values */ 
+			else { /* ELSE IF  MIDDLE NODE, then read and forward the values */ 
 				
 				/** My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
 				sendTofather = AQQ[Hold_Sampling_Timer].forwarder_id;	 
@@ -485,7 +531,7 @@ implementation
 					ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
 					ucast_pkt->mode = 0;
 
-					call TimerStatsMeasurement_ReUcastSimple.startOneShot(TOS_NODE_ID * 20);  					   // Timer for Unicast Message - TOS_NODE_ID * 20				
+					call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);  					   // Timer for Unicast Message - TOS_NODE_ID * 20				
 				}
 				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
 
@@ -505,7 +551,7 @@ implementation
 					stats_ucast_pkt->average = data;
 					stats_ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
 					stats_ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
-					stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
+					//stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
 					stats_ucast_pkt->mode = 1;
 
 					post DelayMeasurementScheduling();
@@ -547,25 +593,23 @@ implementation
 /* ----------------------------------------- TimerSendPCSerial => SERIAL SEND : MOTE -> PC -------------------------------------------- */ 
 	event void TimerSendPCSerial.fired() {
 		post SendSerial();
+		count_received_children = 0;
 
-		if (number_Of_queries > 0) {
+		if (number_Of_queries > 1) {  /*>1 because if we have one query it is neccessary*/
 			start = 0;
 			minPeriod = 0;
 			while (start < NUMBER_OF_QUERIES) {
-
 				if (start == 0) {
 					while (minPeriod < NUMBER_OF_QUERIES && AQQ[minPeriod].state == 0) {
 						minPeriod++;
 					}
 				}
-
 				if (AQQ[start].state == 1) {
 					AQQ[start].RemaingTime -= AQQ[Hold_Waiting_Timer].RemaingTime;
 					if (AQQ[start].RemaingTime <= AQQ[minPeriod].RemaingTime && AQQ[start].RemaingTime != 0) {
 						minPeriod = start;
 					}
 				}
-
 				start++;
 			}
 
@@ -580,19 +624,9 @@ implementation
 /* ------------------------------------------- TimerQueryFired => Query_Lifetime END -------------------------------------------------- */ 
 	event void TimerQueryFired.fired() {
 		dbg("QueryC", "The query_%hu expired! @ %s", sim_time_string());
-
 		/*Disable the expired query*/
 		number_Of_queries--;
 		AQQ[HoldTimer].state = 0; 
-
-		/* Remove every child node for that query */
-		start = 0;
-		while(start < LAST_SENDERS) {
-			if (AQQ[HoldTimer].source_id == Children_Nodes[start].source_id && AQQ[HoldTimer].sequence_number == Children_Nodes[start].sequence_number) {
-				Children_Nodes[start].state = 0;
-			}
-			start++;
-		}
 
 		if (number_Of_queries > 0) {
 			expiredQuery = HoldTimer;
@@ -600,7 +634,7 @@ implementation
 			query_pos = 0;
 			while (query_pos < NUMBER_OF_QUERIES) {
 				if (AQQ[query_pos].state == 1) {
-					AQQ[query_pos].query_lifetime = AQQ[query_pos].query_lifetime - AQQ[expiredQuery].query_lifetime;
+					AQQ[query_pos].query_lifetime -= AQQ[expiredQuery].query_lifetime;
 					if (AQQ[query_pos].query_lifetime <= AQQ[minQuery].query_lifetime && AQQ[query_pos].query_lifetime != 0) {
 						HoldTimer = query_pos;
 					}
@@ -618,8 +652,8 @@ implementation
 		}
 	}
 
-/* ---------------------------------------- TimerSimpleMeasurementUcast => Re-UNICAST MEASUREMENTS --------------------------------------------- */
-	event void TimerSimpleMeasurementUcast.fired() {
+/* ---------------------------------------- TimerReUnicast => Re-UNICAST MEASUREMENTS --------------------------------------------- */
+	event void TimerReUnicast.fired() {
 		if (!unicast_busy) {
 			ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
 			if (ucast_pkt == NULL) {
@@ -635,10 +669,9 @@ implementation
 		}
 	} 
 
-/* ---------------------------------------- TimerStatsMeasurement_ReUcastSimple => UNICAST MEASUREMENTS --------------------------------------------- */
-	event void TimerStatsMeasurement_ReUcastSimple.fired() {
+/* ---------------------------------------- Timer_StatsUnicast_Unicast => UNICAST MEASUREMENTS --------------------------------------------- */
+	event void Timer_StatsUnicast_Unicast.fired() {
 		if (!unicast_busy) {
-
 			if (AQQ[remindQuery].propagation_mode == 0) {
 				ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
 				if (ucast_pkt == NULL) {
@@ -653,10 +686,20 @@ implementation
 				}
 			}
 			else if (AQQ[remindQuery].propagation_mode == 1) {
+				count_received_children = 0;	/*init the counter for the next ucast transmission */
 				stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_send], sizeof (stats_sampling_msg_t)));
 				if (stats_ucast_pkt == NULL) {
 					return;
 				}
+
+				while(start < LAST_SENDERS) {
+					if (stats_ucast_pkt->contributed_ids[start] == 0) {
+						stats_ucast_pkt->contributed_ids[start] = TOS_NODE_ID;
+						break;
+					}
+					start++;
+				}
+
 
 				memcpy(&pkt, &StatsSamplingPacketBuffer[stats_sampling_send], sizeof(message_t));
 
@@ -664,14 +707,13 @@ implementation
 					unicast_busy = TRUE;
 					call Leds.led2On();
 				}
-			}	
+			}
 		}
 	} 
 
 /* ----------------------------------------- SAMPLING RADIO RECEIVE MESSAGES ------------------------------------------------ */
 	event message_t* SamplingRadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
-		/** If i receive a SIMPLE sampling message */
-		if (len == sizeof(sampling_msg_t)) {
+		if (len == sizeof(sampling_msg_t)) {					/** RECEIVE SIMPLE SAMPLING MESSAGE **/
 			r_sampling_pkt = (sampling_msg_t*) payload;
 
 			/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
@@ -700,7 +742,7 @@ implementation
 					sendTofather = AQQ[query_pos].forwarder_id;
 				}
 				
-				call TimerSimpleMeasurementUcast.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
+				call TimerReUnicast.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
 			}
 			else {  /* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
 				source_id = r_sampling_pkt->source_id;
@@ -713,8 +755,9 @@ implementation
 				call TimerSendPCSerial.startOneShot(20);
 			}
 		} 
-		else if (len == sizeof(stats_sampling_msg_t)) {				/** ELSE if i receive a STATS sampling message */
+		else if (len == sizeof(stats_sampling_msg_t)) {				/** RECEIVE STATS SAMPLING MESSAGE */
 			r_stats_sampling_pkt = (stats_sampling_msg_t*) payload;
+			count_received_children++;
 
 			if (min > r_stats_sampling_pkt->min) {
 				min = r_stats_sampling_pkt->min;
@@ -724,18 +767,14 @@ implementation
 			}
 
 			query_pos = 0;
-			while (AQQ[query_pos].source_id != r_stats_sampling_pkt->destination_id && AQQ[query_pos].sequence_number != r_stats_sampling_pkt->sequence_number && query_pos < NUMBER_OF_QUERIES) {
+			while (query_pos < NUMBER_OF_QUERIES) {
+				if (AQQ[query_pos].source_id == r_stats_sampling_pkt->destination_id && AQQ[query_pos].sequence_number == r_stats_sampling_pkt->sequence_number) {
+					average = (max + min) / (count_received_children+1);		// false --> if the topology is tree???
+					sendTofather = AQQ[query_pos].forwarder_id;		/** Save the father node */
+					break;
+				}
 				query_pos++;
 			}
-
-			/** SUCCESS - find the N nodes from hops */
-			if (query_pos < NUMBER_OF_QUERIES) {
-				divideNumber = r_stats_sampling_pkt->hops - AQQ[query_pos].hops;
-				average = (max - min) / (divideNumber+1);
-
-				/** Save the father node */
-				sendTofather = AQQ[query_pos].forwarder_id;
-			}	
 			/** If MIDDLE NODE then RE-UNICAST to my father. */
 			if (r_stats_sampling_pkt->destination_id != TOS_NODE_ID) {
 
@@ -757,17 +796,23 @@ implementation
 				stats_ucast_pkt->sequence_number = r_stats_sampling_pkt->sequence_number;
 				start = 0;
 				while (start < LAST_SENDERS) {
-					if (r_stats_sampling_pkt->contributed_ids[start] == 0) {
-						stats_ucast_pkt->contributed_ids[start] = TOS_NODE_ID;
-						break;
+					if (r_stats_sampling_pkt->contributed_ids[start] != 0) {
+						stats_ucast_pkt->contributed_ids[start] = r_stats_sampling_pkt->contributed_ids[start];
 					}
 					start++;
 				}
 				stats_ucast_pkt->mode = 1;
 
-				dtDelay = call TimerStatsMeasurement_ReUcastSimple.getNow();
-				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay; /** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
+				dtDelay = call Timer_StatsUnicast_Unicast.getNow();
+				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay;	/** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
 				AQQ[query_pos].RemaingTime = AQQ[query_pos].WaitingTime;
+
+				/*If i got msg from all my children, stop the timer and procceed to ucast transmission*/
+				if (count_received_children == AQQ[query_pos].number_of_children) { 
+					call Timer_StatsUnicast_Unicast.stop();
+					call Timer_StatsUnicast_Unicast.startOneShot(20);
+				}
+
 			}
 			else { 			/*If ORIGINATOR NODE, then send to serial*/
 				source_id = r_stats_sampling_pkt->source_id;
@@ -775,11 +820,42 @@ implementation
 				forwarder_id = r_stats_sampling_pkt->forwarder_id;
 				destination_id = r_stats_sampling_pkt->destination_id;
 				sequence_number = r_stats_sampling_pkt->sequence_number;
+				start = 0;
+				while (start < LAST_SENDERS) {
+					if (r_stats_sampling_pkt->contributed_ids[start] != 0) {
+						ContributedNodes[start].node_id = r_stats_sampling_pkt->contributed_ids[start];
+					}
+					start++;
+				}
 
-				memcpy(ContributedNodes, r_stats_sampling_pkt->contributed_ids, LAST_SENDERS * sizeof(nx_uint8_t));
+				//memcpy(ContributedNodes, r_stats_sampling_pkt->contributed_ids, LAST_SENDERS * sizeof(nx_uint8_t));
 
 				dtDelay = call TimerSendPCSerial.getNow();
 				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay; /** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
+				AQQ[query_pos].RemaingTime = AQQ[query_pos].WaitingTime;
+
+				/*If i got msg from all my children, stop the timer and procceed to serial transmission*/
+				if (count_received_children == AQQ[query_pos].number_of_children) { 
+					call TimerSendPCSerial.stop();
+					call TimerSendPCSerial.startOneShot(20);
+				}
+			}
+		}
+		else if (len == sizeof(query_cancel_msg_t)) {
+			rcv_query_cacnel = (query_cancel_msg_t*) payload;
+
+			query_pos = 0;
+			while (query_pos < NUMBER_OF_QUERIES) {
+				if (AQQ[query_pos].source_id == rcv_query_cacnel->source_id && AQQ[query_pos].sequence_number == rcv_query_cacnel->sequence_number){
+					start = 0;
+					while (start < LAST_SENDERS){
+						if (AQQ[query_pos].children[start] == rcv_query_cacnel->forwarder_id) {
+							AQQ[query_pos].children[start] = 0;
+							break;
+						}
+						start++;
+					}
+				}	
 			}
 		}
 		return msg;
@@ -861,8 +937,9 @@ implementation
 				start = 0;
 				while (start < NUMBER_OF_QUERIES) {
 					if (AQQ[start].source_id == r_pkt->source_id && AQQ[start].sequence_number == r_pkt->sequence_number){
-						AQQ[start].WaitingTime = AQQ[start].sampling_period / 2;				/*And set for that query an upper bound for waiting time. */
+						AQQ[start].WaitingTime = AQQ[start].sampling_period - 1000 ;				/*And set for that query an upper bound for waiting time. */
 						AQQ[start].RemaingTime = AQQ[start].WaitingTime;
+						AQQ[start].number_of_children++;
 						break;
 					}
 					start++;
@@ -874,7 +951,37 @@ implementation
 					nextChild++;
 				} 
 			}
-		} 
+		}
+		else if (len == sizeof(query_cancel_msg_t)) {
+			rcv_query_cacnel = (query_cancel_msg_t*) payload;
+
+			if (number_Of_queries > 0) {
+				query_pos = 0;
+				while (query_pos < NUMBER_OF_QUERIES) {
+					if (AQQ[query_pos].source_id == rcv_query_cacnel->source_id && AQQ[query_pos].sequence_number == rcv_query_cacnel->sequence_number && AQQ[query_pos].state == 1) {
+						query_cancel = query_pos;
+						break;
+					}
+					query_pos++;
+				}
+			}
+			post QueryCancel();  			/* task to find the query and cancel its operation */
+
+			save = save%SIZE;
+			bcast_query_cancel = (query_cancel_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_cancel_msg_t) ));
+			if (bcast_query_cancel == NULL) {
+				return;
+			}
+			save++;
+
+			bcast_pkt->source_id = rcv_query_cacnel->source_id;
+			bcast_pkt->sequence_number = rcv_query_cacnel->sequence_number;
+			bcast_pkt->propagation_mode = rcv_query_cacnel->propagation_mode;
+			bcast_pkt->forwarder_id = TOS_NODE_ID;								/*who is sending the broadcast */
+
+			send_qcancelTo_node = AQQ[query_cancel].father_node;
+			post QueryCancelConfirmation();			/* Give a response to the father node that send you the query cancelation */
+		}
 		return msg;
 	}
 
@@ -896,6 +1003,7 @@ implementation
 				AQQ[query_pos].sequence_number = sequence_number;
 				AQQ[query_pos].forwarder_id = TOS_NODE_ID;
 				AQQ[query_pos].father_node = TOS_NODE_ID;
+				AQQ[query_pos].number_of_children = 0;
 				AQQ[query_pos].hops = 0;
 				AQQ[query_pos].sampling_period = s_pkt->sampling_period;
 				AQQ[query_pos].query_lifetime = s_pkt->query_lifetime;
@@ -910,7 +1018,7 @@ implementation
 				TimeToMeasure[sendQuery] = AQQ[sendQuery].sampling_period;		/* save the sampling period */
 				post MeasurementScheduling();
 
-				// prepare to re-Broadcast
+				// configure the Broadcast
 				save = save%SIZE;
 				bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
 				if (bcast_pkt == NULL) {
@@ -927,6 +1035,32 @@ implementation
 				bcast_pkt->query_lifetime = AQQ[sendQuery].query_lifetime;
 				bcast_pkt->propagation_mode = AQQ[sendQuery].propagation_mode;
 			}	
+		}
+		else if (len == sizeof(query_cancel_msg_t)) {
+			srl_query_cancel = (query_cancel_msg_t*) payload;
+
+			if (number_Of_queries > 0) {
+				query_pos = 0;
+				while (query_pos < NUMBER_OF_QUERIES) {
+					if (AQQ[query_pos].source_id == srl_query_cancel->source_id && AQQ[query_pos].sequence_number == srl_query_cancel->sequence_number && AQQ[query_pos].state == 1) {
+						query_cancel = query_pos;
+						break;
+					}
+				}
+			}
+			post QueryCancel();
+
+			save = save%SIZE;
+			bcast_query_cancel = (query_cancel_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_cancel_msg_t) ));
+			if (bcast_query_cancel == NULL) {
+				return;
+			}
+			save++;
+
+			bcast_pkt->source_id = srl_query_cancel->source_id;
+			bcast_pkt->sequence_number = srl_query_cancel->sequence_number;
+			bcast_pkt->propagation_mode = srl_query_cancel->propagation_mode;
+			bcast_pkt->forwarder_id = TOS_NODE_ID;
 		}
 		return msg;
 	}
@@ -961,6 +1095,7 @@ implementation
 					stats_sampling_send = 0;
 				}
 			}	
+			post init_ContributedNodes();
 		}		
 	}
 
@@ -969,6 +1104,7 @@ implementation
 		if (&serial_pkt == msg) {
 			serial_busy = FALSE;
 		}
+		post init_ContributedNodes();
 	}
-/* ---------------------------------------------------------------------------------------------------------------------------- */	
+
 }

@@ -12,8 +12,9 @@ implementation
 	components new TimerMilliC() as TimerReadSensor;
 	components new TimerMilliC() as TimerSendPCSerial;
 	components new TimerMilliC() as TimerQueryFired;
-	components new TimerMilliC() as TimerSimpleMeasurementUcast;
-	components new TimerMilliC() as TimerStatsMeasurement_ReUcastSimple;
+	components new TimerMilliC() as TimerReUnicast;
+	components new TimerMilliC() as TimerQueryCancelResponse;
+	components new TimerMilliC() as Timer_StatsUnicast_Unicast;
 	
 	components new  HamamatsuS1087ParC() as Sensor;
 	//components new DemoSensorC() as Sensor;
@@ -40,8 +41,9 @@ implementation
 	App.TimerReadSensor -> TimerReadSensor;
 	App.TimerSendPCSerial -> TimerSendPCSerial;
 	App.TimerQueryFired -> TimerQueryFired;
-	App.TimerSimpleMeasurementUcast -> TimerSimpleMeasurementUcast;
-	App.TimerStatsMeasurement_ReUcastSimple -> TimerStatsMeasurement_ReUcastSimple;
+	App.TimerReUnicast -> TimerReUnicast;
+	App.Timer_StatsUnicast_Unicast -> Timer_StatsUnicast_Unicast;
+	App.TimerQueryCancelResponse -> TimerQueryCancelResponse;
 
 	App.SerialReceive -> SerialAMReceiverC;
 	App.SerialPacket -> SerialAMSenderC;

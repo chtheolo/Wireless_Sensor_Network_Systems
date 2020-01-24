@@ -10,11 +10,21 @@ import Queue
 #import time
 
 AM_QUERY_MSG = 6
+AM_QYERY_CANCEL_MSG = 16
 AM_SAMPLING_MSG = 36
 AM_STATS_SAMPLING_MSG = 46
 
 
 #application defined messages
+class QueryCancelMsg(tos.Packet):
+    def __init__(self, packet = None):
+        tos.Packet.__init__(self, 
+                                [('source_id','int', 1),
+                                 ('sequence_number','int', 1),
+                                 ('propagation_mode', 'int', 1),
+                                 ('forwarder_id', 'int', 1)], 
+                                packet)
+
 class AppMsg(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self, 
@@ -99,7 +109,12 @@ def transmitter(tx_queue):
             var3 = int(raw_input(''))
             
             print('PC -> TelosB: ', var1, var2, var3)
-            msg = AppMsg((var1, var2, var3, []))
+            if var3 == 2:
+                var4 = var1
+                msg = QueryCancelMsg((var1, var2, var3, var4, []))
+            elif var3 == 0 or var3 == 1:
+                msg = AppMsg((var1, var2, var3, []))
+
             print (msg)
             tx_queue.put(msg)
             print('Sent')
@@ -139,7 +154,6 @@ class SerialManager(object):
                     print(pkt.data)
                     msg = SamplingMsg(pkt.data)
                     sampling_msg = SamplingMsg(pkt.data)
-                    #self.rx_queue.put(msg)
                     self.rx_queue.put(sampling_msg)
                 elif pkt is not None and len(pkt.data) == 18:
                     print(pkt)

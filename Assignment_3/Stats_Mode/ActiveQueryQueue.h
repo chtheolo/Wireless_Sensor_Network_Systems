@@ -7,6 +7,7 @@ typedef nx_struct ActiveQueryQueue {
 	nx_uint8_t forwarder_id;
 	nx_uint8_t father_node;
 	nx_uint8_t children[5];
+	nx_uint8_t number_of_children;
 	nx_uint8_t hops;
 	nx_uint16_t sampling_period;
 	nx_uint16_t query_lifetime;
