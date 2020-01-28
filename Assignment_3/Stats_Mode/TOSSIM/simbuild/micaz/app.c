@@ -1289,7 +1289,7 @@ typedef struct sim_log_channel {
 } sim_log_channel_t;
 
 enum __nesc_unnamed4272 {
-  SIM_LOG_OUTPUT_COUNT = 213U
+  SIM_LOG_OUTPUT_COUNT = 206U
 };
 
 sim_log_output_t outputs[SIM_LOG_OUTPUT_COUNT];
@@ -2324,15 +2324,17 @@ enum __nesc_unnamed4280 {
 
 
 
+
 #line 8
 typedef nx_struct query_flooding_msg {
-  nx_uint16_t source_id;
-  nx_uint16_t sequence_number;
-  nx_uint16_t forwarder_id;
-  nx_uint16_t hops;
+  nx_uint8_t source_id;
+  nx_uint8_t sequence_number;
+  nx_uint8_t forwarder_id;
+  nx_uint8_t father_node;
+  nx_uint8_t hops;
   nx_uint16_t sampling_period;
   nx_uint16_t query_lifetime;
-  nx_uint16_t propagation_mode;
+  nx_uint8_t propagation_mode;
 } __attribute__((packed)) query_flooding_msg_t;
 # 4 "QueryPacket.h"
 enum __nesc_unnamed4281 {
@@ -2347,9 +2349,9 @@ enum __nesc_unnamed4281 {
 typedef nx_struct query_msg {
   nx_uint16_t sampling_period;
   nx_uint16_t query_lifetime;
-  nx_uint16_t propagation_mode;
+  nx_uint8_t propagation_mode;
 } __attribute__((packed)) query_msg_t;
-# 4 "SamplingPacket.h"
+# 6 "SamplingPacket.h"
 enum __nesc_unnamed4282 {
   AM_SAMPLING_MSG = 36
 };
@@ -2361,15 +2363,19 @@ enum __nesc_unnamed4282 {
 
 
 
-#line 8
+
+
+#line 10
 typedef nx_struct sampling_msg {
-  nx_uint16_t source_id;
-  nx_uint16_t data_id;
-  nx_uint16_t forwarder_id;
+  nx_uint8_t source_id;
+  nx_uint8_t data_id;
+  nx_uint8_t forwarder_id;
   nx_uint16_t sensor_data;
-  nx_uint16_t destination_id;
-  nx_uint16_t sequence_number;
-} __attribute__((packed)) sampling_msg_t;
+  nx_uint8_t destination_id;
+  nx_uint8_t sequence_number;
+  nx_uint8_t mode;
+} __attribute__((packed)) 
+sampling_msg_t;
 # 25 "/opt/tinyos-2.1.2/tos/chips/atm128/sim/atm128_sim.h"
 enum __nesc_unnamed4283 {
 
@@ -3807,25 +3813,74 @@ typedef union __nesc_unnamed4328 {
     uint8_t rsvd : 2;
   } bits;
 } Atm128_ETIFR_t;
-# 13 "ActiveQueryQueue.h"
+# 4 "StatsSamplingPacket.h"
+enum __nesc_unnamed4330 {
+  AM_STATS_SAMPLING_MSG = 46, 
+  MAX_NODES_IDS = 5
+};
+#line 21
+#line 9
+typedef nx_struct stats_sampling_msg {
+  nx_uint8_t source_id;
+  nx_uint8_t data_id;
+  nx_uint8_t forwarder_id;
+  nx_uint8_t hops;
+  nx_uint16_t min;
+  nx_uint16_t max;
+  nx_uint16_t average;
+  nx_uint8_t destination_id;
+  nx_uint8_t sequence_number;
+  nx_uint8_t contributed_ids[5];
+  nx_uint8_t mode;
+} __attribute__((packed)) stats_sampling_msg_t;
+# 20 "ActiveQueryQueue.h"
 #line 4
 typedef nx_struct ActiveQueryQueue {
-  nx_uint16_t source_id;
-  nx_uint16_t sequence_number;
-  nx_uint16_t forwarder_id;
-  nx_uint16_t hops;
+  nx_uint8_t source_id;
+  nx_uint8_t sequence_number;
+  nx_uint8_t forwarder_id;
+  nx_uint8_t father_node;
+  nx_uint8_t children[5];
+  nx_uint8_t number_of_children;
+  nx_uint8_t hops;
   nx_uint16_t sampling_period;
   nx_uint16_t query_lifetime;
-  nx_uint16_t propagation_mode;
-  nx_uint16_t state;
+  nx_uint8_t propagation_mode;
+  nx_uint8_t state;
+
+  nx_uint16_t startDelay;
+  nx_uint16_t WaitingTime;
+  nx_uint16_t RemaingTime;
 } __attribute__((packed)) ActiveQueryQueue_t;
 # 8 "SendersHistory.h"
 #line 4
 typedef nx_struct SendersHistory {
-  nx_uint16_t source_id;
+  nx_uint8_t source_id;
 
-  nx_uint16_t sequence_number;
+  nx_uint8_t sequence_number;
 } __attribute__((packed)) SendersHistory_t;
+# 6 "Contributed_Nodes.h"
+#line 4
+typedef nx_struct contributed_nodes {
+  nx_uint8_t node_id;
+} __attribute__((packed)) contributed_nodes_t;
+# 4 "QueryCancel.h"
+enum __nesc_unnamed4331 {
+  AM_QYERY_CANCEL_MSG = 16
+};
+
+
+
+
+
+
+#line 8
+typedef nx_struct query_cancel_msg {
+  nx_uint8_t source_id;
+  nx_uint8_t sequence_number;
+  nx_uint8_t propagation_mode;
+  nx_uint8_t forwarder_id;
+} __attribute__((packed)) query_cancel_msg_t;
 typedef TMilli /*AlarmCounterMilliP.Atm128AlarmAsyncC*/Atm128AlarmAsyncC$0$precision;
 typedef /*AlarmCounterMilliP.Atm128AlarmAsyncC*/Atm128AlarmAsyncC$0$precision /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$precision;
 typedef /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$precision /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$Alarm$precision_tag;
@@ -3849,17 +3904,18 @@ typedef /*HilTimerMilliC.CounterToLocalTimeC*/CounterToLocalTimeC$0$precision_ta
 typedef uint32_t /*HilTimerMilliC.CounterToLocalTimeC*/CounterToLocalTimeC$0$Counter$size_type;
 typedef uint16_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$width_t;
 typedef /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$width_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Read$val_t;
-typedef TMilli QueryPropagationC$Timer0$precision_tag;
-typedef TMilli QueryPropagationC$Timer3$precision_tag;
+typedef TMilli QueryPropagationC$TimerQueryFired$precision_tag;
 typedef uint16_t QueryPropagationC$Read$val_t;
-typedef TMilli QueryPropagationC$Timer1$precision_tag;
-typedef TMilli QueryPropagationC$Timer4$precision_tag;
-typedef TMilli QueryPropagationC$Timer2$precision_tag;
-typedef TMilli QueryPropagationC$Timer5$precision_tag;
-enum AMQueueP$__nesc_unnamed4330 {
+typedef TMilli QueryPropagationC$Timer_StatsUnicast_Unicast$precision_tag;
+typedef TMilli QueryPropagationC$TimerReadSensor$precision_tag;
+typedef TMilli QueryPropagationC$TimerSendPCSerial$precision_tag;
+typedef TMilli QueryPropagationC$TimerQueryCancelResponse$precision_tag;
+typedef TMilli QueryPropagationC$TimerQueryBroadcast$precision_tag;
+typedef TMilli QueryPropagationC$TimerReUnicast$precision_tag;
+enum AMQueueP$__nesc_unnamed4332 {
   AMQueueP$NUM_CLIENTS = 2U
 };
-enum SerialAMQueueP$__nesc_unnamed4331 {
+enum SerialAMQueueP$__nesc_unnamed4333 {
   SerialAMQueueP$NUM_CLIENTS = 1U
 };
 # 62 "/opt/tinyos-2.1.2/tos/interfaces/Init.nc"
@@ -4332,8 +4388,6 @@ static void /*HilTimerMilliC.CounterToLocalTimeC*/CounterToLocalTimeC$0$Counter$
 static error_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Read$read(void );
 # 75 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
 static void /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$senseResult$runTask(void );
-# 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer0$fired(void );
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void QueryPropagationC$SamplingRadioAMSend$sendDone(
 #line 103
@@ -4349,16 +4403,20 @@ error_t error);
 static void QueryPropagationC$init_StateMessages$runTask(void );
 # 60 "/opt/tinyos-2.1.2/tos/interfaces/Boot.nc"
 static void QueryPropagationC$Boot$booted(void );
-# 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer3$fired(void );
+# 75 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+static void QueryPropagationC$init_ContributedNodes$runTask(void );
 # 113 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
 static void QueryPropagationC$RadioAMControl$startDone(error_t error);
 #line 138
 static void QueryPropagationC$RadioAMControl$stopDone(error_t error);
-# 63 "/opt/tinyos-2.1.2/tos/interfaces/Read.nc"
-static void QueryPropagationC$Read$readDone(error_t result, QueryPropagationC$Read$val_t val);
 # 75 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
 static void QueryPropagationC$init_ActiveQueryQ$runTask(void );
+#line 75
+static void QueryPropagationC$SendSerial$runTask(void );
+# 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+static void QueryPropagationC$TimerQueryFired$fired(void );
+# 63 "/opt/tinyos-2.1.2/tos/interfaces/Read.nc"
+static void QueryPropagationC$Read$readDone(error_t result, QueryPropagationC$Read$val_t val);
 # 78 "/opt/tinyos-2.1.2/tos/interfaces/Receive.nc"
 static 
 #line 74
@@ -4393,8 +4451,10 @@ void * payload,
 
 
 uint8_t len);
-# 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer1$fired(void );
+# 113 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
+static void QueryPropagationC$SerialAMControl$startDone(error_t error);
+#line 138
+static void QueryPropagationC$SerialAMControl$stopDone(error_t error);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void QueryPropagationC$RadioAMSend$sendDone(
 #line 103
@@ -4406,12 +4466,14 @@ message_t * msg,
 
 
 error_t error);
-# 113 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
-static void QueryPropagationC$SerialAMControl$startDone(error_t error);
-#line 138
-static void QueryPropagationC$SerialAMControl$stopDone(error_t error);
+# 75 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+static void QueryPropagationC$DelayMeasurementScheduling$runTask(void );
 # 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer4$fired(void );
+static void QueryPropagationC$Timer_StatsUnicast_Unicast$fired(void );
+# 75 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+static void QueryPropagationC$QueryCancel$runTask(void );
+# 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+static void QueryPropagationC$TimerReadSensor$fired(void );
 # 78 "/opt/tinyos-2.1.2/tos/interfaces/Receive.nc"
 static 
 #line 74
@@ -4429,8 +4491,10 @@ void * payload,
 
 
 uint8_t len);
+# 75 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+static void QueryPropagationC$QueryCancelConfirmation$runTask(void );
 # 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer2$fired(void );
+static void QueryPropagationC$TimerSendPCSerial$fired(void );
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void QueryPropagationC$SerialAMSend$sendDone(
 #line 103
@@ -4447,7 +4511,11 @@ static void QueryPropagationC$QueryScheduling$runTask(void );
 #line 75
 static void QueryPropagationC$MeasurementScheduling$runTask(void );
 # 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer5$fired(void );
+static void QueryPropagationC$TimerQueryCancelResponse$fired(void );
+#line 83
+static void QueryPropagationC$TimerQueryBroadcast$fired(void );
+#line 83
+static void QueryPropagationC$TimerReUnicast$fired(void );
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$send(am_addr_t addr, 
 #line 71
@@ -4472,7 +4540,7 @@ error_t error);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$sendDone(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40d0b2b0, 
+am_id_t arg_0x40d7d490, 
 # 103 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 message_t * msg, 
 
@@ -4485,7 +4553,7 @@ error_t error);
 # 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$send(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40d0c8a8, 
+uint8_t arg_0x40d80a90, 
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4499,7 +4567,7 @@ uint8_t len);
 #line 100
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40d0c8a8, 
+uint8_t arg_0x40d80a90, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4555,7 +4623,7 @@ error_t error);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$sendDone(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40d0b2b0, 
+am_id_t arg_0x40d7d490, 
 # 103 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 message_t * msg, 
 
@@ -4568,7 +4636,7 @@ error_t error);
 # 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$send(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40d0c8a8, 
+uint8_t arg_0x40d80a90, 
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4582,7 +4650,7 @@ uint8_t len);
 #line 100
 static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$default$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40d0c8a8, 
+uint8_t arg_0x40d80a90, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -4674,9 +4742,9 @@ uint8_t arg_0x40734970);
 
 
 
-enum SimSchedulerBasicP$__nesc_unnamed4332 {
+enum SimSchedulerBasicP$__nesc_unnamed4334 {
 
-  SimSchedulerBasicP$NUM_TASKS = 17U, 
+  SimSchedulerBasicP$NUM_TASKS = 22U, 
   SimSchedulerBasicP$NO_TASK = 255
 };
 
@@ -5011,7 +5079,7 @@ double reverseGain);
 static bool TossimPacketModelC$GainRadioModel$clearChannel(void );
 static void TossimPacketModelC$GainRadioModel$setPendingTransmission(void );
 # 96 "/opt/tinyos-2.1.2/tos/lib/tossim/TossimPacketModelC.nc"
-enum TossimPacketModelC$__nesc_unnamed4333 {
+enum TossimPacketModelC$__nesc_unnamed4335 {
 #line 96
   TossimPacketModelC$startDoneTask = 0U
 };
@@ -5021,14 +5089,14 @@ typedef int TossimPacketModelC$__nesc_sillytask_startDoneTask[TossimPacketModelC
 
 
 
-enum TossimPacketModelC$__nesc_unnamed4334 {
+enum TossimPacketModelC$__nesc_unnamed4336 {
 #line 101
   TossimPacketModelC$stopDoneTask = 1U
 };
 #line 101
 typedef int TossimPacketModelC$__nesc_sillytask_stopDoneTask[TossimPacketModelC$stopDoneTask];
 #line 145
-enum TossimPacketModelC$__nesc_unnamed4335 {
+enum TossimPacketModelC$__nesc_unnamed4337 {
 #line 145
   TossimPacketModelC$sendDoneTask = 2U
 };
@@ -5279,20 +5347,20 @@ static error_t SerialActiveMessageC$Model$send(int node, message_t *msg, uint8_t
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
 static error_t SerialActiveMessageC$modelSendDone$postTask(void );
 # 74 "/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/SerialActiveMessageC.nc"
-enum SerialActiveMessageC$__nesc_unnamed4336 {
+enum SerialActiveMessageC$__nesc_unnamed4338 {
 #line 74
   SerialActiveMessageC$startDone = 3U
 };
 #line 74
 typedef int SerialActiveMessageC$__nesc_sillytask_startDone[SerialActiveMessageC$startDone];
-enum SerialActiveMessageC$__nesc_unnamed4337 {
+enum SerialActiveMessageC$__nesc_unnamed4339 {
 #line 75
   SerialActiveMessageC$stopDone = 4U
 };
 #line 75
 typedef int SerialActiveMessageC$__nesc_sillytask_stopDone[SerialActiveMessageC$stopDone];
 #line 119
-enum SerialActiveMessageC$__nesc_unnamed4338 {
+enum SerialActiveMessageC$__nesc_unnamed4340 {
 #line 119
   SerialActiveMessageC$modelSendDone = 5U
 };
@@ -5422,7 +5490,7 @@ static void LedsP$Leds$led0Off(void );
 
 
 
-static inline void LedsP$Leds$led1On(void );
+static void LedsP$Leds$led1On(void );
 
 
 
@@ -5485,7 +5553,7 @@ uint32_t /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAs
 
 
 
-enum /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$__nesc_unnamed4339 {
+enum /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$__nesc_unnamed4341 {
   Atm128AlarmAsyncP$0$MINDT = 2, 
   Atm128AlarmAsyncP$0$MAXT = 230
 };
@@ -5723,7 +5791,7 @@ static void /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC$0$Alarm$stop(void );
 # 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
 static void /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC$0$Timer$fired(void );
 # 74 "/opt/tinyos-2.1.2/tos/lib/timer/AlarmToTimerC.nc"
-enum /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC$0$__nesc_unnamed4340 {
+enum /*HilTimerMilliC.AlarmToTimerC*/AlarmToTimerC$0$__nesc_unnamed4342 {
 #line 74
   AlarmToTimerC$0$fired = 6U
 };
@@ -5767,16 +5835,16 @@ static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$fired(
 # 48 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
 uint8_t arg_0x40be2c70);
 #line 71
-enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$__nesc_unnamed4341 {
+enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$__nesc_unnamed4343 {
 #line 71
   VirtualizeTimerC$0$updateFromTimer = 7U
 };
 #line 71
 typedef int /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$__nesc_sillytask_updateFromTimer[/*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer];
 #line 53
-enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$__nesc_unnamed4342 {
+enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$__nesc_unnamed4344 {
 
-  VirtualizeTimerC$0$NUM_TIMERS = 6U, 
+  VirtualizeTimerC$0$NUM_TIMERS = 7U, 
   VirtualizeTimerC$0$END_OF_LIST = 255
 };
 
@@ -5788,7 +5856,7 @@ enum /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$__nesc_unnamed4342 {
 
 
 #line 59
-typedef struct /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$__nesc_unnamed4343 {
+typedef struct /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$__nesc_unnamed4345 {
 
   uint32_t t0;
   uint32_t dt;
@@ -5848,7 +5916,7 @@ static void /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Rea
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
 static error_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$senseResult$postTask(void );
 # 47 "/opt/tinyos-2.1.2/tos/system/ConstantSensorC.nc"
-enum /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$__nesc_unnamed4344 {
+enum /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$__nesc_unnamed4346 {
 #line 47
   ConstantSensorC$0$senseResult = 8U
 };
@@ -5860,14 +5928,6 @@ static inline void /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensor
 
 
 static inline error_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Read$read(void );
-# 151 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static uint32_t QueryPropagationC$Timer0$getdt(void );
-#line 144
-static uint32_t QueryPropagationC$Timer0$gett0(void );
-#line 92
-static bool QueryPropagationC$Timer0$isRunning(void );
-#line 73
-static void QueryPropagationC$Timer0$startOneShot(uint32_t dt);
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t QueryPropagationC$SamplingRadioAMSend$send(am_addr_t addr, 
 #line 71
@@ -5883,12 +5943,8 @@ message_t * msg,
 uint8_t len);
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
 static error_t QueryPropagationC$init_StateMessages$postTask(void );
-# 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static uint32_t QueryPropagationC$Timer3$getNow(void );
-#line 92
-static bool QueryPropagationC$Timer3$isRunning(void );
-#line 73
-static void QueryPropagationC$Timer3$startOneShot(uint32_t dt);
+#line 67
+static error_t QueryPropagationC$init_ContributedNodes$postTask(void );
 # 126 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
 static 
 #line 123
@@ -5903,7 +5959,9 @@ message_t * msg,
 
 
 uint8_t len);
-#line 126
+# 104 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
+static error_t QueryPropagationC$RadioAMControl$start(void );
+# 126 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
 static 
 #line 123
 void * 
@@ -5917,23 +5975,25 @@ message_t * msg,
 
 
 uint8_t len);
-# 104 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
-static error_t QueryPropagationC$RadioAMControl$start(void );
-# 55 "/opt/tinyos-2.1.2/tos/interfaces/Read.nc"
-static error_t QueryPropagationC$Read$read(void );
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
 static error_t QueryPropagationC$init_ActiveQueryQ$postTask(void );
+#line 67
+static error_t QueryPropagationC$SendSerial$postTask(void );
 # 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static uint32_t QueryPropagationC$Timer1$getNow(void );
+static uint32_t QueryPropagationC$TimerQueryFired$getNow(void );
 #line 92
-static bool QueryPropagationC$Timer1$isRunning(void );
+static bool QueryPropagationC$TimerQueryFired$isRunning(void );
 #line 73
-static void QueryPropagationC$Timer1$startOneShot(uint32_t dt);
+static void QueryPropagationC$TimerQueryFired$startOneShot(uint32_t dt);
 
 
 
 
-static void QueryPropagationC$Timer1$stop(void );
+static void QueryPropagationC$TimerQueryFired$stop(void );
+# 55 "/opt/tinyos-2.1.2/tos/interfaces/Read.nc"
+static error_t QueryPropagationC$Read$read(void );
+# 104 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
+static error_t QueryPropagationC$SerialAMControl$start(void );
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t QueryPropagationC$RadioAMSend$send(am_addr_t addr, 
 #line 71
@@ -5947,6 +6007,8 @@ message_t * msg,
 
 
 uint8_t len);
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+static error_t QueryPropagationC$DelayMeasurementScheduling$postTask(void );
 # 126 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
 static 
 #line 123
@@ -5961,10 +6023,30 @@ message_t * msg,
 
 
 uint8_t len);
-# 104 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
-static error_t QueryPropagationC$SerialAMControl$start(void );
-# 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer4$startOneShot(uint32_t dt);
+# 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+static uint32_t QueryPropagationC$Timer_StatsUnicast_Unicast$getNow(void );
+#line 92
+static bool QueryPropagationC$Timer_StatsUnicast_Unicast$isRunning(void );
+#line 73
+static void QueryPropagationC$Timer_StatsUnicast_Unicast$startOneShot(uint32_t dt);
+
+
+
+
+static void QueryPropagationC$Timer_StatsUnicast_Unicast$stop(void );
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+static error_t QueryPropagationC$QueryCancel$postTask(void );
+# 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+static uint32_t QueryPropagationC$TimerReadSensor$getNow(void );
+#line 92
+static bool QueryPropagationC$TimerReadSensor$isRunning(void );
+#line 73
+static void QueryPropagationC$TimerReadSensor$startOneShot(uint32_t dt);
+
+
+
+
+static void QueryPropagationC$TimerReadSensor$stop(void );
 # 61 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
 static void QueryPropagationC$Leds$led0Off(void );
 
@@ -5989,8 +6071,19 @@ static void QueryPropagationC$Leds$led2Off(void );
 static void QueryPropagationC$Leds$led0On(void );
 #line 89
 static void QueryPropagationC$Leds$led2On(void );
-# 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer2$startOneShot(uint32_t dt);
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+static error_t QueryPropagationC$QueryCancelConfirmation$postTask(void );
+# 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+static uint32_t QueryPropagationC$TimerSendPCSerial$getNow(void );
+#line 92
+static bool QueryPropagationC$TimerSendPCSerial$isRunning(void );
+#line 73
+static void QueryPropagationC$TimerSendPCSerial$startOneShot(uint32_t dt);
+
+
+
+
+static void QueryPropagationC$TimerSendPCSerial$stop(void );
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t QueryPropagationC$SerialAMSend$send(am_addr_t addr, 
 #line 71
@@ -6009,13 +6102,23 @@ static error_t QueryPropagationC$QueryScheduling$postTask(void );
 #line 67
 static error_t QueryPropagationC$MeasurementScheduling$postTask(void );
 # 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer5$startOneShot(uint32_t dt);
-# 112 "QueryPropagationC.nc"
-enum QueryPropagationC$__nesc_unnamed4345 {
-#line 112
+static void QueryPropagationC$TimerQueryCancelResponse$startOneShot(uint32_t dt);
+#line 151
+static uint32_t QueryPropagationC$TimerQueryBroadcast$getdt(void );
+#line 144
+static uint32_t QueryPropagationC$TimerQueryBroadcast$gett0(void );
+#line 92
+static bool QueryPropagationC$TimerQueryBroadcast$isRunning(void );
+#line 73
+static void QueryPropagationC$TimerQueryBroadcast$startOneShot(uint32_t dt);
+#line 73
+static void QueryPropagationC$TimerReUnicast$startOneShot(uint32_t dt);
+# 119 "QueryPropagationC.nc"
+enum QueryPropagationC$__nesc_unnamed4347 {
+#line 119
   QueryPropagationC$init_StateMessages = 9U
 };
-#line 112
+#line 119
 typedef int QueryPropagationC$__nesc_sillytask_init_StateMessages[QueryPropagationC$init_StateMessages];
 
 
@@ -6023,89 +6126,146 @@ typedef int QueryPropagationC$__nesc_sillytask_init_StateMessages[QueryPropagati
 
 
 
-enum QueryPropagationC$__nesc_unnamed4346 {
-#line 119
+enum QueryPropagationC$__nesc_unnamed4348 {
+#line 126
   QueryPropagationC$init_ActiveQueryQ = 10U
 };
-#line 119
+#line 126
 typedef int QueryPropagationC$__nesc_sillytask_init_ActiveQueryQ[QueryPropagationC$init_ActiveQueryQ];
 
 
 
 
 
+enum QueryPropagationC$__nesc_unnamed4349 {
+#line 132
+  QueryPropagationC$init_ContributedNodes = 11U
+};
+#line 132
+typedef int QueryPropagationC$__nesc_sillytask_init_ContributedNodes[QueryPropagationC$init_ContributedNodes];
 
-enum QueryPropagationC$__nesc_unnamed4347 {
-#line 126
-  QueryPropagationC$QueryScheduling = 11U
+
+
+
+
+enum QueryPropagationC$__nesc_unnamed4350 {
+#line 138
+  QueryPropagationC$QueryScheduling = 12U
 };
-#line 126
+#line 138
 typedef int QueryPropagationC$__nesc_sillytask_QueryScheduling[QueryPropagationC$QueryScheduling];
-#line 172
-enum QueryPropagationC$__nesc_unnamed4348 {
-#line 172
-  QueryPropagationC$MeasurementScheduling = 12U
+#line 181
+enum QueryPropagationC$__nesc_unnamed4351 {
+#line 181
+  QueryPropagationC$MeasurementScheduling = 13U
 };
-#line 172
+#line 181
 typedef int QueryPropagationC$__nesc_sillytask_MeasurementScheduling[QueryPropagationC$MeasurementScheduling];
-#line 54
+#line 211
+enum QueryPropagationC$__nesc_unnamed4352 {
+#line 211
+  QueryPropagationC$DelayMeasurementScheduling = 14U
+};
+#line 211
+typedef int QueryPropagationC$__nesc_sillytask_DelayMeasurementScheduling[QueryPropagationC$DelayMeasurementScheduling];
+#line 266
+enum QueryPropagationC$__nesc_unnamed4353 {
+#line 266
+  QueryPropagationC$SendSerial = 15U
+};
+#line 266
+typedef int QueryPropagationC$__nesc_sillytask_SendSerial[QueryPropagationC$SendSerial];
+#line 324
+enum QueryPropagationC$__nesc_unnamed4354 {
+#line 324
+  QueryPropagationC$QueryCancel = 16U
+};
+#line 324
+typedef int QueryPropagationC$__nesc_sillytask_QueryCancel[QueryPropagationC$QueryCancel];
+#line 346
+enum QueryPropagationC$__nesc_unnamed4355 {
+#line 346
+  QueryPropagationC$QueryCancelConfirmation = 17U
+};
+#line 346
+typedef int QueryPropagationC$__nesc_sillytask_QueryCancelConfirmation[QueryPropagationC$QueryCancelConfirmation];
+#line 53
 query_flooding_msg_t *QueryPropagationC$r_pkt[1000];
-#line 54
+#line 53
 query_flooding_msg_t *QueryPropagationC$bcast_pkt[1000];
+query_cancel_msg_t *QueryPropagationC$srl_query_cancel[1000];
+#line 54
+query_cancel_msg_t *QueryPropagationC$rcv_query_cacnel[1000];
+#line 54
+query_cancel_msg_t *QueryPropagationC$bcast_query_cancel[1000];
+#line 54
+query_cancel_msg_t *QueryPropagationC$ucast_query_cancel[1000];
 sampling_msg_t *QueryPropagationC$r_sampling_pkt[1000];
 #line 55
 sampling_msg_t *QueryPropagationC$s_sampling_pkt[1000];
 #line 55
 sampling_msg_t *QueryPropagationC$ucast_pkt[1000];
+stats_sampling_msg_t *QueryPropagationC$r_stats_sampling_pkt[1000];
+#line 56
+stats_sampling_msg_t *QueryPropagationC$s_stats_sampling_pkt[1000];
+#line 56
+stats_sampling_msg_t *QueryPropagationC$stats_ucast_pkt[1000];
 query_msg_t *QueryPropagationC$s_pkt[1000];
-
 message_t QueryPropagationC$pkt[1000];
 #line 58
 message_t QueryPropagationC$serial_pkt[1000];
 
 
-uint16_t QueryPropagationC$sequence_number[1000];
-
-
-
-
-
 
 
 uint8_t QueryPropagationC$send[1000];
-#line 69
+#line 63
 uint8_t QueryPropagationC$save[1000];
 uint8_t QueryPropagationC$sampling_send[1000];
-#line 70
+#line 64
 uint8_t QueryPropagationC$sampling_save[1000];
+uint8_t QueryPropagationC$stats_sampling_send[1000];
+uint8_t QueryPropagationC$stats_sampling_save[1000];
 uint8_t QueryPropagationC$number_Of_queries[1000];
 uint8_t QueryPropagationC$next[1000];
+uint8_t QueryPropagationC$remindQuery[1000];
+uint8_t QueryPropagationC$start[1000];
+uint8_t QueryPropagationC$HoldTimer[1000];
+uint8_t QueryPropagationC$query_pos[1000];
+uint8_t QueryPropagationC$minQuery[1000];
+uint8_t QueryPropagationC$expiredQuery[1000];
+uint8_t QueryPropagationC$sendQuery[1000];
+uint8_t QueryPropagationC$Hold_Sampling_Timer[1000];
+uint8_t QueryPropagationC$sequence_number[1000];
+uint8_t QueryPropagationC$data_id[1000];
+uint8_t QueryPropagationC$s_data_id[1000];
+uint8_t QueryPropagationC$forwarder_id[1000];
+uint8_t QueryPropagationC$destination_id[1000];
+uint8_t QueryPropagationC$hops[1000];
+uint8_t QueryPropagationC$source_id[1000];
+uint8_t QueryPropagationC$Hold_Waiting_Timer[1000];
+uint8_t QueryPropagationC$nextChild[1000];
+uint8_t QueryPropagationC$sendTofather[1000];
+uint8_t QueryPropagationC$query_cancel[1000];
+uint8_t QueryPropagationC$send_qcancelTo_node[1000];
+uint8_t QueryPropagationC$count_received_children[1000];
+uint8_t QueryPropagationC$i[1000];
 
 
 uint16_t QueryPropagationC$t0[1000];
-#line 75
+#line 93
 uint16_t QueryPropagationC$dt[1000];
-uint16_t QueryPropagationC$start[1000];
-uint16_t QueryPropagationC$HoldTimer[1000];
-uint16_t QueryPropagationC$query_pos[1000];
-uint16_t QueryPropagationC$minQuery[1000];
-uint16_t QueryPropagationC$expiredQuery[1000];
-uint16_t QueryPropagationC$sendQuery[1000];
-
 uint16_t QueryPropagationC$runningTime[1000];
 uint16_t QueryPropagationC$checkTimer[1000];
 uint16_t QueryPropagationC$timerStartAt[1000];
 uint16_t QueryPropagationC$time4MeasurementStartAt[1000];
-uint16_t QueryPropagationC$Hold_Sampling_Timer[1000];
 uint16_t QueryPropagationC$minPeriod[1000];
-uint16_t QueryPropagationC$sendTofather[1000];
 uint16_t QueryPropagationC$sensor_data[1000];
-uint16_t QueryPropagationC$source_id[1000];
-uint16_t QueryPropagationC$sequence_number[1000];
-uint16_t QueryPropagationC$data_id[1000];
-uint16_t QueryPropagationC$s_data_id[1000];
-uint16_t QueryPropagationC$forwarder_id[1000];
-uint16_t QueryPropagationC$destination_id[1000];
+uint16_t QueryPropagationC$min[1000];
+uint16_t QueryPropagationC$max[1000];
+uint16_t QueryPropagationC$average[1000];
+
+uint16_t QueryPropagationC$dtDelay[1000];
 
 
 bool QueryPropagationC$busy[1000];
@@ -6113,14 +6273,15 @@ bool QueryPropagationC$unicast_busy[1000];
 bool QueryPropagationC$serial_busy[1000];
 
 
-uint16_t QueryPropagationC$TimeToMeasure[1000][3];
 message_t QueryPropagationC$PacketBuffer[1000][10];
-#line 105
+#line 112
 message_t QueryPropagationC$SamplingPacketBuffer[1000][10];
+#line 112
+message_t QueryPropagationC$StatsSamplingPacketBuffer[1000][10];
 ActiveQueryQueue_t QueryPropagationC$AQQ[1000][3];
 SendersHistory_t QueryPropagationC$QuerySendersHistory[1000][5];
-
-
+contributed_nodes_t QueryPropagationC$ContributedNodes[1000][5];
+uint16_t QueryPropagationC$TimeToMeasure[1000][3];
 
 
 static inline void QueryPropagationC$init_StateMessages$runTask(void );
@@ -6136,13 +6297,26 @@ static inline void QueryPropagationC$init_ActiveQueryQ$runTask(void );
 
 
 
+static inline void QueryPropagationC$init_ContributedNodes$runTask(void );
+
+
+
+
 
 static inline void QueryPropagationC$QueryScheduling$runTask(void );
-#line 172
+#line 181
 static inline void QueryPropagationC$MeasurementScheduling$runTask(void );
-#line 206
+#line 211
+static inline void QueryPropagationC$DelayMeasurementScheduling$runTask(void );
+#line 266
+static inline void QueryPropagationC$SendSerial$runTask(void );
+#line 324
+static inline void QueryPropagationC$QueryCancel$runTask(void );
+#line 346
+static inline void QueryPropagationC$QueryCancelConfirmation$runTask(void );
+#line 366
 static inline void QueryPropagationC$Boot$booted(void );
-#line 230
+#line 393
 static inline void QueryPropagationC$RadioAMControl$startDone(error_t err);
 
 
@@ -6167,9 +6341,13 @@ static inline void QueryPropagationC$SerialAMControl$startDone(error_t err);
 static inline void QueryPropagationC$SerialAMControl$stopDone(error_t err);
 
 
-static inline void QueryPropagationC$Timer0$fired(void );
-#line 279
-static inline void QueryPropagationC$Timer1$fired(void );
+static inline void QueryPropagationC$TimerQueryBroadcast$fired(void );
+#line 460
+static inline void QueryPropagationC$TimerQueryCancelResponse$fired(void );
+#line 474
+static inline void QueryPropagationC$TimerReadSensor$fired(void );
+
+
 
 
 
@@ -6178,25 +6356,25 @@ static inline void QueryPropagationC$Timer1$fired(void );
 
 
 static inline void QueryPropagationC$Read$readDone(error_t result, uint16_t data);
-#line 357
-static inline void QueryPropagationC$Timer2$fired(void );
-#line 384
-static inline void QueryPropagationC$Timer3$fired(void );
-#line 417
-static inline void QueryPropagationC$Timer4$fired(void );
-#line 441
-static inline void QueryPropagationC$Timer5$fired(void );
-#line 466
+#line 594
+static inline void QueryPropagationC$TimerSendPCSerial$fired(void );
+#line 625
+static inline void QueryPropagationC$TimerQueryFired$fired(void );
+#line 656
+static inline void QueryPropagationC$TimerReUnicast$fired(void );
+#line 673
+static inline void QueryPropagationC$Timer_StatsUnicast_Unicast$fired(void );
+#line 713
 static inline message_t *QueryPropagationC$SamplingRadioReceive$receive(message_t *msg, void *payload, uint8_t len);
-#line 513
+#line 866
 static inline message_t *QueryPropagationC$RadioReceive$receive(message_t *msg, void *payload, uint8_t len);
-#line 598
+#line 990
 static inline message_t *QueryPropagationC$SerialReceive$receive(message_t *msg, void *payload, uint8_t len);
-#line 651
+#line 1070
 static void QueryPropagationC$RadioAMSend$sendDone(message_t *msg, error_t err);
-#line 664
+#line 1082
 static void QueryPropagationC$SamplingRadioAMSend$sendDone(message_t *msg, error_t err);
-#line 685
+#line 1104
 static inline void QueryPropagationC$SerialAMSend$sendDone(message_t *msg, error_t err);
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static void /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$sendDone(
@@ -6238,7 +6416,7 @@ message_t * amsg,
 
 am_id_t t);
 # 53 "/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc"
-static inline error_t /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$send(am_addr_t dest, 
+static error_t /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$send(am_addr_t dest, 
 message_t *msg, 
 uint8_t len);
 
@@ -6254,7 +6432,7 @@ static inline void /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQue
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40d0b2b0, 
+am_id_t arg_0x40d7d490, 
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -6271,7 +6449,7 @@ uint8_t len);
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40d0c8a8, 
+uint8_t arg_0x40d80a90, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -6301,22 +6479,22 @@ static am_id_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMPacket$type(
 #line 143
 message_t * amsg);
 # 126 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-enum /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$__nesc_unnamed4349 {
+enum /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$__nesc_unnamed4356 {
 #line 126
-  AMQueueImplP$0$CancelTask = 13U
+  AMQueueImplP$0$CancelTask = 18U
 };
 #line 126
 typedef int /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$__nesc_sillytask_CancelTask[/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$CancelTask];
 #line 169
-enum /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$__nesc_unnamed4350 {
+enum /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$__nesc_unnamed4357 {
 #line 169
-  AMQueueImplP$0$errorTask = 14U
+  AMQueueImplP$0$errorTask = 19U
 };
 #line 169
 typedef int /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$__nesc_sillytask_errorTask[/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$errorTask];
 #line 57
 #line 55
-typedef struct /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$__nesc_unnamed4351 {
+typedef struct /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$__nesc_unnamed4358 {
   message_t * msg;
 } /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue_entry_t;
 
@@ -6442,7 +6620,7 @@ message_t * amsg,
 
 am_id_t t);
 # 53 "/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc"
-static inline error_t /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMSend$send(am_addr_t dest, 
+static error_t /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMSend$send(am_addr_t dest, 
 message_t *msg, 
 uint8_t len);
 
@@ -6458,7 +6636,7 @@ static inline void /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueue
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$send(
 # 48 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-am_id_t arg_0x40d0b2b0, 
+am_id_t arg_0x40d7d490, 
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
 am_addr_t addr, 
 #line 71
@@ -6475,7 +6653,7 @@ uint8_t len);
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$sendDone(
 # 46 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-uint8_t arg_0x40d0c8a8, 
+uint8_t arg_0x40d80a90, 
 # 96 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
 message_t * msg, 
 
@@ -6505,22 +6683,22 @@ static am_id_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMPacket$type(
 #line 143
 message_t * amsg);
 # 126 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-enum /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$__nesc_unnamed4352 {
+enum /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$__nesc_unnamed4359 {
 #line 126
-  AMQueueImplP$1$CancelTask = 15U
+  AMQueueImplP$1$CancelTask = 20U
 };
 #line 126
 typedef int /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$__nesc_sillytask_CancelTask[/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$CancelTask];
 #line 169
-enum /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$__nesc_unnamed4353 {
+enum /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$__nesc_unnamed4360 {
 #line 169
-  AMQueueImplP$1$errorTask = 16U
+  AMQueueImplP$1$errorTask = 21U
 };
 #line 169
 typedef int /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$__nesc_sillytask_errorTask[/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$errorTask];
 #line 57
 #line 55
-typedef struct /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$__nesc_unnamed4354 {
+typedef struct /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$__nesc_unnamed4361 {
   message_t * msg;
 } /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue_entry_t;
 
@@ -6919,7 +7097,27 @@ static inline bool TossimActiveMessageC$AMPacket$isForMe(message_t *amsg)
   TossimActiveMessageC$AMPacket$destination(amsg) == AM_BROADCAST_ADDR;
 }
 
-# 310 "/usr/lib/ncc/nesc_nx.h"
+# 281 "/usr/lib/ncc/nesc_nx.h"
+static __inline  uint8_t __nesc_ntoh_uint8(const void * source)
+#line 281
+{
+  const uint8_t *base = source;
+
+#line 283
+  return base[0];
+}
+
+static __inline  uint8_t __nesc_hton_uint8(void * target, uint8_t value)
+#line 286
+{
+  uint8_t *base = target;
+
+#line 288
+  base[0] = value;
+  return value;
+}
+
+#line 310
 static __inline  uint16_t __nesc_ntoh_uint16(const void * source)
 #line 310
 {
@@ -6940,6 +7138,21 @@ static __inline  uint16_t __nesc_hton_uint16(void * target, uint16_t value)
   return value;
 }
 
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+inline static error_t QueryPropagationC$QueryCancelConfirmation$postTask(void ){
+#line 67
+  unsigned char __nesc_result;
+#line 67
+
+#line 67
+  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(QueryPropagationC$QueryCancelConfirmation);
+#line 67
+
+#line 67
+  return __nesc_result;
+#line 67
+}
+#line 67
 # 189 "/opt/tinyos-2.1.2/tos/lib/tossim/TossimActiveMessageC.nc"
 static inline void *TossimActiveMessageC$Packet$getPayload(message_t *msg, uint8_t len)
 #line 189
@@ -6968,6 +7181,20 @@ inline static void * QueryPropagationC$Packet$getPayload(message_t * msg, uint8_
 }
 #line 126
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+inline static error_t QueryPropagationC$QueryCancel$postTask(void ){
+#line 67
+  unsigned char __nesc_result;
+#line 67
+
+#line 67
+  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(QueryPropagationC$QueryCancel);
+#line 67
+
+#line 67
+  return __nesc_result;
+#line 67
+}
+#line 67
 inline static error_t QueryPropagationC$MeasurementScheduling$postTask(void ){
 #line 67
   unsigned char __nesc_result;
@@ -6996,62 +7223,64 @@ inline static error_t QueryPropagationC$QueryScheduling$postTask(void ){
 #line 67
 }
 #line 67
-# 513 "QueryPropagationC.nc"
+# 866 "QueryPropagationC.nc"
 static inline message_t *QueryPropagationC$RadioReceive$receive(message_t *msg, void *payload, uint8_t len)
-#line 513
+#line 866
 {
-  unsigned short __nesc_temp43;
-  unsigned char *__nesc_temp42;
+  unsigned char __nesc_temp47;
+  unsigned char *__nesc_temp46;
 
-#line 514
+#line 867
   if (len == sizeof(query_flooding_msg_t )) {
       QueryPropagationC$r_pkt[sim_node()] = (query_flooding_msg_t *)payload;
 
 
-
-
       QueryPropagationC$query_pos[sim_node()] = 0;
-      while (QueryPropagationC$query_pos[sim_node()] < 5 && __nesc_ntoh_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) != __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata)) {
+      while (QueryPropagationC$query_pos[sim_node()] < 5 && __nesc_ntoh_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) != __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata)) {
           QueryPropagationC$query_pos[sim_node()]++;
         }
 
+
       if (QueryPropagationC$query_pos[sim_node()] == 5) {
           QueryPropagationC$next[sim_node()] = QueryPropagationC$next[sim_node()] % 5;
-          __nesc_hton_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].source_id.nxdata, 0);
-          __nesc_hton_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].sequence_number.nxdata, 0);
-          __nesc_hton_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].source_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].sequence_number.nxdata, 0);
+          __nesc_hton_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata));
           QueryPropagationC$query_pos[sim_node()] = QueryPropagationC$next[sim_node()];
         }
 
-      if (QueryPropagationC$query_pos[sim_node()] < 5 && __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata) > __nesc_ntoh_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata)) {
+
+      if (__nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata) > __nesc_ntoh_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata) && QueryPropagationC$query_pos[sim_node()] < 5) {
           QueryPropagationC$next[sim_node()]++;
-          __nesc_hton_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata));
 
           if (QueryPropagationC$number_Of_queries[sim_node()] < 3) {
               QueryPropagationC$number_Of_queries[sim_node()]++;
 
-              sim_log_debug(200U, "ReceiveC", "NEW Radio Received QUERY_ID: %hu, SOURCE_ID: %hu, FORWARDER_ID: %hu ,@ %s \n\n", __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata), __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->forwarder_id.nxdata), sim_time_string());
+              sim_log_debug(195U, "ReceiveC", "NEW QUERY \n");
 
               QueryPropagationC$query_pos[sim_node()] = 0;
-              while (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] < 3) {
+              while (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] < 3) {
                   QueryPropagationC$query_pos[sim_node()]++;
                 }
 
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].forwarder_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->forwarder_id.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].hops.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->hops.nxdata) + 1);
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sampling_period.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->sampling_period.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->query_lifetime.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].propagation_mode.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->propagation_mode.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata, 1);
+              if (QueryPropagationC$query_pos[sim_node()] < 3) {
+                  __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata));
+                  __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata));
+                  __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].forwarder_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->forwarder_id.nxdata));
+                  __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].father_node.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->forwarder_id.nxdata));
+                  __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].hops.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->hops.nxdata) + 1);
+                  __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sampling_period.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->sampling_period.nxdata));
+                  __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->query_lifetime.nxdata));
+                  __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].propagation_mode.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->propagation_mode.nxdata));
+                  __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].WaitingTime.nxdata, 20);
+                  __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].RemaingTime.nxdata, 20);
+                  __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata, 1);
+                }
 
               QueryPropagationC$sendQuery[sim_node()] = QueryPropagationC$query_pos[sim_node()];
-
               QueryPropagationC$QueryScheduling$postTask();
 
               QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$sendQuery[sim_node()]] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].sampling_period.nxdata);
-
               QueryPropagationC$MeasurementScheduling$postTask();
 
               QueryPropagationC$save[sim_node()] = QueryPropagationC$save[sim_node()] % 10;
@@ -7061,34 +7290,95 @@ static inline message_t *QueryPropagationC$RadioReceive$receive(message_t *msg, 
                 }
               QueryPropagationC$save[sim_node()]++;
 
-              __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].source_id.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].sequence_number.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
-              __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->hops.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].hops.nxdata));
+              __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].source_id.nxdata));
+              __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].sequence_number.nxdata));
+              __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
+              __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->father_node.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].father_node.nxdata));
+              __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->hops.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].hops.nxdata));
               __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->sampling_period.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].sampling_period.nxdata));
               __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->query_lifetime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].query_lifetime.nxdata));
-              __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->propagation_mode.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].propagation_mode.nxdata));
+              __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->propagation_mode.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].propagation_mode.nxdata));
             }
         }
       else {
-        if (QueryPropagationC$query_pos[sim_node()] < 3 && __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata) == __nesc_ntoh_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata)) {
+#line 936
+        if (__nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata) && QueryPropagationC$query_pos[sim_node()] < 3) {
 
-            (__nesc_temp42 = QueryPropagationC$r_pkt[sim_node()]->hops.nxdata, __nesc_hton_uint16(__nesc_temp42, (__nesc_temp43 = __nesc_ntoh_uint16(__nesc_temp42)) + 1), __nesc_temp43);
-            QueryPropagationC$query_pos[sim_node()] = 0;
-            while (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] < 3) {
-                if (__nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata) == __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) && __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->hops.nxdata) < __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].hops.nxdata)) {
-                    __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].forwarder_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->forwarder_id.nxdata));
-                    __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].hops.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_pkt[sim_node()]->hops.nxdata));
+            QueryPropagationC$start[sim_node()] = 0;
+            while (QueryPropagationC$start[sim_node()] < 3) {
+                if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].source_id.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->source_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->sequence_number.nxdata)) {
+                    __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].WaitingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].sampling_period.nxdata) - 1000);
+                    __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].RemaingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].WaitingTime.nxdata));
+                    (__nesc_temp46 = QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].number_of_children.nxdata, __nesc_hton_uint8(__nesc_temp46, (__nesc_temp47 = __nesc_ntoh_uint8(__nesc_temp46)) + 1), __nesc_temp47);
+                    break;
                   }
-                QueryPropagationC$query_pos[sim_node()]++;
+                QueryPropagationC$start[sim_node()]++;
+              }
+
+            if (__nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->father_node.nxdata) == TOS_NODE_ID) {
+                QueryPropagationC$nextChild[sim_node()] = QueryPropagationC$nextChild[sim_node()] % 5;
+                __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].children[QueryPropagationC$nextChild[sim_node()]].nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_pkt[sim_node()]->forwarder_id.nxdata));
+                QueryPropagationC$nextChild[sim_node()]++;
               }
           }
         }
     }
-#line 594
+  else {
+#line 956
+    if (len == sizeof(query_cancel_msg_t )) {
+        QueryPropagationC$rcv_query_cacnel[sim_node()] = (query_cancel_msg_t *)payload;
+
+        if (QueryPropagationC$number_Of_queries[sim_node()] > 0) {
+            QueryPropagationC$query_pos[sim_node()] = 0;
+            while (QueryPropagationC$query_pos[sim_node()] < 3) {
+                if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$rcv_query_cacnel[sim_node()]->source_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$rcv_query_cacnel[sim_node()]->sequence_number.nxdata) && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1) {
+                    QueryPropagationC$query_cancel[sim_node()] = QueryPropagationC$query_pos[sim_node()];
+                    break;
+                  }
+                QueryPropagationC$query_pos[sim_node()]++;
+              }
+          }
+        QueryPropagationC$QueryCancel$postTask();
+
+        QueryPropagationC$save[sim_node()] = QueryPropagationC$save[sim_node()] % 10;
+        QueryPropagationC$bcast_query_cancel[sim_node()] = (query_cancel_msg_t *)QueryPropagationC$Packet$getPayload(&QueryPropagationC$PacketBuffer[sim_node()][QueryPropagationC$save[sim_node()]], sizeof(query_cancel_msg_t ));
+        if (QueryPropagationC$bcast_query_cancel[sim_node()] == (void *)0) {
+            return;
+          }
+        QueryPropagationC$save[sim_node()]++;
+
+        __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$rcv_query_cacnel[sim_node()]->source_id.nxdata));
+        __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$rcv_query_cacnel[sim_node()]->sequence_number.nxdata));
+        __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->propagation_mode.nxdata, __nesc_ntoh_uint8(QueryPropagationC$rcv_query_cacnel[sim_node()]->propagation_mode.nxdata));
+        __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
+
+        QueryPropagationC$send_qcancelTo_node[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].father_node.nxdata);
+        QueryPropagationC$QueryCancelConfirmation$postTask();
+      }
+    }
+#line 986
   return msg;
 }
 
+# 164 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
+static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(uint8_t num)
+{
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num].isrunning = FALSE;
+}
+
+# 78 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static void QueryPropagationC$TimerSendPCSerial$stop(void ){
+#line 78
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(2U);
+#line 78
+}
+#line 78
+inline static void QueryPropagationC$Timer_StatsUnicast_Unicast$stop(void ){
+#line 78
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(6U);
+#line 78
+}
+#line 78
 # 222 "/opt/tinyos-2.1.2/tos/chips/atm128/timer/Atm128AlarmAsyncP.nc"
 static inline uint32_t /*AlarmCounterMilliP.Atm128AlarmAsyncC.Atm128AlarmAsyncP*/Atm128AlarmAsyncP$0$Alarm$getNow(void )
 #line 222
@@ -7133,19 +7423,27 @@ inline static uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Tim
 #line 136
 }
 #line 136
-# 159 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
-static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(uint8_t num, uint32_t dt)
+# 189 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
+static inline uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$getNow(uint8_t num)
 {
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$startTimer(num, /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$TimerFrom$getNow(), dt, TRUE);
+  return /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$TimerFrom$getNow();
 }
 
-# 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static void QueryPropagationC$Timer4$startOneShot(uint32_t dt){
-#line 73
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(4U, dt);
-#line 73
+# 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static uint32_t QueryPropagationC$Timer_StatsUnicast_Unicast$getNow(void ){
+#line 136
+  unsigned int __nesc_result;
+#line 136
+
+#line 136
+  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$getNow(6U);
+#line 136
+
+#line 136
+  return __nesc_result;
+#line 136
 }
-#line 73
+#line 136
 # 126 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
 inline static void * QueryPropagationC$SamplingAMPacket$getPayload(message_t * msg, uint8_t len){
 #line 126
@@ -7161,17 +7459,28 @@ inline static void * QueryPropagationC$SamplingAMPacket$getPayload(message_t * m
 #line 126
 }
 #line 126
-# 466 "QueryPropagationC.nc"
+# 159 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
+static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(uint8_t num, uint32_t dt)
+{
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$startTimer(num, /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$TimerFrom$getNow(), dt, TRUE);
+}
+
+# 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static void QueryPropagationC$TimerReUnicast$startOneShot(uint32_t dt){
+#line 73
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(4U, dt);
+#line 73
+}
+#line 73
+# 713 "QueryPropagationC.nc"
 static inline message_t *QueryPropagationC$SamplingRadioReceive$receive(message_t *msg, void *payload, uint8_t len)
-#line 466
+#line 713
 {
   if (len == sizeof(sampling_msg_t )) {
       QueryPropagationC$r_sampling_pkt[sim_node()] = (sampling_msg_t *)payload;
 
-      sim_log_debug(198U, "ReceiveC", "NEW Samplings Received \n");
-      sim_log_debug(199U, "ReceiveC", "SOURCE_ID: %hu, FORWARDER_ID: %hu, SAMPLING_ID: %hu \n", __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->source_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->forwarder_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->data_id.nxdata));
 
-      if (__nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->destination_id.nxdata) != TOS_NODE_ID) {
+      if (__nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->destination_id.nxdata) != TOS_NODE_ID) {
 
           QueryPropagationC$sampling_save[sim_node()] = QueryPropagationC$sampling_save[sim_node()] % 10;
           QueryPropagationC$ucast_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_save[sim_node()]], sizeof(sampling_msg_t ));
@@ -7180,33 +7489,148 @@ static inline message_t *QueryPropagationC$SamplingRadioReceive$receive(message_
             }
           QueryPropagationC$sampling_save[sim_node()]++;
 
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->source_id.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->data_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->data_id.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
+          __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->source_id.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->data_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->data_id.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
           __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->sensor_data.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->sensor_data.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->destination_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->destination_id.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->sequence_number.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->destination_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->destination_id.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->sequence_number.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->mode.nxdata, 0);
 
           QueryPropagationC$query_pos[sim_node()] = 0;
-          while (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) != __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->destination_id.nxdata) && __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata) != __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->sequence_number.nxdata) && QueryPropagationC$query_pos[sim_node()] < 3) {
+          while (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) != __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->destination_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata) != __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->sequence_number.nxdata) && QueryPropagationC$query_pos[sim_node()] < 3) {
               QueryPropagationC$query_pos[sim_node()]++;
             }
           if (QueryPropagationC$query_pos[sim_node()] < 3) {
-              QueryPropagationC$sendTofather[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].forwarder_id.nxdata);
+              QueryPropagationC$sendTofather[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].forwarder_id.nxdata);
             }
 
-          QueryPropagationC$Timer4$startOneShot(TOS_NODE_ID * 20);
+          QueryPropagationC$TimerReUnicast$startOneShot(TOS_NODE_ID * 20);
         }
       else {
-          QueryPropagationC$source_id[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->source_id.nxdata);
-          QueryPropagationC$s_data_id[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->data_id.nxdata);
-          QueryPropagationC$forwarder_id[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->forwarder_id.nxdata);
+          QueryPropagationC$source_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->source_id.nxdata);
+          QueryPropagationC$s_data_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->data_id.nxdata);
+          QueryPropagationC$forwarder_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->forwarder_id.nxdata);
           QueryPropagationC$sensor_data[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->sensor_data.nxdata);
-          QueryPropagationC$destination_id[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->destination_id.nxdata);
-          QueryPropagationC$sequence_number[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$r_sampling_pkt[sim_node()]->sequence_number.nxdata);
-          QueryPropagationC$Timer2$startOneShot(20);
+          QueryPropagationC$destination_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->destination_id.nxdata);
+          QueryPropagationC$sequence_number[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_sampling_pkt[sim_node()]->sequence_number.nxdata);
+
+          QueryPropagationC$TimerSendPCSerial$startOneShot(20);
         }
     }
+  else {
+#line 756
+    if (len == sizeof(stats_sampling_msg_t )) {
+        QueryPropagationC$r_stats_sampling_pkt[sim_node()] = (stats_sampling_msg_t *)payload;
+        QueryPropagationC$count_received_children[sim_node()]++;
+
+        if (QueryPropagationC$min[sim_node()] > __nesc_ntoh_uint16(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->min.nxdata)) {
+            QueryPropagationC$min[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->min.nxdata);
+          }
+        if (QueryPropagationC$max[sim_node()] < __nesc_ntoh_uint16(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->max.nxdata)) {
+            QueryPropagationC$max[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->max.nxdata);
+          }
+
+        QueryPropagationC$query_pos[sim_node()] = 0;
+        while (QueryPropagationC$query_pos[sim_node()] < 3) {
+            if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->destination_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->sequence_number.nxdata)) {
+                QueryPropagationC$average[sim_node()] = (QueryPropagationC$max[sim_node()] + QueryPropagationC$min[sim_node()]) / (QueryPropagationC$count_received_children[sim_node()] + 1);
+                QueryPropagationC$sendTofather[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].forwarder_id.nxdata);
+                break;
+              }
+            QueryPropagationC$query_pos[sim_node()]++;
+          }
+
+        if (__nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->destination_id.nxdata) != TOS_NODE_ID) {
+
+            QueryPropagationC$stats_sampling_save[sim_node()] = QueryPropagationC$stats_sampling_save[sim_node()] % 10;
+            QueryPropagationC$stats_ucast_pkt[sim_node()] = (stats_sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$StatsSamplingPacketBuffer[sim_node()][QueryPropagationC$stats_sampling_save[sim_node()]], sizeof(stats_sampling_msg_t ));
+            if (QueryPropagationC$stats_ucast_pkt[sim_node()] == (void *)0) {
+                return;
+              }
+            QueryPropagationC$stats_sampling_save[sim_node()]++;
+
+            __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->source_id.nxdata));
+            __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->data_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->data_id.nxdata));
+            __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
+            __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->hops.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->hops.nxdata));
+            __nesc_hton_uint16(QueryPropagationC$stats_ucast_pkt[sim_node()]->min.nxdata, QueryPropagationC$min[sim_node()]);
+            __nesc_hton_uint16(QueryPropagationC$stats_ucast_pkt[sim_node()]->max.nxdata, QueryPropagationC$max[sim_node()]);
+            __nesc_hton_uint16(QueryPropagationC$stats_ucast_pkt[sim_node()]->average.nxdata, QueryPropagationC$average[sim_node()]);
+            __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->destination_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->destination_id.nxdata));
+            __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->sequence_number.nxdata));
+            QueryPropagationC$start[sim_node()] = 0;
+            QueryPropagationC$i[sim_node()] = 0;
+            while (QueryPropagationC$start[sim_node()] < 5) {
+                if (__nesc_ntoh_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata) == 0) {
+                    __nesc_hton_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->contributed_ids[QueryPropagationC$i[sim_node()]].nxdata));
+                    QueryPropagationC$i[sim_node()]++;
+                  }
+                QueryPropagationC$start[sim_node()]++;
+              }
+
+            __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->mode.nxdata, 1);
+
+            QueryPropagationC$dtDelay[sim_node()] = QueryPropagationC$Timer_StatsUnicast_Unicast$getNow();
+            __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].WaitingTime.nxdata, QueryPropagationC$dtDelay[sim_node()] - __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].startDelay.nxdata));
+            __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].RemaingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].WaitingTime.nxdata));
+
+
+            if (QueryPropagationC$count_received_children[sim_node()] == __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].number_of_children.nxdata)) {
+                QueryPropagationC$Timer_StatsUnicast_Unicast$stop();
+                QueryPropagationC$Timer_StatsUnicast_Unicast$startOneShot(20);
+              }
+          }
+        else 
+          {
+            QueryPropagationC$source_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->source_id.nxdata);
+            QueryPropagationC$s_data_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->data_id.nxdata);
+            QueryPropagationC$forwarder_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->forwarder_id.nxdata);
+            QueryPropagationC$destination_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->destination_id.nxdata);
+            QueryPropagationC$sequence_number[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->sequence_number.nxdata);
+            QueryPropagationC$start[sim_node()] = 0;
+            QueryPropagationC$i[sim_node()] = 0;
+            while (QueryPropagationC$start[sim_node()] < 5) {
+                if (__nesc_ntoh_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata) == 0) {
+                    __nesc_hton_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$r_stats_sampling_pkt[sim_node()]->contributed_ids[QueryPropagationC$i[sim_node()]].nxdata));
+                    QueryPropagationC$i[sim_node()]++;
+                  }
+                QueryPropagationC$start[sim_node()]++;
+              }
+
+            QueryPropagationC$dtDelay[sim_node()] = QueryPropagationC$TimerSendPCSerial$getNow();
+            __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].WaitingTime.nxdata, QueryPropagationC$dtDelay[sim_node()] - __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].startDelay.nxdata) + 100);
+            __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].RemaingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].WaitingTime.nxdata));
+
+
+            if (QueryPropagationC$count_received_children[sim_node()] == __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].number_of_children.nxdata)) {
+                QueryPropagationC$TimerSendPCSerial$stop();
+                QueryPropagationC$TimerSendPCSerial$startOneShot(20);
+              }
+          }
+      }
+    else {
+#line 845
+      if (len == sizeof(query_cancel_msg_t )) {
+          QueryPropagationC$rcv_query_cacnel[sim_node()] = (query_cancel_msg_t *)payload;
+
+          QueryPropagationC$query_pos[sim_node()] = 0;
+          while (QueryPropagationC$query_pos[sim_node()] < 3) {
+              if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$rcv_query_cacnel[sim_node()]->source_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$rcv_query_cacnel[sim_node()]->sequence_number.nxdata)) {
+                  QueryPropagationC$start[sim_node()] = 0;
+                  while (QueryPropagationC$start[sim_node()] < 5) {
+                      if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].children[QueryPropagationC$start[sim_node()]].nxdata) == __nesc_ntoh_uint8(QueryPropagationC$rcv_query_cacnel[sim_node()]->forwarder_id.nxdata)) {
+                          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].children[QueryPropagationC$start[sim_node()]].nxdata, 0);
+                          break;
+                        }
+                      QueryPropagationC$start[sim_node()]++;
+                    }
+                }
+            }
+        }
+      }
+    }
+#line 862
   return msg;
 }
 
@@ -7370,19 +7794,9 @@ inline static serial_header_t *getSerialHeader(message_t *msg)
   return (serial_header_t *)(msg->data - sizeof(serial_header_t ));
 }
 
-# 281 "/usr/lib/ncc/nesc_nx.h"
-static __inline  uint8_t __nesc_ntoh_uint8(const void * source)
-#line 281
-{
-  const uint8_t *base = source;
-
-#line 283
-  return base[0];
-}
-
-# 598 "QueryPropagationC.nc"
+# 990 "QueryPropagationC.nc"
 static inline message_t *QueryPropagationC$SerialReceive$receive(message_t *msg, void *payload, uint8_t len)
-#line 598
+#line 990
 {
   if (len == sizeof(query_msg_t )) {
       QueryPropagationC$s_pkt[sim_node()] = (query_msg_t *)payload;
@@ -7391,28 +7805,28 @@ static inline message_t *QueryPropagationC$SerialReceive$receive(message_t *msg,
           QueryPropagationC$number_Of_queries[sim_node()]++;
           QueryPropagationC$sequence_number[sim_node()]++;
 
-          sim_log_debug(201U, "ReceiveC", "Serial Received QUERY_ID: %hu ,@ %s \n\n", QueryPropagationC$sequence_number[sim_node()], sim_time_string());
-
           QueryPropagationC$query_pos[sim_node()] = 0;
-          while (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] < 3) {
+          while (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] < 3) {
               QueryPropagationC$query_pos[sim_node()]++;
             }
 
-          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata, TOS_NODE_ID);
-          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata, QueryPropagationC$sequence_number[sim_node()]);
-          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].forwarder_id.nxdata, TOS_NODE_ID);
-          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].hops.nxdata, 0);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata, TOS_NODE_ID);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata, QueryPropagationC$sequence_number[sim_node()]);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].forwarder_id.nxdata, TOS_NODE_ID);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].father_node.nxdata, TOS_NODE_ID);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].number_of_children.nxdata, 0);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].hops.nxdata, 0);
           __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sampling_period.nxdata, __nesc_ntoh_uint16(QueryPropagationC$s_pkt[sim_node()]->sampling_period.nxdata));
           __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$s_pkt[sim_node()]->query_lifetime.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].propagation_mode.nxdata, __nesc_ntoh_uint16(QueryPropagationC$s_pkt[sim_node()]->propagation_mode.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata, 1);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].propagation_mode.nxdata, __nesc_ntoh_uint8(QueryPropagationC$s_pkt[sim_node()]->propagation_mode.nxdata));
+          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].WaitingTime.nxdata, 20);
+          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].RemaingTime.nxdata, 20);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata, 1);
 
           QueryPropagationC$sendQuery[sim_node()] = QueryPropagationC$query_pos[sim_node()];
-
           QueryPropagationC$QueryScheduling$postTask();
 
           QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$sendQuery[sim_node()]] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].sampling_period.nxdata);
-
           QueryPropagationC$MeasurementScheduling$postTask();
 
 
@@ -7423,15 +7837,46 @@ static inline message_t *QueryPropagationC$SerialReceive$receive(message_t *msg,
             }
           QueryPropagationC$save[sim_node()]++;
 
-          __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].source_id.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].sequence_number.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->forwarder_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].forwarder_id.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->hops.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].hops.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].source_id.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].sequence_number.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->forwarder_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].forwarder_id.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->father_node.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].father_node.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->hops.nxdata, 0);
           __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->sampling_period.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].sampling_period.nxdata));
           __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->query_lifetime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].query_lifetime.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$bcast_pkt[sim_node()]->propagation_mode.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].propagation_mode.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->propagation_mode.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].propagation_mode.nxdata));
         }
     }
+  else {
+#line 1040
+    if (len == sizeof(query_cancel_msg_t )) {
+        QueryPropagationC$srl_query_cancel[sim_node()] = (query_cancel_msg_t *)payload;
+
+        if (QueryPropagationC$number_Of_queries[sim_node()] > 0) {
+            QueryPropagationC$query_pos[sim_node()] = 0;
+            while (QueryPropagationC$query_pos[sim_node()] < 3) {
+                if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].source_id.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$srl_query_cancel[sim_node()]->source_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC$srl_query_cancel[sim_node()]->sequence_number.nxdata) && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1) {
+                    QueryPropagationC$query_cancel[sim_node()] = QueryPropagationC$query_pos[sim_node()];
+                    break;
+                  }
+              }
+          }
+        QueryPropagationC$QueryCancel$postTask();
+
+        QueryPropagationC$save[sim_node()] = QueryPropagationC$save[sim_node()] % 10;
+        QueryPropagationC$bcast_query_cancel[sim_node()] = (query_cancel_msg_t *)QueryPropagationC$Packet$getPayload(&QueryPropagationC$PacketBuffer[sim_node()][QueryPropagationC$save[sim_node()]], sizeof(query_cancel_msg_t ));
+        if (QueryPropagationC$bcast_query_cancel[sim_node()] == (void *)0) {
+            return;
+          }
+        QueryPropagationC$save[sim_node()]++;
+
+        __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$srl_query_cancel[sim_node()]->source_id.nxdata));
+        __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$srl_query_cancel[sim_node()]->sequence_number.nxdata));
+        __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->propagation_mode.nxdata, __nesc_ntoh_uint8(QueryPropagationC$srl_query_cancel[sim_node()]->propagation_mode.nxdata));
+        __nesc_hton_uint8(QueryPropagationC$bcast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
+      }
+    }
+#line 1066
   return msg;
 }
 
@@ -7674,12 +8119,12 @@ inline static error_t QueryPropagationC$RadioAMControl$start(void ){
 #line 104
 }
 #line 104
-# 230 "QueryPropagationC.nc"
+# 393 "QueryPropagationC.nc"
 static inline void QueryPropagationC$RadioAMControl$startDone(error_t err)
-#line 230
+#line 393
 {
   if (err == SUCCESS) {
-      sim_log_debug(190U, "RadioC", "RADIO_CONTROL = OK %s.\n", sim_time_string());
+      sim_log_debug(192U, "RadioC", "RADIO_CONTROL = OK %s.\n", sim_time_string());
     }
   else {
       QueryPropagationC$RadioAMControl$start();
@@ -7701,9 +8146,9 @@ static inline void TossimPacketModelC$startDoneTask$runTask(void )
   TossimPacketModelC$Control$startDone(SUCCESS);
 }
 
-# 239 "QueryPropagationC.nc"
+# 402 "QueryPropagationC.nc"
 static inline void QueryPropagationC$RadioAMControl$stopDone(error_t err)
-#line 239
+#line 402
 {
 }
 
@@ -7722,18 +8167,7 @@ static inline void TossimPacketModelC$stopDoneTask$runTask(void )
   TossimPacketModelC$Control$stopDone(SUCCESS);
 }
 
-# 286 "/usr/lib/ncc/nesc_nx.h"
-static __inline  uint8_t __nesc_hton_uint8(void * target, uint8_t value)
-#line 286
-{
-  uint8_t *base = target;
-
-#line 288
-  base[0] = value;
-  return value;
-}
-
-#line 303
+# 303 "/usr/lib/ncc/nesc_nx.h"
 static __inline  int8_t __nesc_hton_int8(void * target, int8_t value)
 #line 303
 {
@@ -7824,12 +8258,12 @@ inline static error_t QueryPropagationC$SerialAMControl$start(void ){
 #line 104
 }
 #line 104
-# 242 "QueryPropagationC.nc"
+# 405 "QueryPropagationC.nc"
 static inline void QueryPropagationC$SerialAMControl$startDone(error_t err)
-#line 242
+#line 405
 {
   if (err == SUCCESS) {
-      sim_log_debug(191U, "RadioC", "SERIAL_CONTROL = OK %s.\n", sim_time_string());
+      sim_log_debug(193U, "RadioC", "SERIAL_CONTROL = OK %s.\n", sim_time_string());
     }
   else {
       QueryPropagationC$SerialAMControl$start();
@@ -7851,9 +8285,9 @@ static inline void SerialActiveMessageC$startDone$runTask(void )
   SerialActiveMessageC$SplitControl$startDone(SUCCESS);
 }
 
-# 251 "QueryPropagationC.nc"
+# 414 "QueryPropagationC.nc"
 static inline void QueryPropagationC$SerialAMControl$stopDone(error_t err)
-#line 251
+#line 414
 {
 }
 
@@ -7888,7 +8322,7 @@ static inline void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$sendDone
       /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$sendDone(/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()], msg, err);
     }
   else {
-      sim_log_debug(212U, "PointerBug", "%s received send done for %p, signaling for %p.\n", __FUNCTION__, msg, /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()]].msg);
+      sim_log_debug(205U, "PointerBug", "%s received send done for %p, signaling for %p.\n", __FUNCTION__, msg, /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()]].msg);
     }
 }
 
@@ -8083,70 +8517,109 @@ static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateF
     }
 }
 
-#line 189
-static inline uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$getNow(uint8_t num)
-{
-  return /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$TimerFrom$getNow();
-}
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+inline static error_t QueryPropagationC$DelayMeasurementScheduling$postTask(void ){
+#line 67
+  unsigned char __nesc_result;
+#line 67
 
-# 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static uint32_t QueryPropagationC$Timer1$getNow(void ){
-#line 136
-  unsigned int __nesc_result;
-#line 136
+#line 67
+  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(QueryPropagationC$DelayMeasurementScheduling);
+#line 67
 
-#line 136
-  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$getNow(1U);
-#line 136
-
-#line 136
+#line 67
   return __nesc_result;
-#line 136
+#line 67
 }
-#line 136
-#line 73
-inline static void QueryPropagationC$Timer5$startOneShot(uint32_t dt){
-#line 73
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(5U, dt);
-#line 73
-}
-#line 73
-# 287 "QueryPropagationC.nc"
+#line 67
+# 484 "QueryPropagationC.nc"
 static inline void QueryPropagationC$Read$readDone(error_t result, uint16_t data)
-#line 287
+#line 484
 {
   if (result == SUCCESS) {
 
-      if (TOS_NODE_ID == __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].source_id.nxdata)) {
+      QueryPropagationC$remindQuery[sim_node()] = QueryPropagationC$Hold_Sampling_Timer[sim_node()];
 
+
+      if (TOS_NODE_ID == __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].source_id.nxdata)) {
           QueryPropagationC$source_id[sim_node()] = TOS_NODE_ID;
           QueryPropagationC$s_data_id[sim_node()] = QueryPropagationC$data_id[sim_node()];
           QueryPropagationC$forwarder_id[sim_node()] = TOS_NODE_ID;
-          QueryPropagationC$sensor_data[sim_node()] = data;
-          QueryPropagationC$destination_id[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].source_id.nxdata);
-          QueryPropagationC$sequence_number[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].sequence_number.nxdata);
-          QueryPropagationC$Timer2$startOneShot(20);
-        }
-      else {
-          QueryPropagationC$sampling_save[sim_node()] = QueryPropagationC$sampling_save[sim_node()] % 10;
-          QueryPropagationC$ucast_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_save[sim_node()]], sizeof(sampling_msg_t ));
-          if (QueryPropagationC$ucast_pkt[sim_node()] == (void *)0) {
-              return;
+
+          QueryPropagationC$destination_id[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].source_id.nxdata);
+          QueryPropagationC$sequence_number[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].sequence_number.nxdata);
+
+          if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].propagation_mode.nxdata) == 0) {
+              QueryPropagationC$sensor_data[sim_node()] = data;
+
+              QueryPropagationC$TimerSendPCSerial$startOneShot(20);
             }
-          QueryPropagationC$sampling_save[sim_node()]++;
+          else {
+#line 503
+            if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].propagation_mode.nxdata) == 1) {
+                QueryPropagationC$hops[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].hops.nxdata);
+                QueryPropagationC$min[sim_node()] = data;
+                QueryPropagationC$max[sim_node()] = data;
+                QueryPropagationC$average[sim_node()] = data;
 
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata, TOS_NODE_ID);
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->data_id.nxdata, QueryPropagationC$data_id[sim_node()]);
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->sensor_data.nxdata, data);
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->destination_id.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].source_id.nxdata));
-          __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].sequence_number.nxdata));
 
-          QueryPropagationC$sendTofather[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].forwarder_id.nxdata);
-
-          QueryPropagationC$Timer5$startOneShot(TOS_NODE_ID * 20);
+                QueryPropagationC$DelayMeasurementScheduling$postTask();
+              }
+            }
         }
+      else 
+#line 513
+        {
 
+
+          QueryPropagationC$sendTofather[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].forwarder_id.nxdata);
+
+          if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].propagation_mode.nxdata) == 0) {
+              QueryPropagationC$sampling_save[sim_node()] = QueryPropagationC$sampling_save[sim_node()] % 10;
+              QueryPropagationC$ucast_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_save[sim_node()]], sizeof(sampling_msg_t ));
+              if (QueryPropagationC$ucast_pkt[sim_node()] == (void *)0) {
+                  return;
+                }
+              QueryPropagationC$sampling_save[sim_node()]++;
+
+              __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata, TOS_NODE_ID);
+              __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->data_id.nxdata, QueryPropagationC$data_id[sim_node()]);
+              __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
+              __nesc_hton_uint16(QueryPropagationC$ucast_pkt[sim_node()]->sensor_data.nxdata, data);
+              __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->destination_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].source_id.nxdata));
+              __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].sequence_number.nxdata));
+              __nesc_hton_uint8(QueryPropagationC$ucast_pkt[sim_node()]->mode.nxdata, 0);
+
+              QueryPropagationC$Timer_StatsUnicast_Unicast$startOneShot(TOS_NODE_ID * 20);
+            }
+          else {
+#line 536
+            if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].propagation_mode.nxdata) == 1) {
+
+                QueryPropagationC$stats_sampling_save[sim_node()] = QueryPropagationC$stats_sampling_save[sim_node()] % 10;
+                QueryPropagationC$stats_ucast_pkt[sim_node()] = (stats_sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$StatsSamplingPacketBuffer[sim_node()][QueryPropagationC$stats_sampling_save[sim_node()]], sizeof(stats_sampling_msg_t ));
+                if (QueryPropagationC$stats_ucast_pkt[sim_node()] == (void *)0) {
+                    return;
+                  }
+                QueryPropagationC$stats_sampling_save[sim_node()]++;
+
+                __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->source_id.nxdata, TOS_NODE_ID);
+                __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->data_id.nxdata, QueryPropagationC$data_id[sim_node()]);
+                __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
+                __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->hops.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].hops.nxdata));
+                __nesc_hton_uint16(QueryPropagationC$stats_ucast_pkt[sim_node()]->min.nxdata, data);
+                __nesc_hton_uint16(QueryPropagationC$stats_ucast_pkt[sim_node()]->max.nxdata, data);
+                __nesc_hton_uint16(QueryPropagationC$stats_ucast_pkt[sim_node()]->average.nxdata, data);
+                __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->destination_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].source_id.nxdata));
+                __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].sequence_number.nxdata));
+
+                __nesc_hton_uint8(QueryPropagationC$stats_ucast_pkt[sim_node()]->mode.nxdata, 1);
+
+                QueryPropagationC$DelayMeasurementScheduling$postTask();
+              }
+            }
+        }
+#line 560
       QueryPropagationC$data_id[sim_node()]++;
 
       if (QueryPropagationC$number_Of_queries[sim_node()] > 0) {
@@ -8156,7 +8629,7 @@ static inline void QueryPropagationC$Read$readDone(error_t result, uint16_t data
           QueryPropagationC$minPeriod[sim_node()] = 0;
           QueryPropagationC$start[sim_node()] = 0;
           while (QueryPropagationC$start[sim_node()] < 3) {
-              if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].state.nxdata) == 1) {
+              if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].state.nxdata) == 1) {
                   if (QueryPropagationC$start[sim_node()] == QueryPropagationC$expiredQuery[sim_node()]) {
                       QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$start[sim_node()]] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].sampling_period.nxdata);
                     }
@@ -8174,10 +8647,8 @@ static inline void QueryPropagationC$Read$readDone(error_t result, uint16_t data
               QueryPropagationC$start[sim_node()]++;
             }
 
-          if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].state.nxdata) != 0) {
-              QueryPropagationC$Timer1$startOneShot(QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]]);
-              QueryPropagationC$time4MeasurementStartAt[sim_node()] = QueryPropagationC$Timer1$getNow();
-            }
+          QueryPropagationC$TimerReadSensor$startOneShot(QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]]);
+          QueryPropagationC$time4MeasurementStartAt[sim_node()] = QueryPropagationC$TimerReadSensor$getNow();
         }
     }
 }
@@ -8196,21 +8667,29 @@ static inline void /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensor
   /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Read$readDone(SUCCESS, 48879U);
 }
 
-# 112 "QueryPropagationC.nc"
+# 119 "QueryPropagationC.nc"
 static inline void QueryPropagationC$init_StateMessages$runTask(void )
-#line 112
+#line 119
 {
   for (QueryPropagationC$start[sim_node()] = 0; QueryPropagationC$start[sim_node()] < 5; QueryPropagationC$start[sim_node()]++) {
-      __nesc_hton_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$start[sim_node()]].source_id.nxdata, 0);
-      __nesc_hton_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$start[sim_node()]].sequence_number.nxdata, 0);
+      __nesc_hton_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$start[sim_node()]].source_id.nxdata, 0);
+      __nesc_hton_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$start[sim_node()]].sequence_number.nxdata, 0);
     }
 }
 
 static inline void QueryPropagationC$init_ActiveQueryQ$runTask(void )
-#line 119
+#line 126
 {
   for (QueryPropagationC$start[sim_node()] = 0; QueryPropagationC$start[sim_node()] < 3; QueryPropagationC$start[sim_node()]++) {
-      __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].state.nxdata, 0);
+      __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].state.nxdata, 0);
+    }
+}
+
+static inline void QueryPropagationC$init_ContributedNodes$runTask(void )
+#line 132
+{
+  for (QueryPropagationC$start[sim_node()] = 0; QueryPropagationC$start[sim_node()] < 5; QueryPropagationC$start[sim_node()]++) {
+      __nesc_hton_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata, 0);
     }
 }
 
@@ -8221,7 +8700,7 @@ static inline uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Tim
 }
 
 # 151 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static uint32_t QueryPropagationC$Timer0$getdt(void ){
+inline static uint32_t QueryPropagationC$TimerQueryBroadcast$getdt(void ){
 #line 151
   unsigned int __nesc_result;
 #line 151
@@ -8242,7 +8721,7 @@ static inline uint32_t /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Tim
 }
 
 # 144 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static uint32_t QueryPropagationC$Timer0$gett0(void ){
+inline static uint32_t QueryPropagationC$TimerQueryBroadcast$gett0(void ){
 #line 144
   unsigned int __nesc_result;
 #line 144
@@ -8263,7 +8742,7 @@ static inline bool /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$i
 }
 
 # 92 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static bool QueryPropagationC$Timer0$isRunning(void ){
+inline static bool QueryPropagationC$TimerQueryBroadcast$isRunning(void ){
 #line 92
   unsigned char __nesc_result;
 #line 92
@@ -8333,7 +8812,7 @@ inline static void QueryPropagationC$Leds$led0On(void ){
 }
 #line 56
 # 92 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static bool QueryPropagationC$Timer3$isRunning(void ){
+inline static bool QueryPropagationC$TimerQueryFired$isRunning(void ){
 #line 92
   unsigned char __nesc_result;
 #line 92
@@ -8347,30 +8826,28 @@ inline static bool QueryPropagationC$Timer3$isRunning(void ){
 #line 92
 }
 #line 92
-# 126 "QueryPropagationC.nc"
+# 138 "QueryPropagationC.nc"
 static inline void QueryPropagationC$QueryScheduling$runTask(void )
-#line 126
+#line 138
 {
 
-  if (QueryPropagationC$Timer3$isRunning() == TRUE) {
-      QueryPropagationC$checkTimer[sim_node()] = QueryPropagationC$Timer3$getNow();
+  if (QueryPropagationC$TimerQueryFired$isRunning() == TRUE) {
+      QueryPropagationC$checkTimer[sim_node()] = QueryPropagationC$TimerQueryFired$getNow();
       QueryPropagationC$runningTime[sim_node()] = QueryPropagationC$checkTimer[sim_node()] - QueryPropagationC$timerStartAt[sim_node()];
       QueryPropagationC$dt[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].query_lifetime.nxdata) - QueryPropagationC$runningTime[sim_node()];
 
       if (QueryPropagationC$dt[sim_node()] > __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$sendQuery[sim_node()]].query_lifetime.nxdata)) {
           QueryPropagationC$HoldTimer[sim_node()] = QueryPropagationC$sendQuery[sim_node()];
-          QueryPropagationC$Timer3$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].query_lifetime.nxdata));
-          QueryPropagationC$timerStartAt[sim_node()] = QueryPropagationC$Timer3$getNow();
+          QueryPropagationC$TimerQueryFired$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].query_lifetime.nxdata));
+          QueryPropagationC$timerStartAt[sim_node()] = QueryPropagationC$TimerQueryFired$getNow();
         }
-      else 
-        {
-          QueryPropagationC$timerStartAt[sim_node()] = QueryPropagationC$Timer3$getNow();
+      else {
+          QueryPropagationC$timerStartAt[sim_node()] = QueryPropagationC$TimerQueryFired$getNow();
         }
-
 
       QueryPropagationC$query_pos[sim_node()] = 0;
       while (QueryPropagationC$query_pos[sim_node()] < 3) {
-          if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] != QueryPropagationC$sendQuery[sim_node()]) {
+          if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] != QueryPropagationC$sendQuery[sim_node()]) {
               __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata) - QueryPropagationC$runningTime[sim_node()]);
             }
           QueryPropagationC$query_pos[sim_node()]++;
@@ -8378,24 +8855,24 @@ static inline void QueryPropagationC$QueryScheduling$runTask(void )
     }
   else {
       QueryPropagationC$HoldTimer[sim_node()] = QueryPropagationC$sendQuery[sim_node()];
-      QueryPropagationC$Timer3$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].query_lifetime.nxdata));
-      QueryPropagationC$timerStartAt[sim_node()] = QueryPropagationC$Timer3$getNow();
+      QueryPropagationC$TimerQueryFired$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].query_lifetime.nxdata));
+      QueryPropagationC$timerStartAt[sim_node()] = QueryPropagationC$TimerQueryFired$getNow();
       QueryPropagationC$Leds$led0On();
     }
 
 
-  if (QueryPropagationC$Timer0$isRunning() == TRUE) {
-      QueryPropagationC$t0[sim_node()] = QueryPropagationC$Timer0$gett0();
-      QueryPropagationC$dt[sim_node()] = QueryPropagationC$Timer0$getdt();
-      QueryPropagationC$Timer0$startOneShot(QueryPropagationC$t0[sim_node()] + QueryPropagationC$dt[sim_node()]);
+  if (QueryPropagationC$TimerQueryBroadcast$isRunning() == TRUE) {
+      QueryPropagationC$t0[sim_node()] = QueryPropagationC$TimerQueryBroadcast$gett0();
+      QueryPropagationC$dt[sim_node()] = QueryPropagationC$TimerQueryBroadcast$getdt();
+      QueryPropagationC$TimerQueryBroadcast$startOneShot(QueryPropagationC$t0[sim_node()] + QueryPropagationC$dt[sim_node()]);
     }
   else {
-      QueryPropagationC$Timer0$startOneShot(TOS_NODE_ID * 50);
+      QueryPropagationC$TimerQueryBroadcast$startOneShot(TOS_NODE_ID * 30);
     }
 }
 
 # 92 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static bool QueryPropagationC$Timer1$isRunning(void ){
+inline static bool QueryPropagationC$TimerReadSensor$isRunning(void ){
 #line 92
   unsigned char __nesc_result;
 #line 92
@@ -8409,29 +8886,27 @@ inline static bool QueryPropagationC$Timer1$isRunning(void ){
 #line 92
 }
 #line 92
-# 172 "QueryPropagationC.nc"
+# 181 "QueryPropagationC.nc"
 static inline void QueryPropagationC$MeasurementScheduling$runTask(void )
-#line 172
+#line 181
 {
-  if (QueryPropagationC$Timer1$isRunning() == TRUE) {
-      QueryPropagationC$checkTimer[sim_node()] = QueryPropagationC$Timer1$getNow();
+  if (QueryPropagationC$TimerReadSensor$isRunning() == TRUE) {
+      QueryPropagationC$checkTimer[sim_node()] = QueryPropagationC$TimerReadSensor$getNow();
       QueryPropagationC$runningTime[sim_node()] = QueryPropagationC$checkTimer[sim_node()] - QueryPropagationC$time4MeasurementStartAt[sim_node()];
       QueryPropagationC$dt[sim_node()] = QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]] - QueryPropagationC$runningTime[sim_node()];
 
       if (QueryPropagationC$dt[sim_node()] > QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$sendQuery[sim_node()]]) {
           QueryPropagationC$Hold_Sampling_Timer[sim_node()] = QueryPropagationC$sendQuery[sim_node()];
-          QueryPropagationC$Timer1$startOneShot(QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]]);
-          QueryPropagationC$time4MeasurementStartAt[sim_node()] = QueryPropagationC$Timer1$getNow();
+          QueryPropagationC$TimerReadSensor$startOneShot(QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]]);
+          QueryPropagationC$time4MeasurementStartAt[sim_node()] = QueryPropagationC$TimerReadSensor$getNow();
         }
-      else 
-        {
-          QueryPropagationC$time4MeasurementStartAt[sim_node()] = QueryPropagationC$Timer1$getNow();
+      else {
+          QueryPropagationC$time4MeasurementStartAt[sim_node()] = QueryPropagationC$TimerReadSensor$getNow();
         }
-
 
       QueryPropagationC$query_pos[sim_node()] = 0;
       while (QueryPropagationC$query_pos[sim_node()] < 3) {
-          if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] != QueryPropagationC$sendQuery[sim_node()]) {
+          if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] != QueryPropagationC$sendQuery[sim_node()]) {
               QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$query_pos[sim_node()]] = QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$query_pos[sim_node()]] - QueryPropagationC$runningTime[sim_node()];
             }
           QueryPropagationC$query_pos[sim_node()]++;
@@ -8439,8 +8914,267 @@ static inline void QueryPropagationC$MeasurementScheduling$runTask(void )
     }
   else {
       QueryPropagationC$Hold_Sampling_Timer[sim_node()] = QueryPropagationC$sendQuery[sim_node()];
-      QueryPropagationC$Timer1$startOneShot(QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]]);
-      QueryPropagationC$time4MeasurementStartAt[sim_node()] = QueryPropagationC$Timer1$getNow();
+      QueryPropagationC$TimerReadSensor$startOneShot(QueryPropagationC$TimeToMeasure[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]]);
+      QueryPropagationC$time4MeasurementStartAt[sim_node()] = QueryPropagationC$TimerReadSensor$getNow();
+    }
+}
+
+# 92 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static bool QueryPropagationC$Timer_StatsUnicast_Unicast$isRunning(void ){
+#line 92
+  unsigned char __nesc_result;
+#line 92
+
+#line 92
+  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$isRunning(6U);
+#line 92
+
+#line 92
+  return __nesc_result;
+#line 92
+}
+#line 92
+inline static bool QueryPropagationC$TimerSendPCSerial$isRunning(void ){
+#line 92
+  unsigned char __nesc_result;
+#line 92
+
+#line 92
+  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$isRunning(2U);
+#line 92
+
+#line 92
+  return __nesc_result;
+#line 92
+}
+#line 92
+# 211 "QueryPropagationC.nc"
+static inline void QueryPropagationC$DelayMeasurementScheduling$runTask(void )
+#line 211
+{
+  unsigned char *__nesc_temp43;
+  unsigned char *__nesc_temp42;
+
+#line 212
+  if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].source_id.nxdata) == TOS_NODE_ID) {
+      if (QueryPropagationC$TimerSendPCSerial$isRunning() == TRUE && QueryPropagationC$Hold_Waiting_Timer[sim_node()] != QueryPropagationC$remindQuery[sim_node()]) {
+          QueryPropagationC$checkTimer[sim_node()] = QueryPropagationC$TimerSendPCSerial$getNow();
+          QueryPropagationC$runningTime[sim_node()] = QueryPropagationC$checkTimer[sim_node()] - __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].startDelay.nxdata);
+          QueryPropagationC$dt[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].RemaingTime.nxdata) - QueryPropagationC$runningTime[sim_node()];
+          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].startDelay.nxdata, QueryPropagationC$TimerSendPCSerial$getNow());
+
+          if (QueryPropagationC$dt[sim_node()] > __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].WaitingTime.nxdata)) {
+              QueryPropagationC$Hold_Waiting_Timer[sim_node()] = QueryPropagationC$remindQuery[sim_node()];
+              QueryPropagationC$TimerSendPCSerial$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].WaitingTime.nxdata));
+            }
+
+          QueryPropagationC$query_pos[sim_node()] = 0;
+          while (QueryPropagationC$query_pos[sim_node()] < 3) {
+              if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] != QueryPropagationC$remindQuery[sim_node()]) {
+                  (__nesc_temp42 = QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].RemaingTime.nxdata, __nesc_hton_uint16(__nesc_temp42, __nesc_ntoh_uint16(__nesc_temp42) - QueryPropagationC$runningTime[sim_node()]));
+                }
+              QueryPropagationC$query_pos[sim_node()]++;
+            }
+        }
+      else {
+          QueryPropagationC$Hold_Waiting_Timer[sim_node()] = QueryPropagationC$remindQuery[sim_node()];
+          QueryPropagationC$TimerSendPCSerial$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].WaitingTime.nxdata));
+          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].startDelay.nxdata, QueryPropagationC$TimerSendPCSerial$getNow());
+        }
+    }
+  else {
+      if (QueryPropagationC$Timer_StatsUnicast_Unicast$isRunning() == TRUE && QueryPropagationC$Hold_Waiting_Timer[sim_node()] != QueryPropagationC$remindQuery[sim_node()]) {
+          QueryPropagationC$checkTimer[sim_node()] = QueryPropagationC$Timer_StatsUnicast_Unicast$getNow();
+          QueryPropagationC$runningTime[sim_node()] = QueryPropagationC$checkTimer[sim_node()] - __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].startDelay.nxdata);
+          QueryPropagationC$dt[sim_node()] = __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].RemaingTime.nxdata) - QueryPropagationC$runningTime[sim_node()];
+          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].startDelay.nxdata, QueryPropagationC$Timer_StatsUnicast_Unicast$getNow());
+
+          if (QueryPropagationC$dt[sim_node()] > __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].WaitingTime.nxdata)) {
+              QueryPropagationC$Hold_Waiting_Timer[sim_node()] = QueryPropagationC$remindQuery[sim_node()];
+              QueryPropagationC$Timer_StatsUnicast_Unicast$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].WaitingTime.nxdata));
+            }
+
+          QueryPropagationC$query_pos[sim_node()] = 0;
+          while (QueryPropagationC$query_pos[sim_node()] < 3) {
+              if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1 && QueryPropagationC$query_pos[sim_node()] != QueryPropagationC$remindQuery[sim_node()]) {
+                  (__nesc_temp43 = QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].RemaingTime.nxdata, __nesc_hton_uint16(__nesc_temp43, __nesc_ntoh_uint16(__nesc_temp43) - QueryPropagationC$runningTime[sim_node()]));
+                }
+              QueryPropagationC$query_pos[sim_node()]++;
+            }
+        }
+      else {
+          QueryPropagationC$Hold_Waiting_Timer[sim_node()] = QueryPropagationC$remindQuery[sim_node()];
+          QueryPropagationC$Timer_StatsUnicast_Unicast$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].WaitingTime.nxdata));
+          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].startDelay.nxdata, QueryPropagationC$Timer_StatsUnicast_Unicast$getNow());
+        }
+    }
+}
+
+# 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
+inline static error_t QueryPropagationC$SerialAMSend$send(am_addr_t addr, message_t * msg, uint8_t len){
+#line 80
+  unsigned char __nesc_result;
+#line 80
+
+#line 80
+  __nesc_result = /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMSend$send(addr, msg, len);
+#line 80
+
+#line 80
+  return __nesc_result;
+#line 80
+}
+#line 80
+# 126 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
+inline static void * QueryPropagationC$SerialPacket$getPayload(message_t * msg, uint8_t len){
+#line 126
+  void *__nesc_result;
+#line 126
+
+#line 126
+  __nesc_result = SerialActiveMessageC$Packet$getPayload(msg, len);
+#line 126
+
+#line 126
+  return __nesc_result;
+#line 126
+}
+#line 126
+# 266 "QueryPropagationC.nc"
+static inline void QueryPropagationC$SendSerial$runTask(void )
+#line 266
+{
+  if (!QueryPropagationC$serial_busy[sim_node()]) {
+      if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].propagation_mode.nxdata) == 0) {
+          QueryPropagationC$s_sampling_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SerialPacket$getPayload(&QueryPropagationC$serial_pkt[sim_node()], sizeof(sampling_msg_t ));
+          if (QueryPropagationC$s_sampling_pkt[sim_node()] == (void *)0) {
+              return;
+            }
+
+          __nesc_hton_uint8(QueryPropagationC$s_sampling_pkt[sim_node()]->source_id.nxdata, QueryPropagationC$source_id[sim_node()]);
+          __nesc_hton_uint8(QueryPropagationC$s_sampling_pkt[sim_node()]->data_id.nxdata, QueryPropagationC$s_data_id[sim_node()]);
+          __nesc_hton_uint8(QueryPropagationC$s_sampling_pkt[sim_node()]->forwarder_id.nxdata, QueryPropagationC$forwarder_id[sim_node()]);
+          __nesc_hton_uint16(QueryPropagationC$s_sampling_pkt[sim_node()]->sensor_data.nxdata, QueryPropagationC$sensor_data[sim_node()]);
+          __nesc_hton_uint8(QueryPropagationC$s_sampling_pkt[sim_node()]->destination_id.nxdata, QueryPropagationC$destination_id[sim_node()]);
+          __nesc_hton_uint8(QueryPropagationC$s_sampling_pkt[sim_node()]->sequence_number.nxdata, QueryPropagationC$sequence_number[sim_node()]);
+          __nesc_hton_uint8(QueryPropagationC$s_sampling_pkt[sim_node()]->mode.nxdata, 0);
+
+          if (QueryPropagationC$SerialAMSend$send(AM_BROADCAST_ADDR, &QueryPropagationC$serial_pkt[sim_node()], sizeof(sampling_msg_t )) == SUCCESS) {
+              sim_log_debug(190U, "BroadcastingC", "Start sending serial packet\n\n ");
+              QueryPropagationC$serial_busy[sim_node()] = TRUE;
+            }
+        }
+      else {
+        if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].propagation_mode.nxdata) == 1) {
+
+            QueryPropagationC$s_stats_sampling_pkt[sim_node()] = (stats_sampling_msg_t *)QueryPropagationC$SerialPacket$getPayload(&QueryPropagationC$serial_pkt[sim_node()], sizeof(stats_sampling_msg_t ));
+            if (QueryPropagationC$s_stats_sampling_pkt[sim_node()] == (void *)0) {
+                return;
+              }
+
+            __nesc_hton_uint8(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->source_id.nxdata, QueryPropagationC$source_id[sim_node()]);
+            __nesc_hton_uint8(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->data_id.nxdata, QueryPropagationC$s_data_id[sim_node()]);
+            __nesc_hton_uint8(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->forwarder_id.nxdata, QueryPropagationC$forwarder_id[sim_node()]);
+            __nesc_hton_uint8(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->hops.nxdata, QueryPropagationC$hops[sim_node()]);
+            __nesc_hton_uint16(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->min.nxdata, QueryPropagationC$min[sim_node()]);
+            __nesc_hton_uint16(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->max.nxdata, QueryPropagationC$max[sim_node()]);
+            __nesc_hton_uint16(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->average.nxdata, QueryPropagationC$average[sim_node()]);
+            __nesc_hton_uint8(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->destination_id.nxdata, QueryPropagationC$destination_id[sim_node()]);
+            __nesc_hton_uint8(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->sequence_number.nxdata, QueryPropagationC$sequence_number[sim_node()]);
+            __nesc_hton_uint8(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->mode.nxdata, 1);
+
+            QueryPropagationC$start[sim_node()] = 0;
+            while (QueryPropagationC$start[sim_node()] < 5) {
+                if (__nesc_ntoh_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata) == 0) {
+                    __nesc_hton_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata, TOS_NODE_ID);
+                    break;
+                  }
+                QueryPropagationC$start[sim_node()]++;
+              }
+            memcpy(QueryPropagationC$s_stats_sampling_pkt[sim_node()]->contributed_ids, QueryPropagationC$ContributedNodes[sim_node()], 5 * sizeof(nx_uint8_t ));
+
+            if (QueryPropagationC$SerialAMSend$send(AM_BROADCAST_ADDR, &QueryPropagationC$serial_pkt[sim_node()], sizeof(stats_sampling_msg_t )) == SUCCESS) {
+                sim_log_debug(191U, "BroadcastingC", "Start sending serial packet\n\n ");
+                QueryPropagationC$serial_busy[sim_node()] = TRUE;
+              }
+          }
+        }
+    }
+}
+
+# 78 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static void QueryPropagationC$TimerQueryFired$stop(void ){
+#line 78
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(3U);
+#line 78
+}
+#line 78
+# 324 "QueryPropagationC.nc"
+static inline void QueryPropagationC$QueryCancel$runTask(void )
+#line 324
+{
+  if (QueryPropagationC$HoldTimer[sim_node()] == QueryPropagationC$query_cancel[sim_node()]) {
+      QueryPropagationC$checkTimer[sim_node()] = QueryPropagationC$TimerQueryFired$getNow();
+      QueryPropagationC$runningTime[sim_node()] = QueryPropagationC$checkTimer[sim_node()] - QueryPropagationC$timerStartAt[sim_node()];
+      __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].query_lifetime.nxdata, QueryPropagationC$runningTime[sim_node()]);
+      QueryPropagationC$TimerQueryFired$stop();
+      QueryPropagationC$TimerQueryFired$startOneShot(10);
+    }
+  else {
+      __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].state.nxdata, 0);
+    }
+
+  if (QueryPropagationC$TimerQueryBroadcast$isRunning() == TRUE) {
+      QueryPropagationC$t0[sim_node()] = QueryPropagationC$TimerQueryBroadcast$gett0();
+      QueryPropagationC$dt[sim_node()] = QueryPropagationC$TimerQueryBroadcast$getdt();
+      QueryPropagationC$TimerQueryBroadcast$startOneShot(QueryPropagationC$t0[sim_node()] + QueryPropagationC$dt[sim_node()]);
+    }
+  else {
+      QueryPropagationC$TimerQueryBroadcast$startOneShot(TOS_NODE_ID * 30);
+    }
+}
+
+# 89 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+inline static void QueryPropagationC$Leds$led2On(void ){
+#line 89
+  LedsP$Leds$led2On();
+#line 89
+}
+#line 89
+# 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
+inline static error_t QueryPropagationC$SamplingRadioAMSend$send(am_addr_t addr, message_t * msg, uint8_t len){
+#line 80
+  unsigned char __nesc_result;
+#line 80
+
+#line 80
+  __nesc_result = /*QueryPropagationAppC.SamplingAMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$1$AMSend$send(addr, msg, len);
+#line 80
+
+#line 80
+  return __nesc_result;
+#line 80
+}
+#line 80
+# 346 "QueryPropagationC.nc"
+static inline void QueryPropagationC$QueryCancelConfirmation$runTask(void )
+#line 346
+{
+  if (!QueryPropagationC$unicast_busy[sim_node()]) {
+      QueryPropagationC$ucast_query_cancel[sim_node()] = (query_cancel_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$pkt[sim_node()], sizeof(query_cancel_msg_t ));
+      if (QueryPropagationC$ucast_query_cancel[sim_node()] == (void *)0) {
+          return;
+        }
+
+      __nesc_hton_uint8(QueryPropagationC$ucast_query_cancel[sim_node()]->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].source_id.nxdata));
+      __nesc_hton_uint8(QueryPropagationC$ucast_query_cancel[sim_node()]->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].sequence_number.nxdata));
+      __nesc_hton_uint8(QueryPropagationC$ucast_query_cancel[sim_node()]->propagation_mode.nxdata, 2);
+      __nesc_hton_uint8(QueryPropagationC$ucast_query_cancel[sim_node()]->forwarder_id.nxdata, TOS_NODE_ID);
+
+      if (QueryPropagationC$SamplingRadioAMSend$send(QueryPropagationC$send_qcancelTo_node[sim_node()], &QueryPropagationC$pkt[sim_node()], sizeof(sampling_msg_t )) == SUCCESS) {
+          QueryPropagationC$unicast_busy[sim_node()] = TRUE;
+          QueryPropagationC$Leds$led2On();
+        }
     }
 }
 
@@ -8486,9 +9220,9 @@ static inline void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone
 }
 
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
-inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t arg_0x40d0c8a8, message_t * msg, error_t error){
+inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t arg_0x40d80a90, message_t * msg, error_t error){
 #line 100
-  switch (arg_0x40d0c8a8) {
+  switch (arg_0x40d80a90) {
 #line 100
     case 0U:
 #line 100
@@ -8504,7 +9238,7 @@ inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$sendDone(uint8_t
 #line 100
     default:
 #line 100
-      /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(arg_0x40d0c8a8, msg, error);
+      /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$default$sendDone(arg_0x40d80a90, msg, error);
 #line 100
       break;
 #line 100
@@ -8549,14 +9283,29 @@ static inline void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$errorTask$runTa
   /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$sendDone(/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()], /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()]].msg, FAIL);
 }
 
-# 685 "QueryPropagationC.nc"
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+inline static error_t QueryPropagationC$init_ContributedNodes$postTask(void ){
+#line 67
+  unsigned char __nesc_result;
+#line 67
+
+#line 67
+  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(QueryPropagationC$init_ContributedNodes);
+#line 67
+
+#line 67
+  return __nesc_result;
+#line 67
+}
+#line 67
+# 1104 "QueryPropagationC.nc"
 static inline void QueryPropagationC$SerialAMSend$sendDone(message_t *msg, error_t err)
-#line 685
+#line 1104
 {
   if (&QueryPropagationC$serial_pkt[sim_node()] == msg) {
       QueryPropagationC$serial_busy[sim_node()] = FALSE;
-      sim_log_debug(202U, "BroadcastingC", "Serial message Done\n\n");
     }
+  QueryPropagationC$init_ContributedNodes$postTask();
 }
 
 # 110 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
@@ -8580,9 +9329,9 @@ static inline void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$default$se
 }
 
 # 100 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
-inline static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$sendDone(uint8_t arg_0x40d0c8a8, message_t * msg, error_t error){
+inline static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$sendDone(uint8_t arg_0x40d80a90, message_t * msg, error_t error){
 #line 100
-  switch (arg_0x40d0c8a8) {
+  switch (arg_0x40d80a90) {
 #line 100
     case 0U:
 #line 100
@@ -8592,7 +9341,7 @@ inline static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$sendDone(u
 #line 100
     default:
 #line 100
-      /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$default$sendDone(arg_0x40d0c8a8, msg, error);
+      /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$default$sendDone(arg_0x40d80a90, msg, error);
 #line 100
       break;
 #line 100
@@ -8706,6 +9455,12 @@ inline static void SimSchedulerBasicP$TaskBasic$runTask(uint8_t arg_0x40734970){
 #line 75
       break;
 #line 75
+    case QueryPropagationC$init_ContributedNodes:
+#line 75
+      QueryPropagationC$init_ContributedNodes$runTask();
+#line 75
+      break;
+#line 75
     case QueryPropagationC$QueryScheduling:
 #line 75
       QueryPropagationC$QueryScheduling$runTask();
@@ -8715,6 +9470,30 @@ inline static void SimSchedulerBasicP$TaskBasic$runTask(uint8_t arg_0x40734970){
     case QueryPropagationC$MeasurementScheduling:
 #line 75
       QueryPropagationC$MeasurementScheduling$runTask();
+#line 75
+      break;
+#line 75
+    case QueryPropagationC$DelayMeasurementScheduling:
+#line 75
+      QueryPropagationC$DelayMeasurementScheduling$runTask();
+#line 75
+      break;
+#line 75
+    case QueryPropagationC$SendSerial:
+#line 75
+      QueryPropagationC$SendSerial$runTask();
+#line 75
+      break;
+#line 75
+    case QueryPropagationC$QueryCancel:
+#line 75
+      QueryPropagationC$QueryCancel$runTask();
+#line 75
+      break;
+#line 75
+    case QueryPropagationC$QueryCancelConfirmation:
+#line 75
+      QueryPropagationC$QueryCancelConfirmation$runTask();
 #line 75
       break;
 #line 75
@@ -8768,13 +9547,13 @@ inline static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$errorTask$po
 }
 #line 67
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$send(am_id_t arg_0x40d0b2b0, am_addr_t addr, message_t * msg, uint8_t len){
+inline static error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$send(am_id_t arg_0x40d7d490, am_addr_t addr, message_t * msg, uint8_t len){
 #line 80
   unsigned char __nesc_result;
 #line 80
 
 #line 80
-  __nesc_result = SerialActiveMessageC$AMSend$send(arg_0x40d0b2b0, addr, msg, len);
+  __nesc_result = SerialActiveMessageC$AMSend$send(arg_0x40d7d490, addr, msg, len);
 #line 80
 
 #line 80
@@ -8940,6 +9719,29 @@ inline static bool LedsP$Led2$get(void ){
 #line 43
 }
 #line 43
+# 54 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline bool /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$get(void )
+#line 54
+{
+#line 54
+  return (atm128RegFile[sim_node()][27U] & (1 << 1)) != 0;
+}
+
+# 43 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+inline static bool LedsP$Led1$get(void ){
+#line 43
+  unsigned char __nesc_result;
+#line 43
+
+#line 43
+  __nesc_result = /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$get();
+#line 43
+
+#line 43
+  return __nesc_result;
+#line 43
+}
+#line 43
 # 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
 inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$errorTask$postTask(void ){
 #line 67
@@ -8956,13 +9758,13 @@ inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$errorTask$postTask
 }
 #line 67
 # 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(am_id_t arg_0x40d0b2b0, am_addr_t addr, message_t * msg, uint8_t len){
+inline static error_t /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(am_id_t arg_0x40d7d490, am_addr_t addr, message_t * msg, uint8_t len){
 #line 80
   unsigned char __nesc_result;
 #line 80
 
 #line 80
-  __nesc_result = TossimActiveMessageC$AMSend$send(arg_0x40d0b2b0, addr, msg, len);
+  __nesc_result = TossimActiveMessageC$AMSend$send(arg_0x40d7d490, addr, msg, len);
 #line 80
 
 #line 80
@@ -9753,546 +10555,6 @@ static inline void CpmModelC$sim_gain_ack_handle(sim_event_t *evt)
   CpmModelC$free_receive_message((CpmModelC$receive_message_t *)evt->data);
 }
 
-# 54 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
-static __inline bool /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$get(void )
-#line 54
-{
-#line 54
-  return (atm128RegFile[sim_node()][27U] & (1 << 1)) != 0;
-}
-
-# 43 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
-inline static bool LedsP$Led1$get(void ){
-#line 43
-  unsigned char __nesc_result;
-#line 43
-
-#line 43
-  __nesc_result = /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$get();
-#line 43
-
-#line 43
-  return __nesc_result;
-#line 43
-}
-#line 43
-# 59 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
-static __inline void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$clr(void )
-#line 59
-{
-#line 59
-  atm128RegFile[sim_node()][27U] &= ~(1 << 1);
-}
-
-# 41 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
-inline static void LedsP$Led1$clr(void ){
-#line 41
-  /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$clr();
-#line 41
-}
-#line 41
-# 89 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
-static inline void LedsP$Leds$led1On(void )
-#line 89
-{
-  LedsP$Led1$clr();
-  sim_log_debug(157U, "LedsC", "LEDS: Led""1"" %s.\n", LedsP$Led1$get() ? "off" : "on");
-#line 91
-  ;
-}
-
-# 72 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
-inline static void QueryPropagationC$Leds$led1On(void ){
-#line 72
-  LedsP$Leds$led1On();
-#line 72
-}
-#line 72
-# 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
-inline static error_t /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$Send$send(message_t * msg, uint8_t len){
-#line 75
-  unsigned char __nesc_result;
-#line 75
-
-#line 75
-  __nesc_result = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$send(0U, msg, len);
-#line 75
-
-#line 75
-  return __nesc_result;
-#line 75
-}
-#line 75
-# 162 "/opt/tinyos-2.1.2/tos/interfaces/AMPacket.nc"
-inline static void /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMPacket$setType(message_t * amsg, am_id_t t){
-#line 162
-  TossimActiveMessageC$AMPacket$setType(amsg, t);
-#line 162
-}
-#line 162
-#line 103
-inline static void /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMPacket$setDestination(message_t * amsg, am_addr_t addr){
-#line 103
-  TossimActiveMessageC$AMPacket$setDestination(amsg, addr);
-#line 103
-}
-#line 103
-# 53 "/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc"
-static inline error_t /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$send(am_addr_t dest, 
-message_t *msg, 
-uint8_t len)
-#line 55
-{
-  /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMPacket$setDestination(msg, dest);
-  /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMPacket$setType(msg, 45);
-  return /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$Send$send(msg, len);
-}
-
-# 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t QueryPropagationC$RadioAMSend$send(am_addr_t addr, message_t * msg, uint8_t len){
-#line 80
-  unsigned char __nesc_result;
-#line 80
-
-#line 80
-  __nesc_result = /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$send(addr, msg, len);
-#line 80
-
-#line 80
-  return __nesc_result;
-#line 80
-}
-#line 80
-# 254 "QueryPropagationC.nc"
-static inline void QueryPropagationC$Timer0$fired(void )
-#line 254
-{
-  sim_log_debug(192U, "BroadcastingC", "New Attempt for BROADCASTING QUERY_ID: %hu ,@ %s.\n", __nesc_ntoh_uint16(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata), sim_time_string());
-
-
-  if (TOS_NODE_ID == __nesc_ntoh_uint16(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata)) {
-      QueryPropagationC$next[sim_node()] = QueryPropagationC$next[sim_node()] % 5;
-      __nesc_hton_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].source_id.nxdata, TOS_NODE_ID);
-      __nesc_hton_uint16(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].sequence_number.nxdata, __nesc_ntoh_uint16(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata));
-      QueryPropagationC$next[sim_node()]++;
-    }
-
-  if (!QueryPropagationC$busy[sim_node()]) {
-      memcpy(&QueryPropagationC$pkt[sim_node()], &QueryPropagationC$PacketBuffer[sim_node()][QueryPropagationC$send[sim_node()]], sizeof(message_t ));
-
-
-
-      if (QueryPropagationC$RadioAMSend$send(AM_BROADCAST_ADDR, &QueryPropagationC$pkt[sim_node()], sizeof(query_flooding_msg_t )) == SUCCESS) {
-          QueryPropagationC$busy[sim_node()] = TRUE;
-          QueryPropagationC$Leds$led1On();
-        }
-    }
-}
-
-# 164 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
-static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(uint8_t num)
-{
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num].isrunning = FALSE;
-}
-
-# 78 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static void QueryPropagationC$Timer1$stop(void ){
-#line 78
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(1U);
-#line 78
-}
-#line 78
-# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
-inline static error_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$senseResult$postTask(void ){
-#line 67
-  unsigned char __nesc_result;
-#line 67
-
-#line 67
-  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(/*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$senseResult);
-#line 67
-
-#line 67
-  return __nesc_result;
-#line 67
-}
-#line 67
-# 51 "/opt/tinyos-2.1.2/tos/system/ConstantSensorC.nc"
-static inline error_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Read$read(void )
-#line 51
-{
-  return /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$senseResult$postTask();
-}
-
-# 55 "/opt/tinyos-2.1.2/tos/interfaces/Read.nc"
-inline static error_t QueryPropagationC$Read$read(void ){
-#line 55
-  unsigned char __nesc_result;
-#line 55
-
-#line 55
-  __nesc_result = /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Read$read();
-#line 55
-
-#line 55
-  return __nesc_result;
-#line 55
-}
-#line 55
-# 279 "QueryPropagationC.nc"
-static inline void QueryPropagationC$Timer1$fired(void )
-#line 279
-{
-  QueryPropagationC$Read$read();
-  if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].state.nxdata) == 0) {
-      QueryPropagationC$Timer1$stop();
-    }
-}
-
-# 229 "/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/SerialActiveMessageC.nc"
-static inline void SerialActiveMessageC$Packet$setPayloadLength(message_t *msg, uint8_t len)
-#line 229
-{
-  __nesc_hton_uint8(SerialActiveMessageC$getHeader(msg)->length.nxdata, len);
-}
-
-# 94 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
-inline static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Packet$setPayloadLength(message_t * msg, uint8_t len){
-#line 94
-  SerialActiveMessageC$Packet$setPayloadLength(msg, len);
-#line 94
-}
-#line 94
-# 90 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
-static inline error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$send(uint8_t clientId, message_t *msg, 
-uint8_t len)
-#line 91
-{
-  if (clientId >= 1) {
-      return FAIL;
-    }
-  if (/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][clientId].msg != (void *)0) {
-      return EBUSY;
-    }
-  sim_log_debug(208U, "AMQueue", "AMQueue: request to send from %hhu (%p): passed checks\n", clientId, msg);
-
-  /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][clientId].msg = msg;
-  /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Packet$setPayloadLength(msg, len);
-
-  if (/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()] >= 1) {
-      error_t err;
-      am_id_t amId = /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMPacket$type(msg);
-      am_addr_t dest = /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMPacket$destination(msg);
-
-      sim_log_debug(209U, "AMQueue", "%s: request to send from %hhu (%p): queue empty\n", __FUNCTION__, clientId, msg);
-      /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()] = clientId;
-
-      err = /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$send(amId, dest, msg, len);
-      if (err != SUCCESS) {
-          sim_log_debug(210U, "AMQueue", "%s: underlying send failed.\n", __FUNCTION__);
-          /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()] = 1;
-          /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][clientId].msg = (void *)0;
-        }
-
-      return err;
-    }
-  else {
-      sim_log_debug(211U, "AMQueue", "AMQueue: request to send from %hhu (%p): queue not empty\n", clientId, msg);
-    }
-  return SUCCESS;
-}
-
-# 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
-inline static error_t /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$Send$send(message_t * msg, uint8_t len){
-#line 75
-  unsigned char __nesc_result;
-#line 75
-
-#line 75
-  __nesc_result = /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$send(0U, msg, len);
-#line 75
-
-#line 75
-  return __nesc_result;
-#line 75
-}
-#line 75
-# 201 "/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/SerialActiveMessageC.nc"
-static inline void SerialActiveMessageC$AMPacket$setType(message_t *amsg, am_id_t t)
-#line 201
-{
-  serial_header_t *header = SerialActiveMessageC$getHeader(amsg);
-
-#line 203
-  __nesc_hton_uint8(header->type.nxdata, t);
-}
-
-# 162 "/opt/tinyos-2.1.2/tos/interfaces/AMPacket.nc"
-inline static void /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMPacket$setType(message_t * amsg, am_id_t t){
-#line 162
-  SerialActiveMessageC$AMPacket$setType(amsg, t);
-#line 162
-}
-#line 162
-# 176 "/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/SerialActiveMessageC.nc"
-static inline void SerialActiveMessageC$AMPacket$setDestination(message_t *amsg, am_addr_t addr)
-#line 176
-{
-  serial_header_t *header = SerialActiveMessageC$getHeader(amsg);
-
-#line 178
-  __nesc_hton_uint16(header->dest.nxdata, addr);
-}
-
-# 103 "/opt/tinyos-2.1.2/tos/interfaces/AMPacket.nc"
-inline static void /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMPacket$setDestination(message_t * amsg, am_addr_t addr){
-#line 103
-  SerialActiveMessageC$AMPacket$setDestination(amsg, addr);
-#line 103
-}
-#line 103
-# 53 "/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc"
-static inline error_t /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMSend$send(am_addr_t dest, 
-message_t *msg, 
-uint8_t len)
-#line 55
-{
-  /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMPacket$setDestination(msg, dest);
-  /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMPacket$setType(msg, 6);
-  return /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$Send$send(msg, len);
-}
-
-# 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t QueryPropagationC$SerialAMSend$send(am_addr_t addr, message_t * msg, uint8_t len){
-#line 80
-  unsigned char __nesc_result;
-#line 80
-
-#line 80
-  __nesc_result = /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMSend$send(addr, msg, len);
-#line 80
-
-#line 80
-  return __nesc_result;
-#line 80
-}
-#line 80
-# 126 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
-inline static void * QueryPropagationC$SerialPacket$getPayload(message_t * msg, uint8_t len){
-#line 126
-  void *__nesc_result;
-#line 126
-
-#line 126
-  __nesc_result = SerialActiveMessageC$Packet$getPayload(msg, len);
-#line 126
-
-#line 126
-  return __nesc_result;
-#line 126
-}
-#line 126
-# 357 "QueryPropagationC.nc"
-static inline void QueryPropagationC$Timer2$fired(void )
-#line 357
-{
-  if (!QueryPropagationC$serial_busy[sim_node()]) {
-
-
-
-      QueryPropagationC$s_sampling_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SerialPacket$getPayload(&QueryPropagationC$serial_pkt[sim_node()], sizeof(sampling_msg_t ));
-      if (QueryPropagationC$s_sampling_pkt[sim_node()] == (void *)0) {
-          return;
-        }
-
-      __nesc_hton_uint16(QueryPropagationC$s_sampling_pkt[sim_node()]->source_id.nxdata, QueryPropagationC$source_id[sim_node()]);
-      __nesc_hton_uint16(QueryPropagationC$s_sampling_pkt[sim_node()]->data_id.nxdata, QueryPropagationC$s_data_id[sim_node()]);
-      __nesc_hton_uint16(QueryPropagationC$s_sampling_pkt[sim_node()]->forwarder_id.nxdata, QueryPropagationC$forwarder_id[sim_node()]);
-      __nesc_hton_uint16(QueryPropagationC$s_sampling_pkt[sim_node()]->sensor_data.nxdata, QueryPropagationC$sensor_data[sim_node()]);
-      __nesc_hton_uint16(QueryPropagationC$s_sampling_pkt[sim_node()]->destination_id.nxdata, QueryPropagationC$destination_id[sim_node()]);
-      __nesc_hton_uint16(QueryPropagationC$s_sampling_pkt[sim_node()]->sequence_number.nxdata, QueryPropagationC$sequence_number[sim_node()]);
-
-
-
-      if (QueryPropagationC$SerialAMSend$send(AM_BROADCAST_ADDR, &QueryPropagationC$serial_pkt[sim_node()], sizeof(sampling_msg_t )) == SUCCESS) {
-
-          QueryPropagationC$serial_busy[sim_node()] = TRUE;
-        }
-    }
-}
-
-# 61 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
-inline static void QueryPropagationC$Leds$led0Off(void ){
-#line 61
-  LedsP$Leds$led0Off();
-#line 61
-}
-#line 61
-# 384 "QueryPropagationC.nc"
-static inline void QueryPropagationC$Timer3$fired(void )
-#line 384
-{
-  sim_log_debug(193U, "QueryC", "QUERY_ID: %hu => EXPIRED!!! @ %s \n", __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].sequence_number.nxdata), sim_time_string());
-
-
-  QueryPropagationC$number_Of_queries[sim_node()]--;
-  __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].state.nxdata, 0);
-
-  if (QueryPropagationC$number_Of_queries[sim_node()] > 0) {
-      QueryPropagationC$expiredQuery[sim_node()] = QueryPropagationC$HoldTimer[sim_node()];
-      QueryPropagationC$minQuery[sim_node()] = 0;
-      QueryPropagationC$query_pos[sim_node()] = 0;
-      while (QueryPropagationC$query_pos[sim_node()] < 3) {
-          if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1) {
-              __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata, __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata) - __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$expiredQuery[sim_node()]].query_lifetime.nxdata));
-              if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata) <= __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$minQuery[sim_node()]].query_lifetime.nxdata) && __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata) != 0) {
-                  QueryPropagationC$HoldTimer[sim_node()] = QueryPropagationC$query_pos[sim_node()];
-                }
-            }
-          else {
-              QueryPropagationC$minQuery[sim_node()]++;
-            }
-          QueryPropagationC$query_pos[sim_node()]++;
-        }
-      QueryPropagationC$Timer3$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].query_lifetime.nxdata));
-      QueryPropagationC$timerStartAt[sim_node()] = QueryPropagationC$Timer3$getNow();
-    }
-  else {
-      QueryPropagationC$Leds$led0Off();
-    }
-}
-
-# 89 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
-inline static void QueryPropagationC$Leds$led2On(void ){
-#line 89
-  LedsP$Leds$led2On();
-#line 89
-}
-#line 89
-# 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
-inline static error_t QueryPropagationC$SamplingRadioAMSend$send(am_addr_t addr, message_t * msg, uint8_t len){
-#line 80
-  unsigned char __nesc_result;
-#line 80
-
-#line 80
-  __nesc_result = /*QueryPropagationAppC.SamplingAMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$1$AMSend$send(addr, msg, len);
-#line 80
-
-#line 80
-  return __nesc_result;
-#line 80
-}
-#line 80
-# 417 "QueryPropagationC.nc"
-static inline void QueryPropagationC$Timer4$fired(void )
-#line 417
-{
-  if (!QueryPropagationC$unicast_busy[sim_node()]) {
-      QueryPropagationC$ucast_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_send[sim_node()]], sizeof(sampling_msg_t ));
-      if (QueryPropagationC$ucast_pkt[sim_node()] == (void *)0) {
-          return;
-        }
-
-      memcpy(&QueryPropagationC$pkt[sim_node()], &QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_send[sim_node()]], sizeof(message_t ));
-
-      if (__nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata) == TOS_NODE_ID && __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata) == TOS_NODE_ID) {
-          sim_log_debug(194U, "RadioC", "UNICAST TRANSMISSION SUCCESS\n SOURCE_ID: %hu, FORWARDER_ID: %hu, DATA_ID: %hu \n\n", __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->data_id.nxdata));
-        }
-      else {
-          sim_log_debug(195U, "RadioC", "RE-UNICAST TRANSMISSION SUCCESS\n SOURCE_ID: %hu, FORWARDER_ID: %hu, DATA_ID: %hu \n\n", __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->data_id.nxdata));
-        }
-
-      if (QueryPropagationC$SamplingRadioAMSend$send(QueryPropagationC$sendTofather[sim_node()], &QueryPropagationC$pkt[sim_node()], sizeof(sampling_msg_t )) == SUCCESS) {
-          QueryPropagationC$unicast_busy[sim_node()] = TRUE;
-          QueryPropagationC$Leds$led2On();
-        }
-    }
-}
-
-
-static inline void QueryPropagationC$Timer5$fired(void )
-#line 441
-{
-  if (!QueryPropagationC$unicast_busy[sim_node()]) {
-
-      QueryPropagationC$ucast_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_send[sim_node()]], sizeof(sampling_msg_t ));
-      if (QueryPropagationC$ucast_pkt[sim_node()] == (void *)0) {
-          return;
-        }
-
-      if (__nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata) == TOS_NODE_ID && __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata) == TOS_NODE_ID) {
-          sim_log_debug(196U, "RadioC", "UNICAST TRANSMISSION SUCCESS\n SOURCE_ID: %hu, FORWARDER_ID: %hu, DATA_ID: %hu \n\n", __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->data_id.nxdata));
-        }
-      else {
-          sim_log_debug(197U, "RadioC", "RE-UNICAST TRANSMISSION SUCCESS\n SOURCE_ID: %hu, FORWARDER_ID: %hu, DATA_ID: %hu \n\n", __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->source_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->forwarder_id.nxdata), __nesc_ntoh_uint16(QueryPropagationC$ucast_pkt[sim_node()]->data_id.nxdata));
-        }
-
-      memcpy(&QueryPropagationC$pkt[sim_node()], &QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_send[sim_node()]], sizeof(message_t ));
-
-      if (QueryPropagationC$SamplingRadioAMSend$send(QueryPropagationC$sendTofather[sim_node()], &QueryPropagationC$pkt[sim_node()], sizeof(sampling_msg_t )) == SUCCESS) {
-          QueryPropagationC$unicast_busy[sim_node()] = TRUE;
-          QueryPropagationC$Leds$led2On();
-        }
-    }
-}
-
-# 204 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
-static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$default$fired(uint8_t num)
-{
-}
-
-# 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-inline static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$fired(uint8_t arg_0x40be2c70){
-#line 83
-  switch (arg_0x40be2c70) {
-#line 83
-    case 0U:
-#line 83
-      QueryPropagationC$Timer0$fired();
-#line 83
-      break;
-#line 83
-    case 1U:
-#line 83
-      QueryPropagationC$Timer1$fired();
-#line 83
-      break;
-#line 83
-    case 2U:
-#line 83
-      QueryPropagationC$Timer2$fired();
-#line 83
-      break;
-#line 83
-    case 3U:
-#line 83
-      QueryPropagationC$Timer3$fired();
-#line 83
-      break;
-#line 83
-    case 4U:
-#line 83
-      QueryPropagationC$Timer4$fired();
-#line 83
-      break;
-#line 83
-    case 5U:
-#line 83
-      QueryPropagationC$Timer5$fired();
-#line 83
-      break;
-#line 83
-    default:
-#line 83
-      /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$default$fired(arg_0x40be2c70);
-#line 83
-      break;
-#line 83
-    }
-#line 83
-}
-#line 83
 # 103 "/opt/tinyos-2.1.2/tos/interfaces/AMPacket.nc"
 inline static void /*QueryPropagationAppC.SamplingAMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$1$AMPacket$setDestination(message_t * amsg, am_addr_t addr){
 #line 103
@@ -10348,6 +10610,519 @@ static __inline void /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$
 inline static void LedsP$Led2$clr(void ){
 #line 41
   /*HplAtm128GeneralIOC.PortA.Bit0*/HplAtm128GeneralIOPinP$0$IO$clr();
+#line 41
+}
+#line 41
+# 176 "/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/SerialActiveMessageC.nc"
+static inline void SerialActiveMessageC$AMPacket$setDestination(message_t *amsg, am_addr_t addr)
+#line 176
+{
+  serial_header_t *header = SerialActiveMessageC$getHeader(amsg);
+
+#line 178
+  __nesc_hton_uint16(header->dest.nxdata, addr);
+}
+
+# 103 "/opt/tinyos-2.1.2/tos/interfaces/AMPacket.nc"
+inline static void /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMPacket$setDestination(message_t * amsg, am_addr_t addr){
+#line 103
+  SerialActiveMessageC$AMPacket$setDestination(amsg, addr);
+#line 103
+}
+#line 103
+# 201 "/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/SerialActiveMessageC.nc"
+static inline void SerialActiveMessageC$AMPacket$setType(message_t *amsg, am_id_t t)
+#line 201
+{
+  serial_header_t *header = SerialActiveMessageC$getHeader(amsg);
+
+#line 203
+  __nesc_hton_uint8(header->type.nxdata, t);
+}
+
+# 162 "/opt/tinyos-2.1.2/tos/interfaces/AMPacket.nc"
+inline static void /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMPacket$setType(message_t * amsg, am_id_t t){
+#line 162
+  SerialActiveMessageC$AMPacket$setType(amsg, t);
+#line 162
+}
+#line 162
+# 229 "/opt/tinyos-2.1.2/tos/lib/tossim/sf/sim/SerialActiveMessageC.nc"
+static inline void SerialActiveMessageC$Packet$setPayloadLength(message_t *msg, uint8_t len)
+#line 229
+{
+  __nesc_hton_uint8(SerialActiveMessageC$getHeader(msg)->length.nxdata, len);
+}
+
+# 94 "/opt/tinyos-2.1.2/tos/interfaces/Packet.nc"
+inline static void /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Packet$setPayloadLength(message_t * msg, uint8_t len){
+#line 94
+  SerialActiveMessageC$Packet$setPayloadLength(msg, len);
+#line 94
+}
+#line 94
+# 90 "/opt/tinyos-2.1.2/tos/system/AMQueueImplP.nc"
+static inline error_t /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$send(uint8_t clientId, message_t *msg, 
+uint8_t len)
+#line 91
+{
+  if (clientId >= 1) {
+      return FAIL;
+    }
+  if (/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][clientId].msg != (void *)0) {
+      return EBUSY;
+    }
+  sim_log_debug(201U, "AMQueue", "AMQueue: request to send from %hhu (%p): passed checks\n", clientId, msg);
+
+  /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][clientId].msg = msg;
+  /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Packet$setPayloadLength(msg, len);
+
+  if (/*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()] >= 1) {
+      error_t err;
+      am_id_t amId = /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMPacket$type(msg);
+      am_addr_t dest = /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMPacket$destination(msg);
+
+      sim_log_debug(202U, "AMQueue", "%s: request to send from %hhu (%p): queue empty\n", __FUNCTION__, clientId, msg);
+      /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()] = clientId;
+
+      err = /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$AMSend$send(amId, dest, msg, len);
+      if (err != SUCCESS) {
+          sim_log_debug(203U, "AMQueue", "%s: underlying send failed.\n", __FUNCTION__);
+          /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$current[sim_node()] = 1;
+          /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$queue[sim_node()][clientId].msg = (void *)0;
+        }
+
+      return err;
+    }
+  else {
+      sim_log_debug(204U, "AMQueue", "AMQueue: request to send from %hhu (%p): queue not empty\n", clientId, msg);
+    }
+  return SUCCESS;
+}
+
+# 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
+inline static error_t /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$Send$send(message_t * msg, uint8_t len){
+#line 75
+  unsigned char __nesc_result;
+#line 75
+
+#line 75
+  __nesc_result = /*SerialAMQueueP.AMQueueImplP*/AMQueueImplP$1$Send$send(0U, msg, len);
+#line 75
+
+#line 75
+  return __nesc_result;
+#line 75
+}
+#line 75
+# 72 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+inline static void QueryPropagationC$Leds$led1On(void ){
+#line 72
+  LedsP$Leds$led1On();
+#line 72
+}
+#line 72
+# 80 "/opt/tinyos-2.1.2/tos/interfaces/AMSend.nc"
+inline static error_t QueryPropagationC$RadioAMSend$send(am_addr_t addr, message_t * msg, uint8_t len){
+#line 80
+  unsigned char __nesc_result;
+#line 80
+
+#line 80
+  __nesc_result = /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$send(addr, msg, len);
+#line 80
+
+#line 80
+  return __nesc_result;
+#line 80
+}
+#line 80
+# 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static void QueryPropagationC$TimerQueryCancelResponse$startOneShot(uint32_t dt){
+#line 73
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(5U, dt);
+#line 73
+}
+#line 73
+# 417 "QueryPropagationC.nc"
+static inline void QueryPropagationC$TimerQueryBroadcast$fired(void )
+#line 417
+{
+
+
+
+  if (TOS_NODE_ID == __nesc_ntoh_uint8(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata)) {
+      QueryPropagationC$start[sim_node()] = 0;
+      QueryPropagationC$query_pos[sim_node()] = 0;
+      while (QueryPropagationC$start[sim_node()] < 5) {
+          if (__nesc_ntoh_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$start[sim_node()]].source_id.nxdata) == TOS_NODE_ID) {
+              __nesc_hton_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$start[sim_node()]].sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata));
+              QueryPropagationC$query_pos[sim_node()]++;
+              break;
+            }
+          QueryPropagationC$start[sim_node()]++;
+        }
+      if (QueryPropagationC$query_pos[sim_node()] == 0) {
+          QueryPropagationC$next[sim_node()] = QueryPropagationC$next[sim_node()] % 5;
+          __nesc_hton_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC$bcast_pkt[sim_node()]->source_id.nxdata));
+          __nesc_hton_uint8(QueryPropagationC$QuerySendersHistory[sim_node()][QueryPropagationC$next[sim_node()]].sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC$bcast_pkt[sim_node()]->sequence_number.nxdata));
+          QueryPropagationC$next[sim_node()]++;
+        }
+    }
+
+  if (!QueryPropagationC$busy[sim_node()]) {
+      memcpy(&QueryPropagationC$pkt[sim_node()], &QueryPropagationC$PacketBuffer[sim_node()][QueryPropagationC$send[sim_node()]], sizeof(message_t ));
+
+      if (__nesc_ntoh_uint8(QueryPropagationC$bcast_pkt[sim_node()]->propagation_mode.nxdata) == 2) {
+          QueryPropagationC$TimerQueryCancelResponse$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].WaitingTime.nxdata));
+
+          if (QueryPropagationC$RadioAMSend$send(AM_BROADCAST_ADDR, &QueryPropagationC$pkt[sim_node()], sizeof(query_cancel_msg_t )) == SUCCESS) {
+              QueryPropagationC$busy[sim_node()] = TRUE;
+              QueryPropagationC$Leds$led1On();
+            }
+        }
+      else {
+          if (QueryPropagationC$RadioAMSend$send(AM_BROADCAST_ADDR, &QueryPropagationC$pkt[sim_node()], sizeof(query_flooding_msg_t )) == SUCCESS) {
+              QueryPropagationC$busy[sim_node()] = TRUE;
+              QueryPropagationC$Leds$led1On();
+            }
+        }
+    }
+}
+
+# 78 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static void QueryPropagationC$TimerReadSensor$stop(void ){
+#line 78
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$stop(1U);
+#line 78
+}
+#line 78
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+inline static error_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$senseResult$postTask(void ){
+#line 67
+  unsigned char __nesc_result;
+#line 67
+
+#line 67
+  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(/*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$senseResult);
+#line 67
+
+#line 67
+  return __nesc_result;
+#line 67
+}
+#line 67
+# 51 "/opt/tinyos-2.1.2/tos/system/ConstantSensorC.nc"
+static inline error_t /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Read$read(void )
+#line 51
+{
+  return /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$senseResult$postTask();
+}
+
+# 55 "/opt/tinyos-2.1.2/tos/interfaces/Read.nc"
+inline static error_t QueryPropagationC$Read$read(void ){
+#line 55
+  unsigned char __nesc_result;
+#line 55
+
+#line 55
+  __nesc_result = /*QueryPropagationAppC.Sensor.ConstantSensorC*/ConstantSensorC$0$Read$read();
+#line 55
+
+#line 55
+  return __nesc_result;
+#line 55
+}
+#line 55
+# 474 "QueryPropagationC.nc"
+static inline void QueryPropagationC$TimerReadSensor$fired(void )
+#line 474
+{
+
+  QueryPropagationC$Read$read();
+
+  if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Sampling_Timer[sim_node()]].state.nxdata) == 0) {
+      QueryPropagationC$TimerReadSensor$stop();
+    }
+}
+
+# 67 "/opt/tinyos-2.1.2/tos/interfaces/TaskBasic.nc"
+inline static error_t QueryPropagationC$SendSerial$postTask(void ){
+#line 67
+  unsigned char __nesc_result;
+#line 67
+
+#line 67
+  __nesc_result = SimSchedulerBasicP$TaskBasic$postTask(QueryPropagationC$SendSerial);
+#line 67
+
+#line 67
+  return __nesc_result;
+#line 67
+}
+#line 67
+# 594 "QueryPropagationC.nc"
+static inline void QueryPropagationC$TimerSendPCSerial$fired(void )
+#line 594
+{
+  unsigned char *__nesc_temp44;
+
+#line 595
+  QueryPropagationC$SendSerial$postTask();
+  QueryPropagationC$count_received_children[sim_node()] = 0;
+
+  if (QueryPropagationC$number_Of_queries[sim_node()] > 1) {
+      QueryPropagationC$start[sim_node()] = 0;
+      QueryPropagationC$minPeriod[sim_node()] = 0;
+      while (QueryPropagationC$start[sim_node()] < 3) {
+          if (QueryPropagationC$start[sim_node()] == 0) {
+              while (QueryPropagationC$minPeriod[sim_node()] < 3 && __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$minPeriod[sim_node()]].state.nxdata) == 0) {
+                  QueryPropagationC$minPeriod[sim_node()]++;
+                }
+            }
+          if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].state.nxdata) == 1) {
+              (__nesc_temp44 = QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].RemaingTime.nxdata, __nesc_hton_uint16(__nesc_temp44, __nesc_ntoh_uint16(__nesc_temp44) - __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].RemaingTime.nxdata)));
+              if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].RemaingTime.nxdata) <= __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$minPeriod[sim_node()]].RemaingTime.nxdata) && __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$start[sim_node()]].RemaingTime.nxdata) != 0) {
+                  QueryPropagationC$minPeriod[sim_node()] = QueryPropagationC$start[sim_node()];
+                }
+            }
+          QueryPropagationC$start[sim_node()]++;
+        }
+
+      if (QueryPropagationC$minPeriod[sim_node()] != QueryPropagationC$Hold_Waiting_Timer[sim_node()]) {
+          QueryPropagationC$Hold_Waiting_Timer[sim_node()] = QueryPropagationC$minPeriod[sim_node()];
+          QueryPropagationC$TimerSendPCSerial$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].RemaingTime.nxdata));
+          __nesc_hton_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$Hold_Waiting_Timer[sim_node()]].startDelay.nxdata, QueryPropagationC$TimerSendPCSerial$getNow());
+        }
+    }
+}
+
+# 61 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+inline static void QueryPropagationC$Leds$led0Off(void ){
+#line 61
+  LedsP$Leds$led0Off();
+#line 61
+}
+#line 61
+# 625 "QueryPropagationC.nc"
+static inline void QueryPropagationC$TimerQueryFired$fired(void )
+#line 625
+{
+  unsigned char *__nesc_temp45;
+
+#line 626
+  sim_log_debug(194U, "QueryC", "The query_%hu expired! @ %s", sim_time_string());
+
+  QueryPropagationC$number_Of_queries[sim_node()]--;
+  __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].state.nxdata, 0);
+
+  if (QueryPropagationC$number_Of_queries[sim_node()] > 0) {
+      QueryPropagationC$expiredQuery[sim_node()] = QueryPropagationC$HoldTimer[sim_node()];
+      QueryPropagationC$minQuery[sim_node()] = 0;
+      QueryPropagationC$query_pos[sim_node()] = 0;
+      while (QueryPropagationC$query_pos[sim_node()] < 3) {
+          if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].state.nxdata) == 1) {
+              (__nesc_temp45 = QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata, __nesc_hton_uint16(__nesc_temp45, __nesc_ntoh_uint16(__nesc_temp45) - __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$expiredQuery[sim_node()]].query_lifetime.nxdata)));
+              if (__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata) <= __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$minQuery[sim_node()]].query_lifetime.nxdata) && __nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_pos[sim_node()]].query_lifetime.nxdata) != 0) {
+                  QueryPropagationC$HoldTimer[sim_node()] = QueryPropagationC$query_pos[sim_node()];
+                }
+            }
+          else {
+              QueryPropagationC$minQuery[sim_node()]++;
+            }
+          QueryPropagationC$query_pos[sim_node()]++;
+        }
+      QueryPropagationC$TimerQueryFired$startOneShot(__nesc_ntoh_uint16(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$HoldTimer[sim_node()]].query_lifetime.nxdata));
+      QueryPropagationC$timerStartAt[sim_node()] = QueryPropagationC$TimerQueryFired$getNow();
+    }
+  else {
+      QueryPropagationC$Leds$led0Off();
+    }
+}
+
+
+static inline void QueryPropagationC$TimerReUnicast$fired(void )
+#line 656
+{
+  if (!QueryPropagationC$unicast_busy[sim_node()]) {
+      QueryPropagationC$ucast_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_send[sim_node()]], sizeof(sampling_msg_t ));
+      if (QueryPropagationC$ucast_pkt[sim_node()] == (void *)0) {
+          return;
+        }
+
+      memcpy(&QueryPropagationC$pkt[sim_node()], &QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_send[sim_node()]], sizeof(message_t ));
+
+      if (QueryPropagationC$SamplingRadioAMSend$send(QueryPropagationC$sendTofather[sim_node()], &QueryPropagationC$pkt[sim_node()], sizeof(sampling_msg_t )) == SUCCESS) {
+          QueryPropagationC$unicast_busy[sim_node()] = TRUE;
+          QueryPropagationC$Leds$led2On();
+        }
+    }
+}
+
+#line 460
+static inline void QueryPropagationC$TimerQueryCancelResponse$fired(void )
+#line 460
+{
+  QueryPropagationC$query_pos[sim_node()] = 0;
+  QueryPropagationC$start[sim_node()] = 0;
+  while (QueryPropagationC$query_pos[sim_node()] < 5) {
+      if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].children[QueryPropagationC$query_pos[sim_node()]].nxdata) != 0) {
+          QueryPropagationC$send_qcancelTo_node[sim_node()] = __nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].children[QueryPropagationC$query_pos[sim_node()]].nxdata);
+          __nesc_hton_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$query_cancel[sim_node()]].children[QueryPropagationC$query_pos[sim_node()]].nxdata, 0);
+          QueryPropagationC$QueryCancelConfirmation$postTask();
+          break;
+        }
+    }
+}
+
+#line 673
+static inline void QueryPropagationC$Timer_StatsUnicast_Unicast$fired(void )
+#line 673
+{
+  if (!QueryPropagationC$unicast_busy[sim_node()]) {
+      if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].propagation_mode.nxdata) == 0) {
+          QueryPropagationC$ucast_pkt[sim_node()] = (sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_send[sim_node()]], sizeof(sampling_msg_t ));
+          if (QueryPropagationC$ucast_pkt[sim_node()] == (void *)0) {
+              return;
+            }
+
+          memcpy(&QueryPropagationC$pkt[sim_node()], &QueryPropagationC$SamplingPacketBuffer[sim_node()][QueryPropagationC$sampling_send[sim_node()]], sizeof(message_t ));
+
+          if (QueryPropagationC$SamplingRadioAMSend$send(QueryPropagationC$sendTofather[sim_node()], &QueryPropagationC$pkt[sim_node()], sizeof(sampling_msg_t )) == SUCCESS) {
+              QueryPropagationC$unicast_busy[sim_node()] = TRUE;
+              QueryPropagationC$Leds$led2On();
+            }
+        }
+      else {
+#line 688
+        if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].propagation_mode.nxdata) == 1) {
+            QueryPropagationC$count_received_children[sim_node()] = 0;
+            QueryPropagationC$stats_ucast_pkt[sim_node()] = (stats_sampling_msg_t *)QueryPropagationC$SamplingAMPacket$getPayload(&QueryPropagationC$StatsSamplingPacketBuffer[sim_node()][QueryPropagationC$stats_sampling_send[sim_node()]], sizeof(stats_sampling_msg_t ));
+            if (QueryPropagationC$stats_ucast_pkt[sim_node()] == (void *)0) {
+                return;
+              }
+            QueryPropagationC$start[sim_node()] = 0;
+            while (QueryPropagationC$start[sim_node()] < 5) {
+                if (__nesc_ntoh_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata) == 0) {
+                    __nesc_hton_uint8(QueryPropagationC$ContributedNodes[sim_node()][QueryPropagationC$start[sim_node()]].node_id.nxdata, TOS_NODE_ID);
+                    break;
+                  }
+                QueryPropagationC$start[sim_node()]++;
+              }
+            memcpy(QueryPropagationC$stats_ucast_pkt[sim_node()]->contributed_ids, QueryPropagationC$ContributedNodes[sim_node()], 5 * sizeof(nx_uint8_t ));
+
+            if (QueryPropagationC$SamplingRadioAMSend$send(QueryPropagationC$sendTofather[sim_node()], &QueryPropagationC$pkt[sim_node()], sizeof(stats_sampling_msg_t )) == SUCCESS) {
+                QueryPropagationC$unicast_busy[sim_node()] = TRUE;
+                QueryPropagationC$Leds$led2On();
+              }
+          }
+        }
+    }
+}
+
+# 204 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
+static inline void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$default$fired(uint8_t num)
+{
+}
+
+# 83 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+inline static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$fired(uint8_t arg_0x40be2c70){
+#line 83
+  switch (arg_0x40be2c70) {
+#line 83
+    case 0U:
+#line 83
+      QueryPropagationC$TimerQueryBroadcast$fired();
+#line 83
+      break;
+#line 83
+    case 1U:
+#line 83
+      QueryPropagationC$TimerReadSensor$fired();
+#line 83
+      break;
+#line 83
+    case 2U:
+#line 83
+      QueryPropagationC$TimerSendPCSerial$fired();
+#line 83
+      break;
+#line 83
+    case 3U:
+#line 83
+      QueryPropagationC$TimerQueryFired$fired();
+#line 83
+      break;
+#line 83
+    case 4U:
+#line 83
+      QueryPropagationC$TimerReUnicast$fired();
+#line 83
+      break;
+#line 83
+    case 5U:
+#line 83
+      QueryPropagationC$TimerQueryCancelResponse$fired();
+#line 83
+      break;
+#line 83
+    case 6U:
+#line 83
+      QueryPropagationC$Timer_StatsUnicast_Unicast$fired();
+#line 83
+      break;
+#line 83
+    default:
+#line 83
+      /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$default$fired(arg_0x40be2c70);
+#line 83
+      break;
+#line 83
+    }
+#line 83
+}
+#line 83
+# 103 "/opt/tinyos-2.1.2/tos/interfaces/AMPacket.nc"
+inline static void /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMPacket$setDestination(message_t * amsg, am_addr_t addr){
+#line 103
+  TossimActiveMessageC$AMPacket$setDestination(amsg, addr);
+#line 103
+}
+#line 103
+#line 162
+inline static void /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMPacket$setType(message_t * amsg, am_id_t t){
+#line 162
+  TossimActiveMessageC$AMPacket$setType(amsg, t);
+#line 162
+}
+#line 162
+# 75 "/opt/tinyos-2.1.2/tos/interfaces/Send.nc"
+inline static error_t /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$Send$send(message_t * msg, uint8_t len){
+#line 75
+  unsigned char __nesc_result;
+#line 75
+
+#line 75
+  __nesc_result = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Send$send(0U, msg, len);
+#line 75
+
+#line 75
+  return __nesc_result;
+#line 75
+}
+#line 75
+# 59 "/opt/tinyos-2.1.2/tos/chips/atm128/pins/sim/HplAtm128GeneralIOPinP.nc"
+static __inline void /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$clr(void )
+#line 59
+{
+#line 59
+  atm128RegFile[sim_node()][27U] &= ~(1 << 1);
+}
+
+# 41 "/opt/tinyos-2.1.2/tos/interfaces/GeneralIO.nc"
+inline static void LedsP$Led1$clr(void ){
+#line 41
+  /*HplAtm128GeneralIOC.PortA.Bit1*/HplAtm128GeneralIOPinP$1$IO$clr();
 #line 41
 }
 #line 41
@@ -11108,9 +11883,9 @@ inline static void QueryPropagationC$Leds$led1Off(void ){
 #line 77
 }
 #line 77
-# 206 "QueryPropagationC.nc"
+# 366 "QueryPropagationC.nc"
 static inline void QueryPropagationC$Boot$booted(void )
-#line 206
+#line 366
 {
 
   QueryPropagationC$send[sim_node()] = 0;
@@ -11118,10 +11893,12 @@ static inline void QueryPropagationC$Boot$booted(void )
   QueryPropagationC$next[sim_node()] = 0;
   QueryPropagationC$data_id[sim_node()] = 0;
   QueryPropagationC$query_pos[sim_node()] = 0;
-  QueryPropagationC$sequence_number[sim_node()] = 0;
+  QueryPropagationC$nextChild[sim_node()] = 0;
   QueryPropagationC$sampling_save[sim_node()] = 0;
   QueryPropagationC$sampling_send[sim_node()] = 0;
+  QueryPropagationC$sequence_number[sim_node()] = 0;
   QueryPropagationC$number_Of_queries[sim_node()] = 0;
+  QueryPropagationC$count_received_children[sim_node()] = 0;
 
   QueryPropagationC$Leds$led0Off();
   QueryPropagationC$Leds$led1Off();
@@ -11129,6 +11906,7 @@ static inline void QueryPropagationC$Boot$booted(void )
 
   QueryPropagationC$init_StateMessages$postTask();
   QueryPropagationC$init_ActiveQueryQ$postTask();
+  QueryPropagationC$init_ContributedNodes$postTask();
 
   QueryPropagationC$RadioAMControl$start();
   QueryPropagationC$SerialAMControl$start();
@@ -12853,12 +13631,33 @@ static uint8_t HplAtm128Timer0AsyncP$Compare$get(void )
 }
 
 # 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer2$startOneShot(uint32_t dt){
+static void QueryPropagationC$TimerSendPCSerial$startOneShot(uint32_t dt){
 #line 73
   /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(2U, dt);
 #line 73
 }
 #line 73
+static void QueryPropagationC$Timer_StatsUnicast_Unicast$startOneShot(uint32_t dt){
+#line 73
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(6U, dt);
+#line 73
+}
+#line 73
+#line 136
+static uint32_t QueryPropagationC$TimerSendPCSerial$getNow(void ){
+#line 136
+  unsigned int __nesc_result;
+#line 136
+
+#line 136
+  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$getNow(2U);
+#line 136
+
+#line 136
+  return __nesc_result;
+#line 136
+}
+#line 136
 # 110 "/opt/tinyos-2.1.2/tos/lib/tossim/sim_packet.c"
   uint8_t sim_packet_max_length(sim_packet_t *msg)
 #line 110
@@ -13139,18 +13938,31 @@ uint8_t len)
   return err;
 }
 
-# 664 "QueryPropagationC.nc"
+# 1082 "QueryPropagationC.nc"
 static void QueryPropagationC$SamplingRadioAMSend$sendDone(message_t *msg, error_t err)
-#line 664
+#line 1082
 {
   if (&QueryPropagationC$pkt[sim_node()] == msg) {
       QueryPropagationC$unicast_busy[sim_node()] = FALSE;
 
       QueryPropagationC$Leds$led2Off();
-      QueryPropagationC$sampling_send[sim_node()]++;
-      if (QueryPropagationC$sampling_send[sim_node()] > 10) {
-          QueryPropagationC$sampling_send[sim_node()] = 0;
+      if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].propagation_mode.nxdata) == 0) {
+          QueryPropagationC$sampling_send[sim_node()]++;
+          if (QueryPropagationC$sampling_send[sim_node()] > 10) {
+              QueryPropagationC$sampling_send[sim_node()] = 0;
+            }
         }
+      else {
+#line 1093
+        if (__nesc_ntoh_uint8(QueryPropagationC$AQQ[sim_node()][QueryPropagationC$remindQuery[sim_node()]].propagation_mode.nxdata) == 1) {
+            QueryPropagationC$stats_sampling_send[sim_node()]++;
+            if (QueryPropagationC$stats_sampling_send[sim_node()] > 10) {
+                QueryPropagationC$stats_sampling_send[sim_node()] = 0;
+              }
+          }
+        }
+#line 1099
+      QueryPropagationC$init_ContributedNodes$postTask();
     }
 }
 
@@ -13164,13 +13976,12 @@ static void LedsP$Leds$led2Off(void )
   ;
 }
 
-# 651 "QueryPropagationC.nc"
+# 1070 "QueryPropagationC.nc"
 static void QueryPropagationC$RadioAMSend$sendDone(message_t *msg, error_t err)
-#line 651
+#line 1070
 {
   if (&QueryPropagationC$pkt[sim_node()] == msg) {
       QueryPropagationC$busy[sim_node()] = FALSE;
-
 
       QueryPropagationC$Leds$led1Off();
       QueryPropagationC$send[sim_node()]++;
@@ -13275,7 +14086,7 @@ static void /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$sendDone(am_id_t id, 
       /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$sendDone(/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()], msg, err);
     }
   else {
-      sim_log_debug(207U, "PointerBug", "%s received send done for %p, signaling for %p.\n", __FUNCTION__, msg, /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()]].msg);
+      sim_log_debug(200U, "PointerBug", "%s received send done for %p, signaling for %p.\n", __FUNCTION__, msg, /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()]].msg);
     }
 }
 
@@ -13329,71 +14140,6 @@ static void CpmModelC$sim_gain_schedule_ack(int source, sim_time_t t, CpmModelC$
   sim_queue_insert(ackEvent);
 }
 
-# 73 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
-static void QueryPropagationC$Timer1$startOneShot(uint32_t dt){
-#line 73
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(1U, dt);
-#line 73
-}
-#line 73
-#line 136
-static uint32_t QueryPropagationC$Timer3$getNow(void ){
-#line 136
-  unsigned int __nesc_result;
-#line 136
-
-#line 136
-  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$getNow(3U);
-#line 136
-
-#line 136
-  return __nesc_result;
-#line 136
-}
-#line 136
-#line 73
-static void QueryPropagationC$Timer3$startOneShot(uint32_t dt){
-#line 73
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(3U, dt);
-#line 73
-}
-#line 73
-static void QueryPropagationC$Timer0$startOneShot(uint32_t dt){
-#line 73
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(0U, dt);
-#line 73
-}
-#line 73
-# 73 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
-static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$fireTimers(uint32_t now)
-{
-  uint16_t num;
-
-  for (num = 0; num < /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$NUM_TIMERS; num++) 
-    {
-      /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer_t *timer = &/*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num];
-
-      if (timer->isrunning) 
-        {
-          uint32_t elapsed = now - timer->t0;
-
-          if (elapsed >= timer->dt) 
-            {
-              if (timer->isoneshot) {
-                timer->isrunning = FALSE;
-                }
-              else {
-#line 90
-                timer->t0 += timer->dt;
-                }
-              /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$fired(num);
-              break;
-            }
-        }
-    }
-  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer$postTask();
-}
-
 # 53 "/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc"
 static error_t /*QueryPropagationAppC.SamplingAMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$1$AMSend$send(am_addr_t dest, 
 message_t *msg, 
@@ -13436,7 +14182,7 @@ uint8_t len)
   if (/*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg != (void *)0) {
       return EBUSY;
     }
-  sim_log_debug(203U, "AMQueue", "AMQueue: request to send from %hhu (%p): passed checks\n", clientId, msg);
+  sim_log_debug(196U, "AMQueue", "AMQueue: request to send from %hhu (%p): passed checks\n", clientId, msg);
 
   /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg = msg;
   /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$Packet$setPayloadLength(msg, len);
@@ -13446,12 +14192,12 @@ uint8_t len)
       am_id_t amId = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMPacket$type(msg);
       am_addr_t dest = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMPacket$destination(msg);
 
-      sim_log_debug(204U, "AMQueue", "%s: request to send from %hhu (%p): queue empty\n", __FUNCTION__, clientId, msg);
+      sim_log_debug(197U, "AMQueue", "%s: request to send from %hhu (%p): queue empty\n", __FUNCTION__, clientId, msg);
       /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()] = clientId;
 
       err = /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$AMSend$send(amId, dest, msg, len);
       if (err != SUCCESS) {
-          sim_log_debug(205U, "AMQueue", "%s: underlying send failed.\n", __FUNCTION__);
+          sim_log_debug(198U, "AMQueue", "%s: underlying send failed.\n", __FUNCTION__);
           /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$current[sim_node()] = 2;
           /*AMQueueP.AMQueueImplP*/AMQueueImplP$0$queue[sim_node()][clientId].msg = (void *)0;
         }
@@ -13459,7 +14205,7 @@ uint8_t len)
       return err;
     }
   else {
-      sim_log_debug(206U, "AMQueue", "AMQueue: request to send from %hhu (%p): queue not empty\n", clientId, msg);
+      sim_log_debug(199U, "AMQueue", "AMQueue: request to send from %hhu (%p): queue not empty\n", clientId, msg);
     }
   return SUCCESS;
 }
@@ -13474,13 +14220,125 @@ static void LedsP$Leds$led2On(void )
   ;
 }
 
-#line 79
+# 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+static uint32_t QueryPropagationC$TimerQueryFired$getNow(void ){
+#line 136
+  unsigned int __nesc_result;
+#line 136
+
+#line 136
+  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$getNow(3U);
+#line 136
+
+#line 136
+  return __nesc_result;
+#line 136
+}
+#line 136
+#line 73
+static void QueryPropagationC$TimerQueryFired$startOneShot(uint32_t dt){
+#line 73
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(3U, dt);
+#line 73
+}
+#line 73
+static void QueryPropagationC$TimerQueryBroadcast$startOneShot(uint32_t dt){
+#line 73
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(0U, dt);
+#line 73
+}
+#line 73
+# 53 "/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc"
+static error_t /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMSend$send(am_addr_t dest, 
+message_t *msg, 
+uint8_t len)
+#line 55
+{
+  /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMPacket$setDestination(msg, dest);
+  /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$AMPacket$setType(msg, 6);
+  return /*QueryPropagationAppC.SerialAMSenderC.AMQueueEntryP*/AMQueueEntryP$2$Send$send(msg, len);
+}
+
+# 136 "/opt/tinyos-2.1.2/tos/lib/timer/Timer.nc"
+static uint32_t QueryPropagationC$TimerReadSensor$getNow(void ){
+#line 136
+  unsigned int __nesc_result;
+#line 136
+
+#line 136
+  __nesc_result = /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$getNow(1U);
+#line 136
+
+#line 136
+  return __nesc_result;
+#line 136
+}
+#line 136
+#line 73
+static void QueryPropagationC$TimerReadSensor$startOneShot(uint32_t dt){
+#line 73
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$startOneShot(1U, dt);
+#line 73
+}
+#line 73
+# 73 "/opt/tinyos-2.1.2/tos/lib/timer/VirtualizeTimerC.nc"
+static void /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$fireTimers(uint32_t now)
+{
+  uint16_t num;
+
+  for (num = 0; num < /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$NUM_TIMERS; num++) 
+    {
+      /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer_t *timer = &/*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$m_timers[sim_node()][num];
+
+      if (timer->isrunning) 
+        {
+          uint32_t elapsed = now - timer->t0;
+
+          if (elapsed >= timer->dt) 
+            {
+              if (timer->isoneshot) {
+                timer->isrunning = FALSE;
+                }
+              else {
+#line 90
+                timer->t0 += timer->dt;
+                }
+              /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$Timer$fired(num);
+              break;
+            }
+        }
+    }
+  /*HilTimerMilliC.VirtualizeTimerC*/VirtualizeTimerC$0$updateFromTimer$postTask();
+}
+
+# 79 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
 static void LedsP$Leds$led0Off(void )
 #line 79
 {
   LedsP$Led0$set();
   sim_log_debug(155U, "LedsC", "LEDS: Led""0"" %s.\n", LedsP$Led0$get() ? "off" : "on");
 #line 81
+  ;
+}
+
+# 53 "/opt/tinyos-2.1.2/tos/system/AMQueueEntryP.nc"
+static error_t /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMSend$send(am_addr_t dest, 
+message_t *msg, 
+uint8_t len)
+#line 55
+{
+  /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMPacket$setDestination(msg, dest);
+  /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$AMPacket$setType(msg, 45);
+  return /*QueryPropagationAppC.AMSenderC.SenderC.AMQueueEntryP*/AMQueueEntryP$0$Send$send(msg, len);
+}
+
+# 89 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
+static void LedsP$Leds$led1On(void )
+#line 89
+{
+  LedsP$Led1$clr();
+  sim_log_debug(157U, "LedsC", "LEDS: Led""1"" %s.\n", LedsP$Led1$get() ? "off" : "on");
+#line 91
   ;
 }
 
@@ -14326,6 +15184,30 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(QueryPropagationC$bcast_pkt[__nesc_mote]);
     return 0;
   }
+  if (!strcmp(varname, "QueryPropagationC$srl_query_cancel"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$srl_query_cancel[__nesc_mote];
+    *size = sizeof(QueryPropagationC$srl_query_cancel[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$rcv_query_cacnel"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$rcv_query_cacnel[__nesc_mote];
+    *size = sizeof(QueryPropagationC$rcv_query_cacnel[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$bcast_query_cancel"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$bcast_query_cancel[__nesc_mote];
+    *size = sizeof(QueryPropagationC$bcast_query_cancel[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$ucast_query_cancel"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$ucast_query_cancel[__nesc_mote];
+    *size = sizeof(QueryPropagationC$ucast_query_cancel[__nesc_mote]);
+    return 0;
+  }
   if (!strcmp(varname, "QueryPropagationC$r_sampling_pkt"))
   {
     *addr = (uintptr_t)&QueryPropagationC$r_sampling_pkt[__nesc_mote];
@@ -14344,6 +15226,24 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(QueryPropagationC$ucast_pkt[__nesc_mote]);
     return 0;
   }
+  if (!strcmp(varname, "QueryPropagationC$r_stats_sampling_pkt"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$r_stats_sampling_pkt[__nesc_mote];
+    *size = sizeof(QueryPropagationC$r_stats_sampling_pkt[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$s_stats_sampling_pkt"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$s_stats_sampling_pkt[__nesc_mote];
+    *size = sizeof(QueryPropagationC$s_stats_sampling_pkt[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$stats_ucast_pkt"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$stats_ucast_pkt[__nesc_mote];
+    *size = sizeof(QueryPropagationC$stats_ucast_pkt[__nesc_mote]);
+    return 0;
+  }
   if (!strcmp(varname, "QueryPropagationC$s_pkt"))
   {
     *addr = (uintptr_t)&QueryPropagationC$s_pkt[__nesc_mote];
@@ -14360,12 +15260,6 @@ static int __nesc_nido_resolve(int __nesc_mote,
   {
     *addr = (uintptr_t)&QueryPropagationC$serial_pkt[__nesc_mote];
     *size = sizeof(QueryPropagationC$serial_pkt[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$sequence_number"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$sequence_number[__nesc_mote];
-    *size = sizeof(QueryPropagationC$sequence_number[__nesc_mote]);
     return 0;
   }
   if (!strcmp(varname, "QueryPropagationC$send"))
@@ -14392,6 +15286,18 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(QueryPropagationC$sampling_save[__nesc_mote]);
     return 0;
   }
+  if (!strcmp(varname, "QueryPropagationC$stats_sampling_send"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$stats_sampling_send[__nesc_mote];
+    *size = sizeof(QueryPropagationC$stats_sampling_send[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$stats_sampling_save"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$stats_sampling_save[__nesc_mote];
+    *size = sizeof(QueryPropagationC$stats_sampling_save[__nesc_mote]);
+    return 0;
+  }
   if (!strcmp(varname, "QueryPropagationC$number_Of_queries"))
   {
     *addr = (uintptr_t)&QueryPropagationC$number_Of_queries[__nesc_mote];
@@ -14404,16 +15310,10 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(QueryPropagationC$next[__nesc_mote]);
     return 0;
   }
-  if (!strcmp(varname, "QueryPropagationC$t0"))
+  if (!strcmp(varname, "QueryPropagationC$remindQuery"))
   {
-    *addr = (uintptr_t)&QueryPropagationC$t0[__nesc_mote];
-    *size = sizeof(QueryPropagationC$t0[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$dt"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$dt[__nesc_mote];
-    *size = sizeof(QueryPropagationC$dt[__nesc_mote]);
+    *addr = (uintptr_t)&QueryPropagationC$remindQuery[__nesc_mote];
+    *size = sizeof(QueryPropagationC$remindQuery[__nesc_mote]);
     return 0;
   }
   if (!strcmp(varname, "QueryPropagationC$start"))
@@ -14452,58 +15352,10 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(QueryPropagationC$sendQuery[__nesc_mote]);
     return 0;
   }
-  if (!strcmp(varname, "QueryPropagationC$runningTime"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$runningTime[__nesc_mote];
-    *size = sizeof(QueryPropagationC$runningTime[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$checkTimer"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$checkTimer[__nesc_mote];
-    *size = sizeof(QueryPropagationC$checkTimer[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$timerStartAt"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$timerStartAt[__nesc_mote];
-    *size = sizeof(QueryPropagationC$timerStartAt[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$time4MeasurementStartAt"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$time4MeasurementStartAt[__nesc_mote];
-    *size = sizeof(QueryPropagationC$time4MeasurementStartAt[__nesc_mote]);
-    return 0;
-  }
   if (!strcmp(varname, "QueryPropagationC$Hold_Sampling_Timer"))
   {
     *addr = (uintptr_t)&QueryPropagationC$Hold_Sampling_Timer[__nesc_mote];
     *size = sizeof(QueryPropagationC$Hold_Sampling_Timer[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$minPeriod"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$minPeriod[__nesc_mote];
-    *size = sizeof(QueryPropagationC$minPeriod[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$sendTofather"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$sendTofather[__nesc_mote];
-    *size = sizeof(QueryPropagationC$sendTofather[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$sensor_data"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$sensor_data[__nesc_mote];
-    *size = sizeof(QueryPropagationC$sensor_data[__nesc_mote]);
-    return 0;
-  }
-  if (!strcmp(varname, "QueryPropagationC$source_id"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$source_id[__nesc_mote];
-    *size = sizeof(QueryPropagationC$source_id[__nesc_mote]);
     return 0;
   }
   if (!strcmp(varname, "QueryPropagationC$sequence_number"))
@@ -14536,6 +15388,132 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(QueryPropagationC$destination_id[__nesc_mote]);
     return 0;
   }
+  if (!strcmp(varname, "QueryPropagationC$hops"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$hops[__nesc_mote];
+    *size = sizeof(QueryPropagationC$hops[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$source_id"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$source_id[__nesc_mote];
+    *size = sizeof(QueryPropagationC$source_id[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$Hold_Waiting_Timer"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$Hold_Waiting_Timer[__nesc_mote];
+    *size = sizeof(QueryPropagationC$Hold_Waiting_Timer[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$nextChild"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$nextChild[__nesc_mote];
+    *size = sizeof(QueryPropagationC$nextChild[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$sendTofather"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$sendTofather[__nesc_mote];
+    *size = sizeof(QueryPropagationC$sendTofather[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$query_cancel"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$query_cancel[__nesc_mote];
+    *size = sizeof(QueryPropagationC$query_cancel[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$send_qcancelTo_node"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$send_qcancelTo_node[__nesc_mote];
+    *size = sizeof(QueryPropagationC$send_qcancelTo_node[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$count_received_children"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$count_received_children[__nesc_mote];
+    *size = sizeof(QueryPropagationC$count_received_children[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$i"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$i[__nesc_mote];
+    *size = sizeof(QueryPropagationC$i[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$t0"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$t0[__nesc_mote];
+    *size = sizeof(QueryPropagationC$t0[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$dt"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$dt[__nesc_mote];
+    *size = sizeof(QueryPropagationC$dt[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$runningTime"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$runningTime[__nesc_mote];
+    *size = sizeof(QueryPropagationC$runningTime[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$checkTimer"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$checkTimer[__nesc_mote];
+    *size = sizeof(QueryPropagationC$checkTimer[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$timerStartAt"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$timerStartAt[__nesc_mote];
+    *size = sizeof(QueryPropagationC$timerStartAt[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$time4MeasurementStartAt"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$time4MeasurementStartAt[__nesc_mote];
+    *size = sizeof(QueryPropagationC$time4MeasurementStartAt[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$minPeriod"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$minPeriod[__nesc_mote];
+    *size = sizeof(QueryPropagationC$minPeriod[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$sensor_data"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$sensor_data[__nesc_mote];
+    *size = sizeof(QueryPropagationC$sensor_data[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$min"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$min[__nesc_mote];
+    *size = sizeof(QueryPropagationC$min[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$max"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$max[__nesc_mote];
+    *size = sizeof(QueryPropagationC$max[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$average"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$average[__nesc_mote];
+    *size = sizeof(QueryPropagationC$average[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$dtDelay"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$dtDelay[__nesc_mote];
+    *size = sizeof(QueryPropagationC$dtDelay[__nesc_mote]);
+    return 0;
+  }
   if (!strcmp(varname, "QueryPropagationC$busy"))
   {
     *addr = (uintptr_t)&QueryPropagationC$busy[__nesc_mote];
@@ -14554,12 +15532,6 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(QueryPropagationC$serial_busy[__nesc_mote]);
     return 0;
   }
-  if (!strcmp(varname, "QueryPropagationC$TimeToMeasure"))
-  {
-    *addr = (uintptr_t)&QueryPropagationC$TimeToMeasure[__nesc_mote];
-    *size = sizeof(QueryPropagationC$TimeToMeasure[__nesc_mote]);
-    return 0;
-  }
   if (!strcmp(varname, "QueryPropagationC$PacketBuffer"))
   {
     *addr = (uintptr_t)&QueryPropagationC$PacketBuffer[__nesc_mote];
@@ -14572,6 +15544,12 @@ static int __nesc_nido_resolve(int __nesc_mote,
     *size = sizeof(QueryPropagationC$SamplingPacketBuffer[__nesc_mote]);
     return 0;
   }
+  if (!strcmp(varname, "QueryPropagationC$StatsSamplingPacketBuffer"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$StatsSamplingPacketBuffer[__nesc_mote];
+    *size = sizeof(QueryPropagationC$StatsSamplingPacketBuffer[__nesc_mote]);
+    return 0;
+  }
   if (!strcmp(varname, "QueryPropagationC$AQQ"))
   {
     *addr = (uintptr_t)&QueryPropagationC$AQQ[__nesc_mote];
@@ -14582,6 +15560,18 @@ static int __nesc_nido_resolve(int __nesc_mote,
   {
     *addr = (uintptr_t)&QueryPropagationC$QuerySendersHistory[__nesc_mote];
     *size = sizeof(QueryPropagationC$QuerySendersHistory[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$ContributedNodes"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$ContributedNodes[__nesc_mote];
+    *size = sizeof(QueryPropagationC$ContributedNodes[__nesc_mote]);
+    return 0;
+  }
+  if (!strcmp(varname, "QueryPropagationC$TimeToMeasure"))
+  {
+    *addr = (uintptr_t)&QueryPropagationC$TimeToMeasure[__nesc_mote];
+    *size = sizeof(QueryPropagationC$TimeToMeasure[__nesc_mote]);
     return 0;
   }
 
@@ -14843,49 +15833,71 @@ static void __nesc_nido_initialise(int __nesc_mote)
   /* Module QueryPropagationC */
   memset((void *)&QueryPropagationC$r_pkt[__nesc_mote], 0, sizeof QueryPropagationC$r_pkt[__nesc_mote]);
   memset((void *)&QueryPropagationC$bcast_pkt[__nesc_mote], 0, sizeof QueryPropagationC$bcast_pkt[__nesc_mote]);
+  memset((void *)&QueryPropagationC$srl_query_cancel[__nesc_mote], 0, sizeof QueryPropagationC$srl_query_cancel[__nesc_mote]);
+  memset((void *)&QueryPropagationC$rcv_query_cacnel[__nesc_mote], 0, sizeof QueryPropagationC$rcv_query_cacnel[__nesc_mote]);
+  memset((void *)&QueryPropagationC$bcast_query_cancel[__nesc_mote], 0, sizeof QueryPropagationC$bcast_query_cancel[__nesc_mote]);
+  memset((void *)&QueryPropagationC$ucast_query_cancel[__nesc_mote], 0, sizeof QueryPropagationC$ucast_query_cancel[__nesc_mote]);
   memset((void *)&QueryPropagationC$r_sampling_pkt[__nesc_mote], 0, sizeof QueryPropagationC$r_sampling_pkt[__nesc_mote]);
   memset((void *)&QueryPropagationC$s_sampling_pkt[__nesc_mote], 0, sizeof QueryPropagationC$s_sampling_pkt[__nesc_mote]);
   memset((void *)&QueryPropagationC$ucast_pkt[__nesc_mote], 0, sizeof QueryPropagationC$ucast_pkt[__nesc_mote]);
+  memset((void *)&QueryPropagationC$r_stats_sampling_pkt[__nesc_mote], 0, sizeof QueryPropagationC$r_stats_sampling_pkt[__nesc_mote]);
+  memset((void *)&QueryPropagationC$s_stats_sampling_pkt[__nesc_mote], 0, sizeof QueryPropagationC$s_stats_sampling_pkt[__nesc_mote]);
+  memset((void *)&QueryPropagationC$stats_ucast_pkt[__nesc_mote], 0, sizeof QueryPropagationC$stats_ucast_pkt[__nesc_mote]);
   memset((void *)&QueryPropagationC$s_pkt[__nesc_mote], 0, sizeof QueryPropagationC$s_pkt[__nesc_mote]);
   memset((void *)&QueryPropagationC$pkt[__nesc_mote], 0, sizeof QueryPropagationC$pkt[__nesc_mote]);
   memset((void *)&QueryPropagationC$serial_pkt[__nesc_mote], 0, sizeof QueryPropagationC$serial_pkt[__nesc_mote]);
-  memset((void *)&QueryPropagationC$sequence_number[__nesc_mote], 0, sizeof QueryPropagationC$sequence_number[__nesc_mote]);
   memset((void *)&QueryPropagationC$send[__nesc_mote], 0, sizeof QueryPropagationC$send[__nesc_mote]);
   memset((void *)&QueryPropagationC$save[__nesc_mote], 0, sizeof QueryPropagationC$save[__nesc_mote]);
   memset((void *)&QueryPropagationC$sampling_send[__nesc_mote], 0, sizeof QueryPropagationC$sampling_send[__nesc_mote]);
   memset((void *)&QueryPropagationC$sampling_save[__nesc_mote], 0, sizeof QueryPropagationC$sampling_save[__nesc_mote]);
+  memset((void *)&QueryPropagationC$stats_sampling_send[__nesc_mote], 0, sizeof QueryPropagationC$stats_sampling_send[__nesc_mote]);
+  memset((void *)&QueryPropagationC$stats_sampling_save[__nesc_mote], 0, sizeof QueryPropagationC$stats_sampling_save[__nesc_mote]);
   memset((void *)&QueryPropagationC$number_Of_queries[__nesc_mote], 0, sizeof QueryPropagationC$number_Of_queries[__nesc_mote]);
   memset((void *)&QueryPropagationC$next[__nesc_mote], 0, sizeof QueryPropagationC$next[__nesc_mote]);
-  memset((void *)&QueryPropagationC$t0[__nesc_mote], 0, sizeof QueryPropagationC$t0[__nesc_mote]);
-  memset((void *)&QueryPropagationC$dt[__nesc_mote], 0, sizeof QueryPropagationC$dt[__nesc_mote]);
+  memset((void *)&QueryPropagationC$remindQuery[__nesc_mote], 0, sizeof QueryPropagationC$remindQuery[__nesc_mote]);
   memset((void *)&QueryPropagationC$start[__nesc_mote], 0, sizeof QueryPropagationC$start[__nesc_mote]);
   memset((void *)&QueryPropagationC$HoldTimer[__nesc_mote], 0, sizeof QueryPropagationC$HoldTimer[__nesc_mote]);
   memset((void *)&QueryPropagationC$query_pos[__nesc_mote], 0, sizeof QueryPropagationC$query_pos[__nesc_mote]);
   memset((void *)&QueryPropagationC$minQuery[__nesc_mote], 0, sizeof QueryPropagationC$minQuery[__nesc_mote]);
   memset((void *)&QueryPropagationC$expiredQuery[__nesc_mote], 0, sizeof QueryPropagationC$expiredQuery[__nesc_mote]);
   memset((void *)&QueryPropagationC$sendQuery[__nesc_mote], 0, sizeof QueryPropagationC$sendQuery[__nesc_mote]);
-  memset((void *)&QueryPropagationC$runningTime[__nesc_mote], 0, sizeof QueryPropagationC$runningTime[__nesc_mote]);
-  memset((void *)&QueryPropagationC$checkTimer[__nesc_mote], 0, sizeof QueryPropagationC$checkTimer[__nesc_mote]);
-  memset((void *)&QueryPropagationC$timerStartAt[__nesc_mote], 0, sizeof QueryPropagationC$timerStartAt[__nesc_mote]);
-  memset((void *)&QueryPropagationC$time4MeasurementStartAt[__nesc_mote], 0, sizeof QueryPropagationC$time4MeasurementStartAt[__nesc_mote]);
   memset((void *)&QueryPropagationC$Hold_Sampling_Timer[__nesc_mote], 0, sizeof QueryPropagationC$Hold_Sampling_Timer[__nesc_mote]);
-  memset((void *)&QueryPropagationC$minPeriod[__nesc_mote], 0, sizeof QueryPropagationC$minPeriod[__nesc_mote]);
-  memset((void *)&QueryPropagationC$sendTofather[__nesc_mote], 0, sizeof QueryPropagationC$sendTofather[__nesc_mote]);
-  memset((void *)&QueryPropagationC$sensor_data[__nesc_mote], 0, sizeof QueryPropagationC$sensor_data[__nesc_mote]);
-  memset((void *)&QueryPropagationC$source_id[__nesc_mote], 0, sizeof QueryPropagationC$source_id[__nesc_mote]);
   memset((void *)&QueryPropagationC$sequence_number[__nesc_mote], 0, sizeof QueryPropagationC$sequence_number[__nesc_mote]);
   memset((void *)&QueryPropagationC$data_id[__nesc_mote], 0, sizeof QueryPropagationC$data_id[__nesc_mote]);
   memset((void *)&QueryPropagationC$s_data_id[__nesc_mote], 0, sizeof QueryPropagationC$s_data_id[__nesc_mote]);
   memset((void *)&QueryPropagationC$forwarder_id[__nesc_mote], 0, sizeof QueryPropagationC$forwarder_id[__nesc_mote]);
   memset((void *)&QueryPropagationC$destination_id[__nesc_mote], 0, sizeof QueryPropagationC$destination_id[__nesc_mote]);
+  memset((void *)&QueryPropagationC$hops[__nesc_mote], 0, sizeof QueryPropagationC$hops[__nesc_mote]);
+  memset((void *)&QueryPropagationC$source_id[__nesc_mote], 0, sizeof QueryPropagationC$source_id[__nesc_mote]);
+  memset((void *)&QueryPropagationC$Hold_Waiting_Timer[__nesc_mote], 0, sizeof QueryPropagationC$Hold_Waiting_Timer[__nesc_mote]);
+  memset((void *)&QueryPropagationC$nextChild[__nesc_mote], 0, sizeof QueryPropagationC$nextChild[__nesc_mote]);
+  memset((void *)&QueryPropagationC$sendTofather[__nesc_mote], 0, sizeof QueryPropagationC$sendTofather[__nesc_mote]);
+  memset((void *)&QueryPropagationC$query_cancel[__nesc_mote], 0, sizeof QueryPropagationC$query_cancel[__nesc_mote]);
+  memset((void *)&QueryPropagationC$send_qcancelTo_node[__nesc_mote], 0, sizeof QueryPropagationC$send_qcancelTo_node[__nesc_mote]);
+  memset((void *)&QueryPropagationC$count_received_children[__nesc_mote], 0, sizeof QueryPropagationC$count_received_children[__nesc_mote]);
+  memset((void *)&QueryPropagationC$i[__nesc_mote], 0, sizeof QueryPropagationC$i[__nesc_mote]);
+  memset((void *)&QueryPropagationC$t0[__nesc_mote], 0, sizeof QueryPropagationC$t0[__nesc_mote]);
+  memset((void *)&QueryPropagationC$dt[__nesc_mote], 0, sizeof QueryPropagationC$dt[__nesc_mote]);
+  memset((void *)&QueryPropagationC$runningTime[__nesc_mote], 0, sizeof QueryPropagationC$runningTime[__nesc_mote]);
+  memset((void *)&QueryPropagationC$checkTimer[__nesc_mote], 0, sizeof QueryPropagationC$checkTimer[__nesc_mote]);
+  memset((void *)&QueryPropagationC$timerStartAt[__nesc_mote], 0, sizeof QueryPropagationC$timerStartAt[__nesc_mote]);
+  memset((void *)&QueryPropagationC$time4MeasurementStartAt[__nesc_mote], 0, sizeof QueryPropagationC$time4MeasurementStartAt[__nesc_mote]);
+  memset((void *)&QueryPropagationC$minPeriod[__nesc_mote], 0, sizeof QueryPropagationC$minPeriod[__nesc_mote]);
+  memset((void *)&QueryPropagationC$sensor_data[__nesc_mote], 0, sizeof QueryPropagationC$sensor_data[__nesc_mote]);
+  memset((void *)&QueryPropagationC$min[__nesc_mote], 0, sizeof QueryPropagationC$min[__nesc_mote]);
+  memset((void *)&QueryPropagationC$max[__nesc_mote], 0, sizeof QueryPropagationC$max[__nesc_mote]);
+  memset((void *)&QueryPropagationC$average[__nesc_mote], 0, sizeof QueryPropagationC$average[__nesc_mote]);
+  memset((void *)&QueryPropagationC$dtDelay[__nesc_mote], 0, sizeof QueryPropagationC$dtDelay[__nesc_mote]);
   QueryPropagationC$busy[__nesc_mote] = FALSE;
   QueryPropagationC$unicast_busy[__nesc_mote] = FALSE;
   QueryPropagationC$serial_busy[__nesc_mote] = FALSE;
-  memset((void *)&QueryPropagationC$TimeToMeasure[__nesc_mote], 0, sizeof QueryPropagationC$TimeToMeasure[__nesc_mote]);
   memset((void *)&QueryPropagationC$PacketBuffer[__nesc_mote], 0, sizeof QueryPropagationC$PacketBuffer[__nesc_mote]);
   memset((void *)&QueryPropagationC$SamplingPacketBuffer[__nesc_mote], 0, sizeof QueryPropagationC$SamplingPacketBuffer[__nesc_mote]);
+  memset((void *)&QueryPropagationC$StatsSamplingPacketBuffer[__nesc_mote], 0, sizeof QueryPropagationC$StatsSamplingPacketBuffer[__nesc_mote]);
   memset((void *)&QueryPropagationC$AQQ[__nesc_mote], 0, sizeof QueryPropagationC$AQQ[__nesc_mote]);
   memset((void *)&QueryPropagationC$QuerySendersHistory[__nesc_mote], 0, sizeof QueryPropagationC$QuerySendersHistory[__nesc_mote]);
+  memset((void *)&QueryPropagationC$ContributedNodes[__nesc_mote], 0, sizeof QueryPropagationC$ContributedNodes[__nesc_mote]);
+  memset((void *)&QueryPropagationC$TimeToMeasure[__nesc_mote], 0, sizeof QueryPropagationC$TimeToMeasure[__nesc_mote]);
 
   /* Module AMQueueEntryP$0 */
 

@@ -13,6 +13,7 @@ typedef nx_struct ActiveQueryQueue {
 	nx_uint16_t query_lifetime;
 	nx_uint8_t propagation_mode;
 	nx_uint8_t state;
+	//nx_uint16_t remaining_period;
 	nx_uint16_t startDelay;
 	nx_uint16_t WaitingTime;
 	nx_uint16_t RemaingTime;

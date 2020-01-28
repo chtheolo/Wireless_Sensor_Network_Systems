@@ -8,12 +8,13 @@ configuration QueryPropagationAppC
 implementation
 {
 	components MainC, LedsC;
-	components new TimerMilliC() as Timer0;
-	components new TimerMilliC() as Timer1;
-	components new TimerMilliC() as Timer2;
-	components new TimerMilliC() as Timer3;
-	components new TimerMilliC() as Timer4;
-	components new TimerMilliC() as Timer5;
+	components new TimerMilliC() as TimerQueryBroadcast;
+	components new TimerMilliC() as TimerReadSensor;
+	components new TimerMilliC() as TimerSendPCSerial;
+	components new TimerMilliC() as TimerQueryFired;
+	components new TimerMilliC() as TimerReUnicast;
+	components new TimerMilliC() as TimerQueryCancelResponse;
+	components new TimerMilliC() as Timer_StatsUnicast_Unicast;
 	
 	//components new  HamamatsuS1087ParC() as Sensor;
 	components new DemoSensorC() as Sensor;
@@ -36,12 +37,13 @@ implementation
 	App.Leds -> LedsC;
 	App.Read -> Sensor;
 
-	App.Timer0 -> Timer0;
-	App.Timer1 -> Timer1;
-	App.Timer2 -> Timer2;
-	App.Timer3 -> Timer3;
-	App.Timer4 -> Timer4;
-	App.Timer5 -> Timer5;
+	App.TimerQueryBroadcast -> TimerQueryBroadcast;
+	App.TimerReadSensor -> TimerReadSensor;
+	App.TimerSendPCSerial -> TimerSendPCSerial;
+	App.TimerQueryFired -> TimerQueryFired;
+	App.TimerReUnicast -> TimerReUnicast;
+	App.Timer_StatsUnicast_Unicast -> Timer_StatsUnicast_Unicast;
+	App.TimerQueryCancelResponse -> TimerQueryCancelResponse;
 
 	App.SerialReceive -> SerialAMReceiverC;
 	App.SerialPacket -> SerialAMSenderC;

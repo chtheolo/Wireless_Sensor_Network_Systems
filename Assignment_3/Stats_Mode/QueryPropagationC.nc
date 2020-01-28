@@ -87,6 +87,7 @@ implementation
 	uint8_t query_cancel;
 	uint8_t send_qcancelTo_node;
 	uint8_t count_received_children;			/*A counter that informs in every iteration how many children send me a msg.*/
+	uint8_t i;
 
 /*  16-bit  */
 	uint16_t t0,dt;
@@ -302,16 +303,15 @@ implementation
 				s_stats_sampling_pkt->sequence_number = sequence_number;
 				s_stats_sampling_pkt->mode = 1;
 				
-				memcpy(s_stats_sampling_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
-
-				query_pos = 0;
-				while(query_pos < LAST_SENDERS) {
-					if (s_stats_sampling_pkt->contributed_ids[query_pos] == 0) {
-						s_stats_sampling_pkt->contributed_ids[query_pos] = TOS_NODE_ID;
+				start = 0;
+				while(start < LAST_SENDERS) {
+					if (ContributedNodes[start].node_id == 0) {
+						ContributedNodes[start].node_id = TOS_NODE_ID;
 						break;
 					}
-					query_pos++;	
+					start++;
 				}
+				memcpy(s_stats_sampling_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
 				
 				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
 					dbg("BroadcastingC", "Start sending serial packet\n\n ");
@@ -595,7 +595,7 @@ implementation
 		post SendSerial();
 		count_received_children = 0;
 
-		if (number_Of_queries > 1) {  /*>1 because if we have one query it is neccessary*/
+		if (number_Of_queries > 1) {  /*>1 because if we have one query it is not neccessary to find the wait remaining time.*/
 			start = 0;
 			minPeriod = 0;
 			while (start < NUMBER_OF_QUERIES) {
@@ -691,17 +691,15 @@ implementation
 				if (stats_ucast_pkt == NULL) {
 					return;
 				}
-
+				start = 0;
 				while(start < LAST_SENDERS) {
-					if (stats_ucast_pkt->contributed_ids[start] == 0) {
-						stats_ucast_pkt->contributed_ids[start] = TOS_NODE_ID;
+					if (ContributedNodes[start].node_id == 0) {
+						ContributedNodes[start].node_id = TOS_NODE_ID;
 						break;
 					}
 					start++;
 				}
-
-
-				memcpy(&pkt, &StatsSamplingPacketBuffer[stats_sampling_send], sizeof(message_t));
+				memcpy(stats_ucast_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
 
 				if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
 					unicast_busy = TRUE;
@@ -795,12 +793,15 @@ implementation
 				stats_ucast_pkt->destination_id = r_stats_sampling_pkt->destination_id;
 				stats_ucast_pkt->sequence_number = r_stats_sampling_pkt->sequence_number;
 				start = 0;
+				i = 0;
 				while (start < LAST_SENDERS) {
-					if (r_stats_sampling_pkt->contributed_ids[start] != 0) {
-						stats_ucast_pkt->contributed_ids[start] = r_stats_sampling_pkt->contributed_ids[start];
+					if (ContributedNodes[start].node_id == 0) {
+						ContributedNodes[start].node_id = r_stats_sampling_pkt->contributed_ids[i];
+						i++;
 					}
 					start++;
 				}
+				
 				stats_ucast_pkt->mode = 1;
 
 				dtDelay = call Timer_StatsUnicast_Unicast.getNow();
@@ -821,17 +822,17 @@ implementation
 				destination_id = r_stats_sampling_pkt->destination_id;
 				sequence_number = r_stats_sampling_pkt->sequence_number;
 				start = 0;
+				i = 0;
 				while (start < LAST_SENDERS) {
-					if (r_stats_sampling_pkt->contributed_ids[start] != 0) {
-						ContributedNodes[start].node_id = r_stats_sampling_pkt->contributed_ids[start];
+					if (ContributedNodes[start].node_id == 0) {
+						ContributedNodes[start].node_id = r_stats_sampling_pkt->contributed_ids[i];
+						i++;
 					}
 					start++;
 				}
 
-				//memcpy(ContributedNodes, r_stats_sampling_pkt->contributed_ids, LAST_SENDERS * sizeof(nx_uint8_t));
-
 				dtDelay = call TimerSendPCSerial.getNow();
-				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay; /** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
+				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay + 100; /** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
 				AQQ[query_pos].RemaingTime = AQQ[query_pos].WaitingTime;
 
 				/*If i got msg from all my children, stop the timer and procceed to serial transmission*/
