@@ -85,10 +85,10 @@ def receiver(rx_queue):
         elif sampling_msg.mode == 1:
 
             print('TelosB -> PC: ')
-            print('Sampling_Source_Node: ', str(sampling_msg.source_id))
+            # print('Sampling_Source_Node: ', str(sampling_msg.source_id))
             print('Sampling Data_ID: ', str(sampling_msg.data_id))
-            print('Forwarder_id: ', str(sampling_msg.forwarder_id))
-            print('Hops: ', str(sampling_msg.hops))
+            # print('Forwarder_id: ', str(sampling_msg.forwarder_id))
+            # print('Hops: ', str(sampling_msg.hops))
             print('Min: ', str(sampling_msg.min))
             print('Max: ', str(sampling_msg.max))
             print('Average: ', str(sampling_msg.average))

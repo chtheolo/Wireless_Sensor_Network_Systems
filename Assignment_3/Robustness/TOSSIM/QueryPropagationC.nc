@@ -95,6 +95,7 @@ implementation
 	uint8_t mode;
 	uint8_t new_entry_node;
 	uint8_t i;
+	uint8_t number_of_nodes;
 
 /*  16-bit  */
 	uint16_t t0,dt;
@@ -109,6 +110,7 @@ implementation
 	uint16_t average;
 	uint16_t startDelay;
 	uint16_t dtDelay;
+	uint16_t Reception_Delay;
 
 /*  bool  */	
 	bool busy = FALSE;
@@ -186,7 +188,6 @@ implementation
 	}
 /* ------------------------------- Measurement Scheduling -------------------------------- */
 	task void MeasurementScheduling() {
-		call Leds.led1Off();
 		if (call TimerReadSensor.isRunning() == TRUE) {
 			checkTimer = call TimerReadSensor.getNow();
 			runningTime = checkTimer - time4MeasurementStartAt;
@@ -241,6 +242,9 @@ implementation
 				Hold_Waiting_Timer = remindQuery;
 				call TimerSendPCSerial.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
 				AQQ[Hold_Waiting_Timer].startDelay = call TimerSendPCSerial.getNow();
+				
+				//dbg("ReceiveC", "RECEPTION DELAY: %hu \n\n\n", AQQ[Hold_Waiting_Timer].WaitingTime);
+				dbg("ReceiveC", "WAITING_TIME: %hu \n\n\n", AQQ[Hold_Waiting_Timer].WaitingTime);
 			}
 		}
 		else {																						/***** MIDDLE NODE ******/
@@ -265,8 +269,16 @@ implementation
 			}
 			else {																					/** else if the new waiting time calculation is for the same query */
 				Hold_Waiting_Timer = remindQuery;
-				call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+				//dbg("SensorReadingC", "Task Delay -- WaitingTime: %hu , RemaingTime: %hu, @ %s\n\n ", AQQ[Hold_Sampling_Timer].WaitingTime, AQQ[Hold_Sampling_Timer].RemaingTime, sim_time_string());
+				if (AQQ[Hold_Sampling_Timer].number_of_children > 0) {
+					call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime + OFFSET);
+				}
+				else {
+					call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);	
+				}
+			
 				AQQ[Hold_Waiting_Timer].startDelay = call Timer_StatsUnicast_Unicast.getNow();		/* Keep a flag, to remember when you start the clock */
+				dbg("ReceiveC", "WAITING_TIME: %hu \n\n\n", AQQ[Hold_Waiting_Timer].WaitingTime);
 			}
 		}	
 	}
@@ -288,7 +300,7 @@ implementation
 				s_sampling_pkt->mode = 0;
 
 				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (sampling_msg_t)) == SUCCESS){
-					dbg("BroadcastingC", "Start sending serial packet\n\n ");
+					dbg("BroadcastingC", "Sending SERIAL PACKET\n\n");
 					serial_busy = TRUE;
 				}
 
@@ -310,6 +322,7 @@ implementation
 				s_stats_sampling_pkt->destination_id = destination_id;
 				s_stats_sampling_pkt->sequence_number = sequence_number;
 				s_stats_sampling_pkt->mode = 1;
+				s_stats_sampling_pkt->number_of_nodes = number_of_nodes; 
 
 				start = 0;
 				while(start < LAST_SENDERS) {
@@ -320,9 +333,11 @@ implementation
 					start++;
 				}
 				memcpy(s_stats_sampling_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
+
+				//dbg("RadioC", "CONTRIBUTED NODES: %hu\n", s_stats_sampling_pkt->number_of_nodes);
 	
 				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
-					dbg("BroadcastingC", "Start sending serial packet\n\n ");
+					dbg("BroadcastingC", "Sending SERIAL PACKET\n\n");
 					serial_busy = TRUE;
 				}
 			}
@@ -357,7 +372,7 @@ implementation
 			if (ucast_query_cancel == NULL) {
 				return;
 			}
-			dbg("RadioC", "UNICAST QUERY CANCEL CONFIRMATION TRANSMISSION \n SOURCE_ID: %hu, FORWARDER_CANCEL_NODE_ID: %hu, ENTRY_NODE_ID: %hu, DATA_ID: %hu QUERY_ID: %hu \n\n", ucast_query_cancel->source_id, ucast_query_cancel->forwarder_id, send_qcancelTo_node, ucast_query_cancel->data_id, ucast_query_cancel->sequence_number);
+			dbg("RadioC", "UNICAST QUERY CANCEL CONFIRMATION TRANSMISSION \n Node[%hu] ---> Node[%hu] { SOURCE_ID: %hu, FORWARDER_CANCEL_NODE_ID: %hu, Query_cancel_NODE_ID: %hu, SEQ_NUM: %hu QUERY_ID: %hu }\n\n", TOS_NODE_ID, send_qcancelTo_node, ucast_query_cancel->source_id, ucast_query_cancel->forwarder_id, send_qcancelTo_node, ucast_query_cancel->sequence_number, ucast_query_cancel->sequence_number);
 
 			ucast_query_cancel->source_id = AQQ[query_cancel].source_id;
 			ucast_query_cancel->sequence_number = AQQ[query_cancel].sequence_number;
@@ -407,7 +422,7 @@ implementation
 				if (!unicast_busy) {
 					if (call SamplingRadioAMSend.send(new_entry_node, &pkt, sizeof (response_update_msg_t)) == SUCCESS){
 						unicast_busy = TRUE;
-						dbg("RadioC", "UNICAST RESPONSE UPDATE TRANSMISSION \n SOURCE_ID: %hu, FORWARDER_ID: %hu, ENTRY_NODE_ID: %hu, DATA_ID: %hu QUERY_ID: %hu \n\n", ucast_ReUpd->source_id, ucast_ReUpd->forwarder_id, new_entry_node, ucast_ReUpd->data_id, ucast_ReUpd->sequence_number);
+						dbg("RadioC", "UNICAST RESPONSE UPDATE TRANSMISSION \n Node[%hu] ---> Node[%hu] { SOURCE_ID: %hu, FORWARDER_ID: %hu, ENTRY_NODE_ID: %hu, SEQ_NUM: %hu QUERY_ID: %hu }\n\n", TOS_NODE_ID, new_entry_node, ucast_ReUpd->source_id, ucast_ReUpd->forwarder_id, new_entry_node, ucast_ReUpd->sequence_number, ucast_ReUpd->sequence_number);
 						//call Leds.led2On();
 					}
 				}
@@ -447,18 +462,18 @@ implementation
 	event void RadioAMControl.startDone(error_t err) {
 		if (err == SUCCESS) {
 			dbg("RadioC", "RADIO_CONTROL = OK %s.\n", sim_time_string());
-			save = save%SIZE;
-			upd_bcast = (update_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (update_msg_t) ));
-			if (upd_bcast == NULL) {
-				return;
-			}
-			save++;
-
-			upd_bcast->node_id = TOS_NODE_ID;
-			upd_bcast->propagation_mode = 3;								/*Propagation_mode = 3 means that is discover broadcast.*/
-			mode = 3;
-			call Leds.led2On();
-			call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);			/* When boot, send a bcast messaage to learn the network state.*/
+			//save = save%SIZE;
+			//upd_bcast = (update_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (update_msg_t) ));
+			//if (upd_bcast == NULL) {
+			//	return;
+			//}
+			//save++;
+//
+//			//upd_bcast->node_id = TOS_NODE_ID;
+//			//upd_bcast->propagation_mode = 3;								/*Propagation_mode = 3 means that is discover broadcast.*/
+//			//mode = 3;
+//			//call Leds.led2On();
+			//call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);			/* When boot, send a bcast messaage to learn the network state.*/
 		}
 		else {
 			call RadioAMControl.start();
@@ -484,7 +499,7 @@ implementation
 		/** if i am the query message source then save that info to SH the array SendersHistory is used to remember the last 5 last
 		  * nodes that send a query, in order to recognize the new message.
 		  */
-		dbg("BroadcastingC", "BROADCASTING QUERY_ID: %hu ,@ %s.\n", bcast_pkt->sequence_number, sim_time_string());
+		
 		if (TOS_NODE_ID == bcast_pkt->source_id) {
 			start = 0;
 			query_pos = 0;
@@ -506,14 +521,17 @@ implementation
 
 		if (!busy) {
 			memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
+			//dbg("BroadcastingC", "READY TO BROADCAST....\n");
 
-			if (mode == 3) {																				/*mode = 3 update bcast */
+			if (mode == 3) {																						/**BROADCAST UPDATE*/
+				dbg("BroadcastingC", "BROADCASTING UPDATE NODE_ID: %hu,@ %s.\n", TOS_NODE_ID, sim_time_string());																				/*mode = 3 update bcast */
 				if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (update_msg_t)) == SUCCESS){
 					busy = TRUE;
 					call Leds.led1On();
 				}
 			}
 			else if (/*bcast_pkt->propagation_mode*/ mode == 2) {
+				dbg("BroadcastingC", "BROADCASTING QUERY_CANCEL_ID: %hu ,@ %s.\n", query_cancel, sim_time_string());
 				call TimerQueryCancelResponse.startOneShot(AQQ[query_cancel].WaitingTime);				/*Waiting upper bound before resending the query cancel */
 
 				if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (query_cancel_msg_t)) == SUCCESS){
@@ -522,6 +540,11 @@ implementation
 				}
 			}
 			else {
+				bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&pkt, sizeof (query_flooding_msg_t)));
+				if (bcast_pkt == NULL) {
+					return;
+				}
+				dbg("BroadcastingC", "BROADCASTING QUERY_ID: %hu ,@ %s.\n", bcast_pkt->sequence_number, sim_time_string());
 				if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (query_flooding_msg_t)) == SUCCESS){
 					busy = TRUE;
 					call Leds.led1On();
@@ -544,12 +567,14 @@ implementation
 	}
 
 /* -------------------------------------- TimerReadSensor =>  START READING VALUES FROM SENSOR ---------------------------------------- */ 	
-	event void TimerReadSensor.fired() {	
-		/* initiate read op */
-		call Read.read(); 
-		/* if the state == 0 then the query has expired */
+	event void TimerReadSensor.fired() {
+		//dbg("SensorReadingC", "Enter, STATE: %hu \n", AQQ[Hold_Sampling_Timer].state);	
+		
 		if (AQQ[Hold_Sampling_Timer].state == 0) {
 			call TimerReadSensor.stop();
+		}
+		else {
+			call Read.read(); /* initiate read op */
 		}
 	}
 
@@ -572,6 +597,7 @@ implementation
 					sensor_data = data;
 					mode = 0;
 
+
 					call TimerSendPCSerial.startOneShot(20);  // to serial send valto kalutera se ena task
 				}
 				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
@@ -579,7 +605,8 @@ implementation
 					min = data;
 					max = data;
 					average = data;
-					//stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
+					number_of_nodes = 0;
+					number_of_nodes += 1;
 					mode = 1;
 
 					post DelayMeasurementScheduling();
@@ -607,7 +634,7 @@ implementation
 					ucast_pkt->mode = 0;
 					mode = 0;
 
-					call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);  					   // Timer for Unicast Message - TOS_NODE_ID * 20				
+					call Timer_StatsUnicast_Unicast.startOneShot(/*TOS_NODE_ID * */OFFSET);  					   // Timer for Unicast Message - TOS_NODE_ID * 20				
 				}
 				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
 
@@ -628,14 +655,27 @@ implementation
 					stats_ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
 					stats_ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
 					stats_ucast_pkt->mode = 1;
+					stats_ucast_pkt->number_of_nodes = 0;
+					stats_ucast_pkt->number_of_nodes + 1;
+					number_of_nodes = 0;
+					number_of_nodes += 1;
 					mode = 1;//AQQ[Hold_Sampling_Timer].propagation_mode;
 
+					min = data;
+					max = data;
+					average = data;
+					//dbg("SensorReadingC", "Sensor Read -- : MIN: %hu , MAX: %hu , AVERAGE: %hu \n\n", min, max, average);
+
+					//dbg("SensorReadingC", "Sensor WaitingTime -- WaitingTime: %hu , RemaingTime: %hu \n\n", AQQ[Hold_Sampling_Timer].WaitingTime, AQQ[Hold_Sampling_Timer].RemaingTime);
 					post DelayMeasurementScheduling();
 				}
 			}
 			data_id++;
+			//dbg("SensorReadingC", "Sensor Read  -- Data_id: %hu \n", data_id);
 			
 			if (number_Of_queries > 0) {
+
+				//dbg("SensorReadingC", "TIME_TO_MEASURE \n");
 			
 				expiredQuery = Hold_Sampling_Timer; // this points to the expired query sampling period
 				runningTime = TimeToMeasure[expiredQuery];
@@ -659,7 +699,13 @@ implementation
 					}
 					start++;
 				}
-
+				//i = 0;
+				//start = 0;
+				//while(i < LAST_SENDERS) {
+				//	dbg("ReceiveC", "Node_%hu -> AQQ[%hu].children[%hu] = %hu\n\n", TOS_NODE_ID, start, i, AQQ[start].children[i]);	
+				//	i++;
+				//}
+				dbg("SensorReadingC", "TIME_TO_MEASURE[%hu] = %hu \n", Hold_Sampling_Timer, TimeToMeasure[Hold_Sampling_Timer]);
 				call TimerReadSensor.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
 				time4MeasurementStartAt = call TimerReadSensor.getNow();
 			}
@@ -699,7 +745,7 @@ implementation
 
 /* ------------------------------------------- TimerQueryFired => Query_Lifetime END -------------------------------------------------- */ 
 	event void TimerQueryFired.fired() {
-		dbg("QueryC", "The query_%hu expired! @ %s", sim_time_string());
+		dbg("QueryC", "The query_ expired! @ %s\n", sim_time_string());
 		/*Disable the expired query*/
 		number_Of_queries--;
 		AQQ[HoldTimer].state = 0; 
@@ -735,7 +781,7 @@ implementation
 			if (ucast_pkt == NULL) {
 				return;
 			}
-			dbg("RadioC", "RE-UNICAST TRANSMISSION \n SOURCE_ID: %hu, FORWARDER_ID: %hu, FATHER_ID: %hu, DATA_ID: %hu QUERY_ID: %hu \n\n", ucast_pkt->source_id, ucast_pkt->forwarder_id, sendTofather, ucast_pkt->data_id, ucast_pkt->sequence_number);
+			dbg("RadioC", "RE-UNICAST TRANSMISSION \n Node[%hu] ---> Node[%hu] { SOURCE_ID: %hu, FORWARDER_ID: %hu, FATHER_ID: %hu, DATA_ID: %hu QUERY_ID: %hu }\n\n", TOS_NODE_ID, sendTofather, ucast_pkt->source_id, ucast_pkt->forwarder_id, sendTofather, ucast_pkt->data_id, ucast_pkt->sequence_number);
 			memcpy(&pkt, &SamplingPacketBuffer[sampling_send], sizeof(message_t));
 
 			if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (sampling_msg_t)) == SUCCESS){
@@ -754,7 +800,7 @@ implementation
 					return;
 				}
 
-				dbg("RadioC", "UNICAST TRANSMISSION \n SOURCE_ID: %hu, FORWARDER_ID: %hu, FATHER_ID: %hu, DATA_ID: %hu QUERY_ID: %hu \n\n", ucast_pkt->source_id, ucast_pkt->forwarder_id, sendTofather, ucast_pkt->data_id, ucast_pkt->sequence_number);
+				dbg("RadioC", "UNICAST TRANSMISSION \n Node[%hu] ---> Node[%hu] { SOURCE_ID: %hu, FORWARDER_ID: %hu, FATHER_ID: %hu, DATA_ID: %hu QUERY_ID: %hu }\n\n", TOS_NODE_ID, sendTofather, ucast_pkt->source_id, ucast_pkt->forwarder_id, sendTofather, ucast_pkt->data_id, ucast_pkt->sequence_number);
 				memcpy(&pkt, &SamplingPacketBuffer[sampling_send], sizeof(message_t));
 
 				if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (sampling_msg_t)) == SUCCESS){
@@ -768,7 +814,10 @@ implementation
 				if (stats_ucast_pkt == NULL) {
 					return;
 				}
-				dbg("RadioC", "UNICAST TRANSMISSION \n SOURCE_ID: %hu, FORWARDER_ID: %hu, FATHER_ID: %hu, DATA_ID: %hu QUERY_ID: %hu \n\n", stats_ucast_pkt->source_id, stats_ucast_pkt->forwarder_id, sendTofather, stats_ucast_pkt->data_id, stats_ucast_pkt->sequence_number);
+
+				dbg("RadioC", "UNICAST TRANSMISSION -- TSU \n Node[%hu] ---> Node[%hu] { SOURCE_ID: %hu, SAMPLING_ID: %hu, FORWARDER_ID: %hu, FATHER_ID: %hu, QUERY_ID: %hu, DESTINATION_ID: %hu } , @ %s \n\n", TOS_NODE_ID, AQQ[remindQuery].father_node, stats_ucast_pkt->source_id, stats_ucast_pkt->data_id, stats_ucast_pkt->forwarder_id, /*sendTofather*/AQQ[remindQuery].father_node, stats_ucast_pkt->sequence_number, stats_ucast_pkt->destination_id, sim_time_string());
+
+				dbg("RadioC", "NUMBER of Contributed NODES: %hu\n", stats_ucast_pkt->number_of_nodes);
 				start = 0;
 				while(start < LAST_SENDERS) {
 					if (ContributedNodes[start].node_id == 0) {
@@ -779,10 +828,10 @@ implementation
 				}
 				memcpy(stats_ucast_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
 
-
+				dbg("RadioC", "Timer_StatsUnicast_Unicast -- WaitingTime: %hu, RemaingTime: %hu , AQQ[%hu] \n\n", AQQ[remindQuery].WaitingTime, AQQ[remindQuery].RemaingTime, remindQuery);
 				memcpy(&pkt, &StatsSamplingPacketBuffer[stats_sampling_send], sizeof(message_t));
 
-				if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
+				if (call SamplingRadioAMSend.send(/*sendTofather*/AQQ[remindQuery].father_node, &pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
 					unicast_busy = TRUE;
 					call Leds.led2On();
 				}
@@ -794,9 +843,8 @@ implementation
 	event message_t* SamplingRadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof(sampling_msg_t)) {					/** RECEIVE SIMPLE SAMPLING MESSAGE **/
 			r_sampling_pkt = (sampling_msg_t*) payload;
-			dbg("ReceiveC", "Measurement_Sampling Message Received \n");
-			dbg("ReceiveC", "SOURCE_ID: %hu, FORWARDER_ID: %hu, SAMPLING_ID: %hu  QUERY_ID: %hu \n", r_sampling_pkt->source_id, r_sampling_pkt->forwarder_id, r_sampling_pkt->data_id, r_sampling_pkt->sequence_number);
-			dbg("ReceiveC", "Contributed Nodes: %hu \n", r_sampling_pkt->count_contributed_nodes);
+			dbg("ReceiveC", "Measurement_Sampling Message Received \n Node[%hu] <--- Node[%hu] { SOURCE_ID: %hu, QUERY_ID: %hu, FORWARDER_ID: %hu, SAMPLING_ID: %hu } \n\n", TOS_NODE_ID, r_sampling_pkt->forwarder_id, r_sampling_pkt->source_id, r_sampling_pkt->sequence_number, r_sampling_pkt->forwarder_id, r_sampling_pkt->data_id);
+			//dbg("ReceiveC", "Contributed Nodes: %hu \n", r_stats_sampling_pkt->number_of_nodes);
 
 			/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
 			if (r_sampling_pkt->destination_id != TOS_NODE_ID) {
@@ -825,7 +873,7 @@ implementation
 					sendTofather = AQQ[query_pos].forwarder_id;
 				}
 				
-				call TimerReUnicast.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
+				call TimerReUnicast.startOneShot(TOS_NODE_ID * OFFSET); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
 			}
 			else {  /* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
 				source_id = r_sampling_pkt->source_id;
@@ -841,17 +889,21 @@ implementation
 		} 
 		else if (len == sizeof(stats_sampling_msg_t)) {				/** RECEIVE STATS SAMPLING MESSAGE */
 			r_stats_sampling_pkt = (stats_sampling_msg_t*) payload;
-			count_received_children++;
-			dbg("ReceiveC", "Stats_Measurement_Sampling Message Received \n");
-			dbg("ReceiveC", "SOURCE_ID: %hu, FORWARDER_ID: %hu, SAMPLING_ID: %hu  QUERY_ID: %hu \n", r_stats_sampling_pkt->source_id, r_stats_sampling_pkt->forwarder_id, r_stats_sampling_pkt->data_id, r_stats_sampling_pkt->sequence_number);
-			dbg("ReceiveC", "Contributed Nodes: %hu \n", r_stats_sampling_pkt->count_contributed_nodes);
 
+			count_received_children++;
+			dbg("ReceiveC", "Stats_Measurement_Sampling Message Received \n Node[%hu] <--- Node[%hu] { SOURCE_ID: %hu, QUERY_ID: %hu, FORWARDER_ID: %hu, SAMPLING_ID: %hu }\n\n",TOS_NODE_ID, r_stats_sampling_pkt->forwarder_id, r_stats_sampling_pkt->source_id, r_stats_sampling_pkt->sequence_number, r_stats_sampling_pkt->forwarder_id, r_stats_sampling_pkt->data_id);
+			//dbg("ReceiveC", "Count number of children: %hu \n", count_received_children);
+
+			//dbg("ReceiveC", "Contributed Nodes: %hu \n", r_stats_sampling_pkt->number_of_nodes);
+
+			//dbg("ReceiveC", "Receive Stats -- : MIN: %hu , MAX: %hu , AVERAGE: %hu \n", r_stats_sampling_pkt->min, r_stats_sampling_pkt->max, r_stats_sampling_pkt->average);
 			if (min > r_stats_sampling_pkt->min) {
 				min = r_stats_sampling_pkt->min;
 			}
 			if (max < r_stats_sampling_pkt->max) {
 				max = r_stats_sampling_pkt->max;
 			}
+			//dbg("ReceiveC", "Aggregated Stats -- : MIN: %hu , MAX: %hu , AVERAGE: %hu \n", min, max, average);
 
 			query_pos = 0;
 			while (query_pos < NUMBER_OF_QUERIES) {
@@ -865,12 +917,11 @@ implementation
 			/** If MIDDLE NODE then RE-UNICAST to my father. */
 			if (r_stats_sampling_pkt->destination_id != TOS_NODE_ID) {
 
-				stats_sampling_save = stats_sampling_save%SIZE;
-				stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_save], sizeof (stats_sampling_msg_t)));
+				stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_send], sizeof (stats_sampling_msg_t)));
 				if (stats_ucast_pkt == NULL) {
 					return;
 				}
-				stats_sampling_save++;
+
 	 
 				stats_ucast_pkt->source_id = r_stats_sampling_pkt->source_id;
 				stats_ucast_pkt->data_id = r_stats_sampling_pkt->data_id;
@@ -881,6 +932,8 @@ implementation
 				stats_ucast_pkt->average = average;
 				stats_ucast_pkt->destination_id = r_stats_sampling_pkt->destination_id;
 				stats_ucast_pkt->sequence_number = r_stats_sampling_pkt->sequence_number;
+				stats_ucast_pkt->number_of_nodes = r_stats_sampling_pkt->number_of_nodes+ 1;
+				number_of_nodes = r_stats_sampling_pkt->number_of_nodes + 1;
 				mode = 1;
 
 				start = 0;
@@ -897,12 +950,14 @@ implementation
 				dtDelay = call Timer_StatsUnicast_Unicast.getNow();
 				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay;	/** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
 				AQQ[query_pos].RemaingTime = AQQ[query_pos].WaitingTime;
+				dbg("ReceiveC", "WaitingTime: %hu \n RemaingTime: %hu \n", AQQ[query_pos].WaitingTime, AQQ[query_pos].RemaingTime);
 
 				/*If i got msg from all my children, stop the timer and procceed to ucast transmission*/
 				if (count_received_children == AQQ[query_pos].number_of_children) { 
 					call Timer_StatsUnicast_Unicast.stop();
-					call Timer_StatsUnicast_Unicast.startOneShot(20);
+					call Timer_StatsUnicast_Unicast.startOneShot(/*TOS_NODE_ID **/ OFFSET);
 				}
+
 
 			}
 			else { 			/*If ORIGINATOR NODE, then send to serial*/
@@ -911,6 +966,7 @@ implementation
 				forwarder_id = r_stats_sampling_pkt->forwarder_id;
 				destination_id = r_stats_sampling_pkt->destination_id;
 				sequence_number = r_stats_sampling_pkt->sequence_number;
+				number_of_nodes = r_stats_sampling_pkt->number_of_nodes++;
 				mode = 1;
 
 				start = 0;
@@ -924,14 +980,15 @@ implementation
 				}
 
 				dtDelay = call TimerSendPCSerial.getNow();
-				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay + 100; /** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
+				AQQ[query_pos].WaitingTime = dtDelay - AQQ[query_pos].startDelay ; /** +200 query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
 				AQQ[query_pos].RemaingTime = AQQ[query_pos].WaitingTime;
-
+				dbg("ReceiveC", "WaitingTime: %hu \n RemaingTime: %hu \n", AQQ[query_pos].WaitingTime, AQQ[query_pos].RemaingTime);
 				/*If i got msg from all my children, stop the timer and procceed to serial transmission*/
 				if (count_received_children == AQQ[query_pos].number_of_children) { 
 					call TimerSendPCSerial.stop();
-					call TimerSendPCSerial.startOneShot(20);
+					call TimerSendPCSerial.startOneShot(0);
 				}
+				Reception_Delay = AQQ[query_pos].WaitingTime;
 			}
 		}
 		else if (len == sizeof(query_cancel_msg_t)) {					/*RECEIVE QUERY CANCEL MESSAGE*/
@@ -1110,24 +1167,24 @@ implementation
 				}	
 			} /** If i have reveived that msg before, i try to find if this msg belongs to a child node */
 			else if (r_pkt->sequence_number == QuerySendersHistory[query_pos].sequence_number && query_pos < NUMBER_OF_QUERIES) {
-				/* Find if that query is active on my system. */
+				/* Find if that query is active on my system and check if the node that send that message has hop number bigger than mine.*/
 				start = 0;
 				while (start < NUMBER_OF_QUERIES) {
-					if (AQQ[start].source_id == r_pkt->source_id && AQQ[start].sequence_number == r_pkt->sequence_number){
-						AQQ[start].WaitingTime = AQQ[start].sampling_period - 1000 ;				/*And set for that query an upper bound for waiting time. */
-						AQQ[start].RemaingTime = AQQ[start].WaitingTime;
-						AQQ[start].number_of_children++;
+					if (AQQ[start].source_id == r_pkt->source_id && AQQ[start].sequence_number == r_pkt->sequence_number && AQQ[start].hops == r_pkt->hops -1){
+						if (r_pkt->father_node == TOS_NODE_ID) {	/* if this node that send me a bcast, has chosen me as his father, then save him in my child list. */
+							AQQ[start].WaitingTime = AQQ[start].sampling_period - 1000 ;				/*And set for that query an upper bound for waiting time. */
+							AQQ[start].RemaingTime = AQQ[start].WaitingTime;
+							AQQ[start].number_of_children++;
+							dbg("ReceiveC", "NODE_ID: %hu, NUMBER_OF_CHILDREN: %hu \n\n\n", TOS_NODE_ID, AQQ[start].number_of_children);
+							nextChild = nextChild%LAST_SENDERS;
+							AQQ[start].children[nextChild] = r_pkt->forwarder_id;
+							nextChild++;
+						} 
 						break;
 					}
 					start++;
 				}
-
-				if (r_pkt->father_node == TOS_NODE_ID) {	/* if this node that send me a bcast, has chosen me as his father, then save him in my child list. */
-					nextChild = nextChild%LAST_SENDERS;
-					AQQ[start].children[nextChild] = r_pkt->forwarder_id;
-					nextChild++;
-				} 
-			}
+			}		
 		}
 		else if (len == sizeof(query_cancel_msg_t)) {
 			rcv_query_cacnel = (query_cancel_msg_t*) payload;
@@ -1163,6 +1220,7 @@ implementation
 		else if (len == sizeof(update_msg_t)) {				/*UPDATE NEW NODE ENTRY MESSAGE*/
 			rcv_bcast_upd = (update_msg_t*) payload;
 
+			dbg("ReceiveC", "Update Received from NODE_ID: %hu \n", rcv_bcast_upd->node_id);
 			new_entry_node = rcv_bcast_upd->node_id;
 			if (number_Of_queries > 0) {
 				call Leds.led2On();
@@ -1180,7 +1238,7 @@ implementation
 			if (number_Of_queries < NUMBER_OF_QUERIES) {
 				number_Of_queries++;
 				sequence_number++; // seq_num
-				dbg("ReceiveC", "Serial Received QUERY_ID: %hu ,@ %s \n\n", sequence_number, sim_time_string());
+				dbg("ReceiveC", "Serial Received QUERY_ID: %hu , Sampling_Period: %hu, Query_Lifetime: %hu, Propagation_Mode: %hu ,@ %s \n\n", sequence_number, s_pkt->sampling_period, s_pkt->query_lifetime, s_pkt->propagation_mode, sim_time_string());
 
 				query_pos = 0;
 				while(AQQ[query_pos].state == 1 && query_pos < NUMBER_OF_QUERIES) {
@@ -1199,6 +1257,7 @@ implementation
 				AQQ[query_pos].WaitingTime = OFFSET;
 				AQQ[query_pos].RemaingTime = OFFSET;
 				AQQ[query_pos].state = 1;
+				dbg("ReceiveC", "Serial Received QUERY_ID: %hu , FORWARDER_ID: %hu ,@ %s \n\n", AQQ[query_pos].sequence_number, AQQ[query_pos].forwarder_id, sim_time_string());
 
 				sendQuery = query_pos;
 				post QueryScheduling();
@@ -1264,7 +1323,7 @@ implementation
 			call Leds.led1Off(); // yellow
 			call Leds.led2Off();
 			send++;
-			if (send > SIZE) {
+			if (send >= SIZE) {
 				send = 0;
 			}
 		}		
@@ -1277,13 +1336,13 @@ implementation
 			call Leds.led2Off(); // blue
 			if (AQQ[remindQuery].propagation_mode == 0) {
 				sampling_send++;
-				if (sampling_send > SIZE) {
+				if (sampling_send >= SIZE) {
 					sampling_send = 0;
 				}
 			}
 			else if (AQQ[remindQuery].propagation_mode == 1) {
 				stats_sampling_send++;
-				if (stats_sampling_send > SIZE) {
+				if (stats_sampling_send >=SIZE) {
 					stats_sampling_send = 0;
 				}
 			}	
@@ -1296,6 +1355,7 @@ implementation
 		if (&serial_pkt == msg) {
 			serial_busy = FALSE;
 			dbg("BroadcastingC", "Serial message Done\n\n");
+			//dbg("ReceiveC", "RECEPTION DELAY: %hu \n\n", Reception_Delay);
 		}
 		post init_ContributedNodes();
 	}

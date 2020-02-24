@@ -3721,13 +3721,13 @@ static void CC2420SpiP__SpiResource__granted(void );
 # 63 "/opt/tinyos-2.1.2/tos/chips/cc2420/interfaces/CC2420Ram.nc"
 static cc2420_status_t CC2420SpiP__Ram__write(
 # 47 "/opt/tinyos-2.1.2/tos/chips/cc2420/spi/CC2420SpiP.nc"
-uint16_t arg_0x40f6f280, 
+uint16_t arg_0x40f6e280, 
 # 63 "/opt/tinyos-2.1.2/tos/chips/cc2420/interfaces/CC2420Ram.nc"
 uint8_t offset, uint8_t * data, uint8_t length);
 # 55 "/opt/tinyos-2.1.2/tos/chips/cc2420/interfaces/CC2420Register.nc"
 static cc2420_status_t CC2420SpiP__Reg__read(
 # 48 "/opt/tinyos-2.1.2/tos/chips/cc2420/spi/CC2420SpiP.nc"
-uint8_t arg_0x40f6fa28, 
+uint8_t arg_0x40f6ea28, 
 # 55 "/opt/tinyos-2.1.2/tos/chips/cc2420/interfaces/CC2420Register.nc"
 uint16_t *data);
 
@@ -3739,7 +3739,7 @@ uint16_t *data);
 
 static cc2420_status_t CC2420SpiP__Reg__write(
 # 48 "/opt/tinyos-2.1.2/tos/chips/cc2420/spi/CC2420SpiP.nc"
-uint8_t arg_0x40f6fa28, 
+uint8_t arg_0x40f6ea28, 
 # 63 "/opt/tinyos-2.1.2/tos/chips/cc2420/interfaces/CC2420Register.nc"
 uint16_t data);
 # 120 "/opt/tinyos-2.1.2/tos/interfaces/Resource.nc"
@@ -7763,26 +7763,26 @@ enum QueryPropagationC____nesc_unnamed4354 {
 };
 #line 274
 typedef int QueryPropagationC____nesc_sillytask_SendSerial[QueryPropagationC__SendSerial];
-#line 343
+#line 332
 enum QueryPropagationC____nesc_unnamed4355 {
-#line 343
+#line 332
   QueryPropagationC__QueryCancel = 15U
 };
-#line 343
+#line 332
 typedef int QueryPropagationC____nesc_sillytask_QueryCancel[QueryPropagationC__QueryCancel];
-#line 365
+#line 354
 enum QueryPropagationC____nesc_unnamed4356 {
-#line 365
+#line 354
   QueryPropagationC__QueryCancelConfirmation = 16U
 };
-#line 365
+#line 354
 typedef int QueryPropagationC____nesc_sillytask_QueryCancelConfirmation[QueryPropagationC__QueryCancelConfirmation];
-#line 384
+#line 373
 enum QueryPropagationC____nesc_unnamed4357 {
-#line 384
+#line 373
   QueryPropagationC__FindQueryAndSend = 17U
 };
-#line 384
+#line 373
 typedef int QueryPropagationC____nesc_sillytask_FindQueryAndSend[QueryPropagationC__FindQueryAndSend];
 #line 56
 response_update_msg_t *QueryPropagationC__ucast_ReUpd;
@@ -7911,17 +7911,17 @@ static inline void QueryPropagationC__MeasurementScheduling__runTask(void );
 static inline void QueryPropagationC__DelayMeasurementScheduling__runTask(void );
 #line 274
 static inline void QueryPropagationC__SendSerial__runTask(void );
-#line 343
+#line 332
 static inline void QueryPropagationC__QueryCancel__runTask(void );
-#line 365
+#line 354
 static inline void QueryPropagationC__QueryCancelConfirmation__runTask(void );
-#line 384
+#line 373
 static inline void QueryPropagationC__FindQueryAndSend__runTask(void );
-#line 429
+#line 418
 static inline void QueryPropagationC__Boot__booted(void );
-#line 456
+#line 445
 static inline void QueryPropagationC__RadioAMControl__startDone(error_t err);
-#line 477
+#line 466
 static inline void QueryPropagationC__RadioAMControl__stopDone(error_t err);
 
 
@@ -7938,9 +7938,9 @@ static inline void QueryPropagationC__SerialAMControl__stopDone(error_t err);
 
 
 static inline void QueryPropagationC__TimerQueryBroadcast__fired(void );
-#line 541
+#line 530
 static inline void QueryPropagationC__TimerQueryCancelResponse__fired(void );
-#line 555
+#line 545
 static inline void QueryPropagationC__TimerReadSensor__fired(void );
 
 
@@ -7952,25 +7952,25 @@ static inline void QueryPropagationC__TimerReadSensor__fired(void );
 
 
 static void QueryPropagationC__Read__readDone(error_t result, uint16_t data);
-#line 678
+#line 671
 static inline void QueryPropagationC__TimerSendPCSerial__fired(void );
-#line 709
+#line 702
 static inline void QueryPropagationC__TimerQueryFired__fired(void );
-#line 740
+#line 733
 static inline void QueryPropagationC__TimerReUnicast__fired(void );
-#line 757
+#line 750
 static inline void QueryPropagationC__Timer_StatsUnicast_Unicast__fired(void );
-#line 801
+#line 794
 static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(message_t *msg, void *payload, uint8_t len);
-#line 1052
+#line 1035
 static inline message_t *QueryPropagationC__RadioReceive__receive(message_t *msg, void *payload, uint8_t len);
-#line 1190
+#line 1172
 static inline message_t *QueryPropagationC__SerialReceive__receive(message_t *msg, void *payload, uint8_t len);
-#line 1273
+#line 1256
 static void QueryPropagationC__RadioAMSend__sendDone(message_t *msg, error_t err);
-#line 1286
+#line 1269
 static void QueryPropagationC__SamplingRadioAMSend__sendDone(message_t *msg, error_t err);
-#line 1308
+#line 1291
 static inline void QueryPropagationC__SerialAMSend__sendDone(message_t *msg, error_t err);
 # 113 "/opt/tinyos-2.1.2/tos/interfaces/SplitControl.nc"
 static void CC2420CsmaP__SplitControl__startDone(error_t error);
@@ -17256,9 +17256,9 @@ inline static error_t QueryPropagationC__init_ContributedNodes__postTask(void ){
 #line 67
 }
 #line 67
-# 1308 "QueryPropagationC.nc"
+# 1291 "QueryPropagationC.nc"
 static inline void QueryPropagationC__SerialAMSend__sendDone(message_t *msg, error_t err)
-#line 1308
+#line 1291
 {
   if (&QueryPropagationC__serial_pkt == msg) {
       QueryPropagationC__serial_busy = FALSE;
@@ -18436,9 +18436,9 @@ inline static error_t QueryPropagationC__QueryScheduling__postTask(void ){
 #line 67
 }
 #line 67
-# 1190 "QueryPropagationC.nc"
+# 1172 "QueryPropagationC.nc"
 static inline message_t *QueryPropagationC__SerialReceive__receive(message_t *msg, void *payload, uint8_t len)
-#line 1190
+#line 1172
 {
   if (len == sizeof(query_msg_t )) {
       QueryPropagationC__s_pkt = (query_msg_t *)payload;
@@ -18492,7 +18492,7 @@ static inline message_t *QueryPropagationC__SerialReceive__receive(message_t *ms
         }
     }
   else {
-#line 1242
+#line 1224
     if (len == sizeof(query_cancel_msg_t )) {
         QueryPropagationC__srl_query_cancel = (query_cancel_msg_t *)payload;
 
@@ -18501,27 +18501,28 @@ static inline message_t *QueryPropagationC__SerialReceive__receive(message_t *ms
             while (QueryPropagationC__query_pos < 3) {
                 if (__nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__query_pos].source_id.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__srl_query_cancel->source_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__query_pos].sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__srl_query_cancel->sequence_number.nxdata) && __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__query_pos].state.nxdata) == 1) {
                     QueryPropagationC__query_cancel = QueryPropagationC__query_pos;
+                    QueryPropagationC__QueryCancel__postTask();
+
+                    QueryPropagationC__save = QueryPropagationC__save % 10;
+                    QueryPropagationC__bcast_query_cancel = (query_cancel_msg_t *)QueryPropagationC__Packet__getPayload(&QueryPropagationC__PacketBuffer[QueryPropagationC__save], sizeof(query_cancel_msg_t ));
+                    if (QueryPropagationC__bcast_query_cancel == (void *)0) {
+                        return;
+                      }
+                    QueryPropagationC__save++;
+
+                    __nesc_hton_uint8(QueryPropagationC__bcast_pkt->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC__srl_query_cancel->source_id.nxdata));
+                    __nesc_hton_uint8(QueryPropagationC__bcast_pkt->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC__srl_query_cancel->sequence_number.nxdata));
+                    __nesc_hton_uint8(QueryPropagationC__bcast_pkt->propagation_mode.nxdata, __nesc_ntoh_uint8(QueryPropagationC__srl_query_cancel->propagation_mode.nxdata));
+                    __nesc_hton_uint8(QueryPropagationC__bcast_pkt->forwarder_id.nxdata, TOS_NODE_ID);
+                    QueryPropagationC__mode = 2;
                     break;
                   }
+                QueryPropagationC__query_pos++;
               }
           }
-        QueryPropagationC__QueryCancel__postTask();
-
-        QueryPropagationC__save = QueryPropagationC__save % 10;
-        QueryPropagationC__bcast_query_cancel = (query_cancel_msg_t *)QueryPropagationC__Packet__getPayload(&QueryPropagationC__PacketBuffer[QueryPropagationC__save], sizeof(query_cancel_msg_t ));
-        if (QueryPropagationC__bcast_query_cancel == (void *)0) {
-            return;
-          }
-        QueryPropagationC__save++;
-
-        __nesc_hton_uint8(QueryPropagationC__bcast_pkt->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC__srl_query_cancel->source_id.nxdata));
-        __nesc_hton_uint8(QueryPropagationC__bcast_pkt->sequence_number.nxdata, __nesc_ntoh_uint8(QueryPropagationC__srl_query_cancel->sequence_number.nxdata));
-        __nesc_hton_uint8(QueryPropagationC__bcast_pkt->propagation_mode.nxdata, __nesc_ntoh_uint8(QueryPropagationC__srl_query_cancel->propagation_mode.nxdata));
-        __nesc_hton_uint8(QueryPropagationC__bcast_pkt->forwarder_id.nxdata, TOS_NODE_ID);
-        QueryPropagationC__mode = 2;
       }
     }
-#line 1269
+#line 1252
   return msg;
 }
 
@@ -18684,9 +18685,9 @@ static inline void /*SerialDispatcherC.SerialDispatcherP*/SerialDispatcherP__0__
     __nesc_atomic_end(__nesc_atomic); }
 }
 
-# 489 "QueryPropagationC.nc"
+# 478 "QueryPropagationC.nc"
 static inline void QueryPropagationC__SerialAMControl__stopDone(error_t err)
-#line 489
+#line 478
 {
 }
 
@@ -19138,9 +19139,9 @@ inline static error_t QueryPropagationC__SerialAMControl__start(void ){
 #line 104
 }
 #line 104
-# 480 "QueryPropagationC.nc"
+# 469 "QueryPropagationC.nc"
 static inline void QueryPropagationC__SerialAMControl__startDone(error_t err)
-#line 480
+#line 469
 {
   if (err == SUCCESS) {
       ;
@@ -21039,14 +21040,14 @@ inline static error_t QueryPropagationC__QueryCancelConfirmation__postTask(void 
 #line 67
 }
 #line 67
-# 1052 "QueryPropagationC.nc"
+# 1035 "QueryPropagationC.nc"
 static inline message_t *QueryPropagationC__RadioReceive__receive(message_t *msg, void *payload, uint8_t len)
-#line 1052
+#line 1035
 {
   unsigned char __nesc_temp47;
   unsigned char *__nesc_temp46;
 
-#line 1053
+#line 1036
   if (len == sizeof(query_flooding_msg_t )) {
       QueryPropagationC__r_pkt = (query_flooding_msg_t *)payload;
 
@@ -21119,30 +21120,29 @@ static inline message_t *QueryPropagationC__RadioReceive__receive(message_t *msg
             }
         }
       else {
-#line 1124
+#line 1107
         if (__nesc_ntoh_uint8(QueryPropagationC__r_pkt->sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__QuerySendersHistory[QueryPropagationC__query_pos].sequence_number.nxdata) && QueryPropagationC__query_pos < 3) {
 
             QueryPropagationC__start = 0;
             while (QueryPropagationC__start < 3) {
-                if (__nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__start].source_id.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__r_pkt->source_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__start].sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__r_pkt->sequence_number.nxdata)) {
-                    __nesc_hton_uint16(QueryPropagationC__AQQ[QueryPropagationC__start].WaitingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__start].sampling_period.nxdata) - 1000);
-                    __nesc_hton_uint16(QueryPropagationC__AQQ[QueryPropagationC__start].RemaingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__start].WaitingTime.nxdata));
-                    (__nesc_temp46 = QueryPropagationC__AQQ[QueryPropagationC__start].number_of_children.nxdata, __nesc_hton_uint8(__nesc_temp46, (__nesc_temp47 = __nesc_ntoh_uint8(__nesc_temp46)) + 1), __nesc_temp47);
+                if (__nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__start].source_id.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__r_pkt->source_id.nxdata) && __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__start].sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__r_pkt->sequence_number.nxdata) && __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__start].hops.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__r_pkt->hops.nxdata) - 1) {
+                    if (__nesc_ntoh_uint8(QueryPropagationC__r_pkt->father_node.nxdata) == TOS_NODE_ID) {
+                        __nesc_hton_uint16(QueryPropagationC__AQQ[QueryPropagationC__start].WaitingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__start].sampling_period.nxdata) - 1000);
+                        __nesc_hton_uint16(QueryPropagationC__AQQ[QueryPropagationC__start].RemaingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__start].WaitingTime.nxdata));
+                        (__nesc_temp46 = QueryPropagationC__AQQ[QueryPropagationC__start].number_of_children.nxdata, __nesc_hton_uint8(__nesc_temp46, (__nesc_temp47 = __nesc_ntoh_uint8(__nesc_temp46)) + 1), __nesc_temp47);
+                        QueryPropagationC__nextChild = QueryPropagationC__nextChild % 5;
+                        __nesc_hton_uint8(QueryPropagationC__AQQ[QueryPropagationC__start].children[QueryPropagationC__nextChild].nxdata, __nesc_ntoh_uint8(QueryPropagationC__r_pkt->forwarder_id.nxdata));
+                        QueryPropagationC__nextChild++;
+                      }
                     break;
                   }
                 QueryPropagationC__start++;
-              }
-
-            if (__nesc_ntoh_uint8(QueryPropagationC__r_pkt->father_node.nxdata) == TOS_NODE_ID) {
-                QueryPropagationC__nextChild = QueryPropagationC__nextChild % 5;
-                __nesc_hton_uint8(QueryPropagationC__AQQ[QueryPropagationC__start].children[QueryPropagationC__nextChild].nxdata, __nesc_ntoh_uint8(QueryPropagationC__r_pkt->forwarder_id.nxdata));
-                QueryPropagationC__nextChild++;
               }
           }
         }
     }
   else {
-#line 1144
+#line 1126
     if (len == sizeof(query_cancel_msg_t )) {
         QueryPropagationC__rcv_query_cacnel = (query_cancel_msg_t *)payload;
 
@@ -21176,7 +21176,7 @@ static inline message_t *QueryPropagationC__RadioReceive__receive(message_t *msg
         QueryPropagationC__QueryCancelConfirmation__postTask();
       }
     else {
-#line 1176
+#line 1158
       if (len == sizeof(update_msg_t )) {
           QueryPropagationC__rcv_bcast_upd = (update_msg_t *)payload;
 
@@ -21188,7 +21188,7 @@ static inline message_t *QueryPropagationC__RadioReceive__receive(message_t *msg
         }
       }
     }
-#line 1186
+#line 1168
   return msg;
 }
 
@@ -21342,9 +21342,9 @@ inline static void QueryPropagationC__TimerReUnicast__startOneShot(uint32_t dt){
 #line 73
 }
 #line 73
-# 801 "QueryPropagationC.nc"
+# 794 "QueryPropagationC.nc"
 static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(message_t *msg, void *payload, uint8_t len)
-#line 801
+#line 794
 {
   if (len == sizeof(sampling_msg_t )) {
       QueryPropagationC__r_sampling_pkt = (sampling_msg_t *)payload;
@@ -21391,7 +21391,7 @@ static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(messag
         }
     }
   else {
-#line 846
+#line 839
     if (len == sizeof(stats_sampling_msg_t )) {
         QueryPropagationC__r_stats_sampling_pkt = (stats_sampling_msg_t *)payload;
         QueryPropagationC__count_received_children++;
@@ -21415,12 +21415,12 @@ static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(messag
 
         if (__nesc_ntoh_uint8(QueryPropagationC__r_stats_sampling_pkt->destination_id.nxdata) != TOS_NODE_ID) {
 
-            QueryPropagationC__stats_sampling_save = QueryPropagationC__stats_sampling_save % 10;
-            QueryPropagationC__stats_ucast_pkt = (stats_sampling_msg_t *)QueryPropagationC__SamplingAMPacket__getPayload(&QueryPropagationC__StatsSamplingPacketBuffer[QueryPropagationC__stats_sampling_save], sizeof(stats_sampling_msg_t ));
+
+            QueryPropagationC__stats_ucast_pkt = (stats_sampling_msg_t *)QueryPropagationC__SamplingAMPacket__getPayload(&QueryPropagationC__StatsSamplingPacketBuffer[QueryPropagationC__stats_sampling_send], sizeof(stats_sampling_msg_t ));
             if (QueryPropagationC__stats_ucast_pkt == (void *)0) {
                 return;
               }
-            QueryPropagationC__stats_sampling_save++;
+
 
             __nesc_hton_uint8(QueryPropagationC__stats_ucast_pkt->source_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC__r_stats_sampling_pkt->source_id.nxdata));
             __nesc_hton_uint8(QueryPropagationC__stats_ucast_pkt->data_id.nxdata, __nesc_ntoh_uint8(QueryPropagationC__r_stats_sampling_pkt->data_id.nxdata));
@@ -21472,20 +21472,20 @@ static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(messag
                   }
                 QueryPropagationC__start++;
               }
-#line 937
+
             QueryPropagationC__dtDelay = QueryPropagationC__TimerSendPCSerial__getNow();
-            __nesc_hton_uint16(QueryPropagationC__AQQ[QueryPropagationC__query_pos].WaitingTime.nxdata, QueryPropagationC__dtDelay - __nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__query_pos].startDelay.nxdata) + 100);
+            __nesc_hton_uint16(QueryPropagationC__AQQ[QueryPropagationC__query_pos].WaitingTime.nxdata, QueryPropagationC__dtDelay - __nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__query_pos].startDelay.nxdata) + 200);
             __nesc_hton_uint16(QueryPropagationC__AQQ[QueryPropagationC__query_pos].RemaingTime.nxdata, __nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__query_pos].WaitingTime.nxdata));
 
 
             if (QueryPropagationC__count_received_children == __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__query_pos].number_of_children.nxdata)) {
                 QueryPropagationC__TimerSendPCSerial__stop();
-                QueryPropagationC__TimerSendPCSerial__startOneShot(20);
+                QueryPropagationC__TimerSendPCSerial__startOneShot(200);
               }
           }
       }
     else {
-#line 948
+#line 931
       if (len == sizeof(query_cancel_msg_t )) {
           QueryPropagationC__rcv_query_cacnel = (query_cancel_msg_t *)payload;
 
@@ -21504,7 +21504,7 @@ static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(messag
             }
         }
       else {
-#line 965
+#line 948
         if (len == sizeof(response_update_msg_t )) {
             QueryPropagationC__ucast_ReUpd = (response_update_msg_t *)payload;
             QueryPropagationC__Leds__led1On();
@@ -21576,7 +21576,7 @@ static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(messag
                     QueryPropagationC__mode = __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__sendQuery].propagation_mode.nxdata);
                   }
                 else {
-#line 1035
+#line 1018
                   if (__nesc_ntoh_uint8(QueryPropagationC__ucast_ReUpd->sequence_number.nxdata) == __nesc_ntoh_uint8(QueryPropagationC__QuerySendersHistory[QueryPropagationC__query_pos].sequence_number.nxdata) && QueryPropagationC__query_pos < 3) {
                       QueryPropagationC__start = 0;
                       while (QueryPropagationC__start < 3) {
@@ -21594,7 +21594,7 @@ static inline message_t *QueryPropagationC__SamplingRadioReceive__receive(messag
         }
       }
     }
-#line 1048
+#line 1031
   return msg;
 }
 
@@ -24177,9 +24177,9 @@ static inline void CC2420CsmaP__sendDone_task__runTask(void )
   CC2420CsmaP__Send__sendDone(CC2420CsmaP__m_msg, packetErr);
 }
 
-# 477 "QueryPropagationC.nc"
+# 466 "QueryPropagationC.nc"
 static inline void QueryPropagationC__RadioAMControl__stopDone(error_t err)
-#line 477
+#line 466
 {
 }
 
@@ -24213,9 +24213,9 @@ inline static error_t QueryPropagationC__RadioAMControl__start(void ){
 #line 104
 }
 #line 104
-# 456 "QueryPropagationC.nc"
+# 445 "QueryPropagationC.nc"
 static inline void QueryPropagationC__RadioAMControl__startDone(error_t err)
-#line 456
+#line 445
 {
   if (err == SUCCESS) {
       ;
@@ -24606,9 +24606,9 @@ inline static error_t QueryPropagationC__SamplingRadioAMSend__send(am_addr_t add
 #line 80
 }
 #line 80
-# 384 "QueryPropagationC.nc"
+# 373 "QueryPropagationC.nc"
 static inline void QueryPropagationC__FindQueryAndSend__runTask(void )
-#line 384
+#line 373
 {
   QueryPropagationC__query_pos = 0;
   while (QueryPropagationC__query_pos < 3) {
@@ -24696,9 +24696,9 @@ inline static void /*AMQueueP.AMQueueImplP*/AMQueueImplP__0__Packet__setPayloadL
 #line 94
 }
 #line 94
-# 365 "QueryPropagationC.nc"
+# 354 "QueryPropagationC.nc"
 static inline void QueryPropagationC__QueryCancelConfirmation__runTask(void )
-#line 365
+#line 354
 {
   if (!QueryPropagationC__unicast_busy) {
       QueryPropagationC__ucast_query_cancel = (query_cancel_msg_t *)QueryPropagationC__SamplingAMPacket__getPayload(&QueryPropagationC__pkt, sizeof(query_cancel_msg_t ));
@@ -24788,9 +24788,9 @@ inline static void QueryPropagationC__TimerQueryFired__stop(void ){
 #line 78
 }
 #line 78
-# 343 "QueryPropagationC.nc"
+# 332 "QueryPropagationC.nc"
 static inline void QueryPropagationC__QueryCancel__runTask(void )
-#line 343
+#line 332
 {
   if (QueryPropagationC__HoldTimer == QueryPropagationC__query_cancel) {
       QueryPropagationC__checkTimer = QueryPropagationC__TimerQueryFired__getNow();
@@ -24895,7 +24895,7 @@ static inline void QueryPropagationC__SendSerial__runTask(void )
                 QueryPropagationC__start++;
               }
             memcpy(QueryPropagationC__s_stats_sampling_pkt->contributed_ids, QueryPropagationC__ContributedNodes, 5 * sizeof(nx_uint8_t ));
-#line 335
+
             if (QueryPropagationC__SerialAMSend__send(AM_BROADCAST_ADDR, &QueryPropagationC__serial_pkt, sizeof(stats_sampling_msg_t )) == SUCCESS) {
                 ;
                 QueryPropagationC__serial_busy = TRUE;
@@ -25113,28 +25113,11 @@ inline static bool QueryPropagationC__TimerReadSensor__isRunning(void ){
 #line 92
 }
 #line 92
-# 94 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
-static inline void LedsP__Leds__led1Off(void )
-#line 94
-{
-  LedsP__Led1__set();
-  ;
-#line 96
-  ;
-}
-
-# 77 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
-inline static void QueryPropagationC__Leds__led1Off(void ){
-#line 77
-  LedsP__Leds__led1Off();
-#line 77
-}
-#line 77
 # 188 "QueryPropagationC.nc"
 static inline void QueryPropagationC__MeasurementScheduling__runTask(void )
 #line 188
 {
-  QueryPropagationC__Leds__led1Off();
+
   if (QueryPropagationC__TimerReadSensor__isRunning() == TRUE) {
       QueryPropagationC__checkTimer = QueryPropagationC__TimerReadSensor__getNow();
       QueryPropagationC__runningTime = QueryPropagationC__checkTimer - QueryPropagationC__time4MeasurementStartAt;
@@ -27027,9 +27010,9 @@ inline static void QueryPropagationC__TimerQueryCancelResponse__startOneShot(uin
 #line 73
 }
 #line 73
-# 492 "QueryPropagationC.nc"
+# 481 "QueryPropagationC.nc"
 static inline void QueryPropagationC__TimerQueryBroadcast__fired(void )
-#line 492
+#line 481
 {
 
 
@@ -27063,7 +27046,7 @@ static inline void QueryPropagationC__TimerQueryBroadcast__fired(void )
             }
         }
       else {
-#line 524
+#line 513
         if (QueryPropagationC__mode == 2) {
             QueryPropagationC__TimerQueryCancelResponse__startOneShot(__nesc_ntoh_uint16(QueryPropagationC__AQQ[QueryPropagationC__query_cancel].WaitingTime.nxdata));
 
@@ -27194,9 +27177,9 @@ inline static error_t QueryPropagationC__Read__read(void ){
 #line 55
 }
 #line 55
-# 555 "QueryPropagationC.nc"
+# 545 "QueryPropagationC.nc"
 static inline void QueryPropagationC__TimerReadSensor__fired(void )
-#line 555
+#line 545
 {
 
   QueryPropagationC__Read__read();
@@ -27221,13 +27204,13 @@ inline static error_t QueryPropagationC__SendSerial__postTask(void ){
 #line 67
 }
 #line 67
-# 678 "QueryPropagationC.nc"
+# 671 "QueryPropagationC.nc"
 static inline void QueryPropagationC__TimerSendPCSerial__fired(void )
-#line 678
+#line 671
 {
   unsigned char *__nesc_temp44;
 
-#line 679
+#line 672
   QueryPropagationC__SendSerial__postTask();
   QueryPropagationC__count_received_children = 0;
 
@@ -27274,13 +27257,13 @@ inline static void QueryPropagationC__Leds__led0Off(void ){
 #line 61
 }
 #line 61
-# 709 "QueryPropagationC.nc"
+# 702 "QueryPropagationC.nc"
 static inline void QueryPropagationC__TimerQueryFired__fired(void )
-#line 709
+#line 702
 {
   unsigned char *__nesc_temp45;
 
-#line 710
+#line 703
   ;
 
   QueryPropagationC__number_Of_queries--;
@@ -27312,7 +27295,7 @@ static inline void QueryPropagationC__TimerQueryFired__fired(void )
 
 
 static inline void QueryPropagationC__TimerReUnicast__fired(void )
-#line 740
+#line 733
 {
   if (!QueryPropagationC__unicast_busy) {
       QueryPropagationC__ucast_pkt = (sampling_msg_t *)QueryPropagationC__SamplingAMPacket__getPayload(&QueryPropagationC__SamplingPacketBuffer[QueryPropagationC__sampling_send], sizeof(sampling_msg_t ));
@@ -27329,9 +27312,9 @@ static inline void QueryPropagationC__TimerReUnicast__fired(void )
     }
 }
 
-#line 541
+#line 530
 static inline void QueryPropagationC__TimerQueryCancelResponse__fired(void )
-#line 541
+#line 530
 {
   QueryPropagationC__query_pos = 0;
   QueryPropagationC__start = 0;
@@ -27340,17 +27323,18 @@ static inline void QueryPropagationC__TimerQueryCancelResponse__fired(void )
           QueryPropagationC__send_qcancelTo_node = __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__query_cancel].children[QueryPropagationC__query_pos].nxdata);
           __nesc_hton_uint8(QueryPropagationC__AQQ[QueryPropagationC__query_cancel].children[QueryPropagationC__query_pos].nxdata, 0);
           QueryPropagationC__QueryCancelConfirmation__postTask();
-          break;
         }
+
+      QueryPropagationC__query_pos++;
     }
 }
 
-#line 757
+#line 750
 static inline void QueryPropagationC__Timer_StatsUnicast_Unicast__fired(void )
-#line 757
+#line 750
 {
   if (!QueryPropagationC__unicast_busy) {
-      if (__nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__remindQuery].propagation_mode.nxdata) == 0) {
+      if (QueryPropagationC__mode == 0) {
           QueryPropagationC__ucast_pkt = (sampling_msg_t *)QueryPropagationC__SamplingAMPacket__getPayload(&QueryPropagationC__SamplingPacketBuffer[QueryPropagationC__sampling_send], sizeof(sampling_msg_t ));
           if (QueryPropagationC__ucast_pkt == (void *)0) {
               return;
@@ -27364,8 +27348,8 @@ static inline void QueryPropagationC__Timer_StatsUnicast_Unicast__fired(void )
             }
         }
       else {
-#line 772
-        if (__nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__remindQuery].propagation_mode.nxdata) == 1) {
+#line 765
+        if (QueryPropagationC__mode == 1) {
             QueryPropagationC__count_received_children = 0;
             QueryPropagationC__stats_ucast_pkt = (stats_sampling_msg_t *)QueryPropagationC__SamplingAMPacket__getPayload(&QueryPropagationC__StatsSamplingPacketBuffer[QueryPropagationC__stats_sampling_send], sizeof(stats_sampling_msg_t ));
             if (QueryPropagationC__stats_ucast_pkt == (void *)0) {
@@ -28860,9 +28844,26 @@ inline static void QueryPropagationC__Leds__led2Off(void ){
 #line 94
 }
 #line 94
-# 429 "QueryPropagationC.nc"
+# 94 "/opt/tinyos-2.1.2/tos/system/LedsP.nc"
+static inline void LedsP__Leds__led1Off(void )
+#line 94
+{
+  LedsP__Led1__set();
+  ;
+#line 96
+  ;
+}
+
+# 77 "/opt/tinyos-2.1.2/tos/interfaces/Leds.nc"
+inline static void QueryPropagationC__Leds__led1Off(void ){
+#line 77
+  LedsP__Leds__led1Off();
+#line 77
+}
+#line 77
+# 418 "QueryPropagationC.nc"
 static inline void QueryPropagationC__Boot__booted(void )
-#line 429
+#line 418
 {
 
   QueryPropagationC__send = 0;
@@ -32780,9 +32781,9 @@ static error_t /*Msp430Uart1P.UartP*/Msp430UartP__0__UartStream__send(uint8_t id
   return SUCCESS;
 }
 
-# 1286 "QueryPropagationC.nc"
+# 1269 "QueryPropagationC.nc"
 static void QueryPropagationC__SamplingRadioAMSend__sendDone(message_t *msg, error_t err)
-#line 1286
+#line 1269
 {
   if (&QueryPropagationC__pkt == msg) {
       QueryPropagationC__unicast_busy = FALSE;
@@ -32795,7 +32796,7 @@ static void QueryPropagationC__SamplingRadioAMSend__sendDone(message_t *msg, err
             }
         }
       else {
-#line 1297
+#line 1280
         if (__nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__remindQuery].propagation_mode.nxdata) == 1) {
             QueryPropagationC__stats_sampling_send++;
             if (QueryPropagationC__stats_sampling_send > 10) {
@@ -32803,14 +32804,14 @@ static void QueryPropagationC__SamplingRadioAMSend__sendDone(message_t *msg, err
               }
           }
         }
-#line 1303
+#line 1286
       QueryPropagationC__init_ContributedNodes__postTask();
     }
 }
 
-#line 1273
+#line 1256
 static void QueryPropagationC__RadioAMSend__sendDone(message_t *msg, error_t err)
-#line 1273
+#line 1256
 {
   if (&QueryPropagationC__pkt == msg) {
       QueryPropagationC__busy = FALSE;
@@ -33962,9 +33963,9 @@ static void AdcP__ResourceRead__granted(uint8_t client)
     }
 }
 
-# 565 "QueryPropagationC.nc"
+# 555 "QueryPropagationC.nc"
 static void QueryPropagationC__Read__readDone(error_t result, uint16_t data)
-#line 565
+#line 555
 {
   if (result == SUCCESS) {
 
@@ -33986,7 +33987,7 @@ static void QueryPropagationC__Read__readDone(error_t result, uint16_t data)
               QueryPropagationC__TimerSendPCSerial__startOneShot(20);
             }
           else {
-#line 585
+#line 575
             if (__nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__Hold_Sampling_Timer].propagation_mode.nxdata) == 1) {
                 QueryPropagationC__hops = __nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__Hold_Sampling_Timer].hops.nxdata);
                 QueryPropagationC__min = data;
@@ -34000,7 +34001,7 @@ static void QueryPropagationC__Read__readDone(error_t result, uint16_t data)
             }
         }
       else 
-#line 596
+#line 586
         {
 
 
@@ -34026,7 +34027,7 @@ static void QueryPropagationC__Read__readDone(error_t result, uint16_t data)
               QueryPropagationC__Timer_StatsUnicast_Unicast__startOneShot(TOS_NODE_ID * 20);
             }
           else {
-#line 620
+#line 610
             if (__nesc_ntoh_uint8(QueryPropagationC__AQQ[QueryPropagationC__Hold_Sampling_Timer].propagation_mode.nxdata) == 1) {
 
                 QueryPropagationC__stats_sampling_save = QueryPropagationC__stats_sampling_save % 10;
@@ -34048,11 +34049,14 @@ static void QueryPropagationC__Read__readDone(error_t result, uint16_t data)
                 __nesc_hton_uint8(QueryPropagationC__stats_ucast_pkt->mode.nxdata, 1);
                 QueryPropagationC__mode = 1;
 
+                QueryPropagationC__min = data;
+                QueryPropagationC__max = data;
+                QueryPropagationC__average = data;
                 QueryPropagationC__DelayMeasurementScheduling__postTask();
               }
             }
         }
-#line 644
+#line 637
       QueryPropagationC__data_id++;
 
       if (QueryPropagationC__number_Of_queries > 0) {
