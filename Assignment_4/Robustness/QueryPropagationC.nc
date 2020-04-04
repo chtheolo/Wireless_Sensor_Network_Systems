@@ -32,6 +32,7 @@ module QueryPropagationC @safe()
 	uses interface Timer<TMilli> as TimerReUnicast;
 	uses interface Timer<TMilli> as TimerQueryCancelResponse;
 	uses interface Timer<TMilli> as Timer_StatsUnicast_Unicast;
+	uses interface Timer<TMilli> as TimerApplications;
 
 	uses interface Read<uint16_t>;
 
@@ -100,7 +101,10 @@ implementation
 	uint8_t count_received_children;			/*A counter that informs in every iteration how many children send me a msg.*/
 	uint8_t mode;
 	uint8_t new_entry_node;
-	uint8_t i;
+	uint8_t i,j;
+	uint8_t instruction;						/*The instructios that being decoded in the application's binary file.*/
+	uint8_t reg;								/*Registers for the instructions*/
+	uint8_t handler_start,handler_size;
 
 /*  16-bit  */
 	uint16_t time4MeasurementStartAt;
@@ -163,9 +167,68 @@ implementation
 /* ------------------------------- Interpretation ----------------------------- */
 	task void Interpretation() {
 		/** The first byte depicts the binary size file. */
-		
-		if (Apps_Queue[start].BinaryMessage[0] == 4) {
-			call Leds.led2Toggle();
+		i = handler_start;
+		while(i<(handler_size+handler_start)) {
+			
+			instruction = Apps_Queue[start].BinaryMessage[i] & 0xF0;
+
+			switch (instruction) {
+				case 0x00:											/*return*/
+					call Leds.led2Off();
+					break;
+				case 0x10:											/*set*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0x20:											/*cpy*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0x30:											/*add*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0x40:											/*sub*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0x50:											/*inc*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0x60:											/*dec*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0x70:											/*max*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0x80:											/*min*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0x90:											/*bgz*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0xA0:											/*bez*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0xB0:											/*bra*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0xC0:											/*led*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					if (reg == 0x01){
+						call Leds.led1On();
+						break;
+					}
+					call Leds.led1Off();
+					break;
+				case 0xD0:											/*rdb*/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+				case 0xE0:											/*tmr*/
+					i++;
+					call TimerApplications.startOneShot(Apps_Queue[start].BinaryMessage[i]*1000);
+					break;
+				case 0xF0:											/**/
+					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					break;
+			}
+			i++;
 		}
 	}
 	
@@ -354,19 +417,6 @@ implementation
 					serial_busy = TRUE;
 				}
 			}
-			/*else if (mode == 5 || mode == 6) {
-				bin_response = (binary_rsp_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (binary_rsp_t) ));
-				if (bin_response == NULL) {
-					return;
-				}
-
-				call Leds.led2On();
-
-				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (binary_rsp_t)) == SUCCESS){
-					dbg("BroadcastingC", "Start sending serial binary response\n\n ");
-					serial_busy = TRUE;
-				}
-			}*/
 		}
 	}
 /* ------------------------------- Query Canceling -------------------------------- */
@@ -518,6 +568,13 @@ implementation
 	}
 	
 	event void SerialAMControl.stopDone(error_t err) { /* do nothing */ }
+
+/* -------------------------------------------------------- TimerApplications ------------------------------------------------------------------ */
+	event void TimerApplications.fired() {
+		handler_start = Apps_Queue[start].BinaryMessage[0] - Apps_Queue[start].BinaryMessage[2];
+		handler_size = Apps_Queue[start].BinaryMessage[2];
+		post Interpretation();
+	}
 
 /* -------------------------------------------- TimerQueryBroadcast =>  SOURCE QUERY BROADCAST ------------------------------------------------- */ 	
 	event void TimerQueryBroadcast.fired() {
@@ -1323,7 +1380,8 @@ implementation
 					start++;
 				}
 			}
-			
+			handler_start = 3;  //init handler
+			handler_size = Apps_Queue[start].BinaryMessage[1];
 			post Interpretation();
 		}
 		return msg;
