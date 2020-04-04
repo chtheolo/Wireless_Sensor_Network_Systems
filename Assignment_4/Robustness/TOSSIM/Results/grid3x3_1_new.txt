@@ -1,0 +1,503 @@
+  1   2   -40.0
+  1   4   -40.0
+  2   3   -40.0
+  2   1   -40.0
+  2   5   -40.0
+  3   2   -40.0
+  3   6   -40.0
+  4   5   -40.0
+  4   7   -40.0
+  4   1   -40.0
+  5   6   -40.0
+  5   4   -40.0
+  5   8   -40.0
+  5   2   -40.0
+  6   5   -40.0
+  6   9   -40.0
+  6   3   -40.0
+  7   8   -40.0
+  7   4   -40.0
+  8   9   -40.0
+  8   7   -40.0
+  8   5   -40.0
+  9   8   -40.0
+  9   6   -40.0
+Creating noise model for  1
+Creating noise model for  2
+Creating noise model for  3
+Creating noise model for  4
+Creating noise model for  5
+Creating noise model for  6
+Creating noise model for  7
+Creating noise model for  8
+Creating noise model for  9
+DEBUG (1): RADIO_CONTROL = OK 0:0:0.000010040.
+DEBUG (1): SERIAL_CONTROL = OK 0:0:0.000010050.
+DEBUG (2): RADIO_CONTROL = OK 0:0:0.000020040.
+DEBUG (2): SERIAL_CONTROL = OK 0:0:0.000020050.
+DEBUG (3): RADIO_CONTROL = OK 0:0:0.000030040.
+DEBUG (3): SERIAL_CONTROL = OK 0:0:0.000030050.
+DEBUG (4): RADIO_CONTROL = OK 0:0:0.000040040.
+DEBUG (4): SERIAL_CONTROL = OK 0:0:0.000040050.
+DEBUG (5): RADIO_CONTROL = OK 0:0:0.000050040.
+DEBUG (5): SERIAL_CONTROL = OK 0:0:0.000050050.
+DEBUG (6): RADIO_CONTROL = OK 0:0:0.000060040.
+DEBUG (6): SERIAL_CONTROL = OK 0:0:0.000060050.
+DEBUG (7): RADIO_CONTROL = OK 0:0:0.000070040.
+DEBUG (7): SERIAL_CONTROL = OK 0:0:0.000070050.
+DEBUG (8): RADIO_CONTROL = OK 0:0:0.000080040.
+DEBUG (8): SERIAL_CONTROL = OK 0:0:0.000080050.
+DEBUG (1): Serial Received QUERY_ID: 1 , Sampling_Period: 5000, Query_Lifetime: 15000, Propagation_Mode: 1 ,@ 0:0:0.000090035 
+
+DEBUG (1): Serial Received QUERY_ID: 1 , FORWARDER_ID: 1 ,@ 0:0:0.000090035 
+
+DEBUG (9): RADIO_CONTROL = OK 0:0:0.000090040.
+DEBUG (9): SERIAL_CONTROL = OK 0:0:0.000090050.
+DEBUG (1): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.029306885.
+DEBUG (4): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 1 ,@ 0:0:0.034296480 
+
+DEBUG (2): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 1 ,@ 0:0:0.034296480 
+
+DEBUG (2): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.092793447.
+DEBUG (5): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 2 ,@ 0:0:0.102864189 
+
+DEBUG (1): NODE_ID: 1, NUMBER_OF_CHILDREN: 1 
+
+
+DEBUG (3): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 2 ,@ 0:0:0.102864189 
+
+DEBUG (4): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.151407197.
+DEBUG (1): NODE_ID: 1, NUMBER_OF_CHILDREN: 2 
+
+
+DEBUG (7): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 4 ,@ 0:0:0.158822926 
+
+DEBUG (3): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.190459697.
+DEBUG (6): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 3 ,@ 0:0:0.197951719 
+
+DEBUG (2): NODE_ID: 2, NUMBER_OF_CHILDREN: 1 
+
+
+DEBUG (5): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.249073448.
+DEBUG (2): NODE_ID: 2, NUMBER_OF_CHILDREN: 2 
+
+
+DEBUG (8): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 5 ,@ 0:0:0.257130041 
+
+DEBUG (7): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.363351260.
+DEBUG (6): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.373106885.
+DEBUG (4): NODE_ID: 4, NUMBER_OF_CHILDREN: 1 
+
+
+DEBUG (3): NODE_ID: 3, NUMBER_OF_CHILDREN: 1 
+
+
+DEBUG (9): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 6 ,@ 0:0:0.376173884 
+
+DEBUG (8): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.491290948.
+DEBUG (5): NODE_ID: 5, NUMBER_OF_CHILDREN: 1 
+
+
+DEBUG (9): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.639738448.
+DEBUG (6): NODE_ID: 6, NUMBER_OF_CHILDREN: 1 
+
+
+DEBUG (1): TIME_TO_MEASURE[0] = 5000 
+DEBUG (1): WAITING_TIME: 4000 
+
+
+DEBUG (2): TIME_TO_MEASURE[0] = 5000 
+DEBUG (2): WAITING_TIME: 4000 
+
+
+DEBUG (4): TIME_TO_MEASURE[0] = 5000 
+DEBUG (4): WAITING_TIME: 4000 
+
+
+DEBUG (3): TIME_TO_MEASURE[0] = 5000 
+DEBUG (3): WAITING_TIME: 4000 
+
+
+DEBUG (5): TIME_TO_MEASURE[0] = 5000 
+DEBUG (5): WAITING_TIME: 4000 
+
+
+DEBUG (7): TIME_TO_MEASURE[0] = 5000 
+DEBUG (7): WAITING_TIME: 20 
+
+
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ Node[7] ---> Node[4] { SOURCE_ID: 7, SAMPLING_ID: 0, FORWARDER_ID: 7, FATHER_ID: 4, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:5.060616885 
+
+DEBUG (7): NUMBER of Contributed NODES: 0
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+ Node[4] <--- Node[7] { SOURCE_ID: 7, QUERY_ID: 1, FORWARDER_ID: 7, SAMPLING_ID: 0 }
+
+DEBUG (4): WaitingTime: 150 
+ RemaingTime: 150 
+DEBUG (6): TIME_TO_MEASURE[0] = 5000 
+DEBUG (6): WAITING_TIME: 4000 
+
+
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ Node[4] ---> Node[1] { SOURCE_ID: 7, SAMPLING_ID: 0, FORWARDER_ID: 4, FATHER_ID: 1, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:5.083047822 
+
+DEBUG (4): NUMBER of Contributed NODES: 1
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 150, RemaingTime: 150 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+ Node[1] <--- Node[4] { SOURCE_ID: 7, QUERY_ID: 1, FORWARDER_ID: 4, SAMPLING_ID: 0 }
+
+DEBUG (1): WaitingTime: 212 
+ RemaingTime: 212 
+DEBUG (8): TIME_TO_MEASURE[0] = 5000 
+DEBUG (8): WAITING_TIME: 20 
+
+
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ Node[8] ---> Node[5] { SOURCE_ID: 8, SAMPLING_ID: 0, FORWARDER_ID: 8, FATHER_ID: 5, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:5.159259698 
+
+DEBUG (8): NUMBER of Contributed NODES: 0
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+ Node[5] <--- Node[8] { SOURCE_ID: 8, QUERY_ID: 1, FORWARDER_ID: 8, SAMPLING_ID: 0 }
+
+DEBUG (5): WaitingTime: 188 
+ RemaingTime: 188 
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ Node[5] ---> Node[2] { SOURCE_ID: 8, SAMPLING_ID: 0, FORWARDER_ID: 5, FATHER_ID: 2, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:5.188526573 
+
+DEBUG (5): NUMBER of Contributed NODES: 1
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 188, RemaingTime: 188 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+ Node[2] <--- Node[5] { SOURCE_ID: 8, QUERY_ID: 1, FORWARDER_ID: 5, SAMPLING_ID: 0 }
+
+DEBUG (2): WaitingTime: 284 
+ RemaingTime: 284 
+DEBUG (9): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): WAITING_TIME: 20 
+
+
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ Node[9] ---> Node[6] { SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 9, FATHER_ID: 6, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:5.278410323 
+
+DEBUG (9): NUMBER of Contributed NODES: 0
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+ Node[6] <--- Node[9] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 9, SAMPLING_ID: 0 }
+
+DEBUG (6): WaitingTime: 211 
+ RemaingTime: 211 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ Node[6] ---> Node[3] { SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 6, FATHER_ID: 3, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:5.306700635 
+
+DEBUG (6): NUMBER of Contributed NODES: 1
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 211, RemaingTime: 211 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+ Node[3] <--- Node[6] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 6, SAMPLING_ID: 0 }
+
+DEBUG (3): WaitingTime: 337 
+ RemaingTime: 337 
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ Node[3] ---> Node[2] { SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:5.334014385 
+
+DEBUG (3): NUMBER of Contributed NODES: 2
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 337, RemaingTime: 337 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+ Node[2] <--- Node[3] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 3, SAMPLING_ID: 0 }
+
+DEBUG (2): WaitingTime: 433 
+ RemaingTime: 433 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ Node[2] ---> Node[1] { SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:5.359395010 
+
+DEBUG (2): NUMBER of Contributed NODES: 3
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 433, RemaingTime: 433 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+ Node[1] <--- Node[2] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 2, SAMPLING_ID: 0 }
+
+DEBUG (1): WaitingTime: 492 
+ RemaingTime: 492 
+DEBUG (1): Sending SERIAL PACKET
+
+DEBUG (1): Serial message Done
+
+DEBUG (1): RECEPTION DELAY: 492 
+
+DEBUG (1): TIME_TO_MEASURE[0] = 5000 
+DEBUG (1): WAITING_TIME: 492 
+
+
+DEBUG (2): TIME_TO_MEASURE[0] = 5000 
+DEBUG (2): WAITING_TIME: 433 
+
+
+DEBUG (4): TIME_TO_MEASURE[0] = 5000 
+DEBUG (4): WAITING_TIME: 150 
+
+
+DEBUG (3): TIME_TO_MEASURE[0] = 5000 
+DEBUG (3): WAITING_TIME: 337 
+
+
+DEBUG (5): TIME_TO_MEASURE[0] = 5000 
+DEBUG (5): WAITING_TIME: 188 
+
+
+DEBUG (7): TIME_TO_MEASURE[0] = 5000 
+DEBUG (7): WAITING_TIME: 20 
+
+
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ Node[7] ---> Node[4] { SOURCE_ID: 7, SAMPLING_ID: 1, FORWARDER_ID: 7, FATHER_ID: 4, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:9.943429385 
+
+DEBUG (7): NUMBER of Contributed NODES: 0
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+ Node[4] <--- Node[7] { SOURCE_ID: 7, QUERY_ID: 1, FORWARDER_ID: 7, SAMPLING_ID: 1 }
+
+DEBUG (4): WaitingTime: 157 
+ RemaingTime: 157 
+DEBUG (6): TIME_TO_MEASURE[0] = 5000 
+DEBUG (6): WAITING_TIME: 211 
+
+
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ Node[4] ---> Node[1] { SOURCE_ID: 7, SAMPLING_ID: 1, FORWARDER_ID: 4, FATHER_ID: 1, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:9.972696260 
+
+DEBUG (4): NUMBER of Contributed NODES: 1
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 157, RemaingTime: 157 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+ Node[1] <--- Node[4] { SOURCE_ID: 7, QUERY_ID: 1, FORWARDER_ID: 4, SAMPLING_ID: 1 }
+
+DEBUG (1): WaitingTime: 215 
+ RemaingTime: 215 
+DEBUG (8): TIME_TO_MEASURE[0] = 5000 
+DEBUG (8): WAITING_TIME: 20 
+
+
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ Node[8] ---> Node[5] { SOURCE_ID: 8, SAMPLING_ID: 1, FORWARDER_ID: 8, FATHER_ID: 5, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:10.042072198 
+
+DEBUG (8): NUMBER of Contributed NODES: 0
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+ Node[5] <--- Node[8] { SOURCE_ID: 8, QUERY_ID: 1, FORWARDER_ID: 8, SAMPLING_ID: 1 }
+
+DEBUG (5): WaitingTime: 181 
+ RemaingTime: 181 
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ Node[5] ---> Node[2] { SOURCE_ID: 8, SAMPLING_ID: 1, FORWARDER_ID: 5, FATHER_ID: 2, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:10.064503135 
+
+DEBUG (5): NUMBER of Contributed NODES: 1
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 181, RemaingTime: 181 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+ Node[2] <--- Node[5] { SOURCE_ID: 8, QUERY_ID: 1, FORWARDER_ID: 5, SAMPLING_ID: 1 }
+
+DEBUG (2): WaitingTime: 274 
+ RemaingTime: 274 
+DEBUG (9): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): WAITING_TIME: 20 
+
+
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ Node[9] ---> Node[6] { SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 9, FATHER_ID: 6, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:10.161222823 
+
+DEBUG (9): NUMBER of Contributed NODES: 0
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+ Node[6] <--- Node[9] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 9, SAMPLING_ID: 1 }
+
+DEBUG (6): WaitingTime: 205 
+ RemaingTime: 205 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ Node[6] ---> Node[3] { SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 6, FATHER_ID: 3, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:10.182677198 
+
+DEBUG (6): NUMBER of Contributed NODES: 1
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 205, RemaingTime: 205 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+ Node[3] <--- Node[6] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 6, SAMPLING_ID: 1 }
+
+DEBUG (3): WaitingTime: 324 
+ RemaingTime: 324 
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ Node[3] ---> Node[2] { SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:10.204131572 
+
+DEBUG (3): NUMBER of Contributed NODES: 2
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 324, RemaingTime: 324 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+ Node[2] <--- Node[3] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 3, SAMPLING_ID: 1 }
+
+DEBUG (2): WaitingTime: 423 
+ RemaingTime: 423 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ Node[2] ---> Node[1] { SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:10.232441885 
+
+DEBUG (2): NUMBER of Contributed NODES: 3
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 423, RemaingTime: 423 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+ Node[1] <--- Node[2] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 2, SAMPLING_ID: 1 }
+
+DEBUG (1): WaitingTime: 487 
+ RemaingTime: 487 
+DEBUG (1): Sending SERIAL PACKET
+
+DEBUG (1): Serial message Done
+
+DEBUG (1): RECEPTION DELAY: 487 
+
+DEBUG (1): TIME_TO_MEASURE[0] = 5000 
+DEBUG (1): The query_ expired! @ 0:0:14.648447530
+DEBUG (1): WAITING_TIME: 487 
+
+
+DEBUG (2): TIME_TO_MEASURE[0] = 5000 
+DEBUG (2): The query_ expired! @ 0:0:14.682637217
+DEBUG (2): WAITING_TIME: 423 
+
+
+DEBUG (4): TIME_TO_MEASURE[0] = 5000 
+DEBUG (4): The query_ expired! @ 0:0:14.682657217
+DEBUG (4): WAITING_TIME: 157 
+
+
+DEBUG (3): TIME_TO_MEASURE[0] = 5000 
+DEBUG (3): The query_ expired! @ 0:0:14.751006592
+DEBUG (3): WAITING_TIME: 324 
+
+
+DEBUG (5): TIME_TO_MEASURE[0] = 5000 
+DEBUG (5): The query_ expired! @ 0:0:14.751026593
+DEBUG (5): WAITING_TIME: 181 
+
+
+DEBUG (7): TIME_TO_MEASURE[0] = 5000 
+DEBUG (7): The query_ expired! @ 0:0:14.806710655
+DEBUG (7): WAITING_TIME: 20 
+
+
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ Node[7] ---> Node[4] { SOURCE_ID: 7, SAMPLING_ID: 2, FORWARDER_ID: 7, FATHER_ID: 4, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:14.826241885 
+
+DEBUG (7): NUMBER of Contributed NODES: 0
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+ Node[4] <--- Node[7] { SOURCE_ID: 7, QUERY_ID: 1, FORWARDER_ID: 7, SAMPLING_ID: 2 }
+
+DEBUG (4): WaitingTime: 156 
+ RemaingTime: 156 
+DEBUG (6): TIME_TO_MEASURE[0] = 5000 
+DEBUG (6): The query_ expired! @ 0:0:14.845763155
+DEBUG (6): WAITING_TIME: 205 
+
+
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ Node[4] ---> Node[1] { SOURCE_ID: 7, SAMPLING_ID: 2, FORWARDER_ID: 4, FATHER_ID: 1, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:14.854532197 
+
+DEBUG (4): NUMBER of Contributed NODES: 1
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 156, RemaingTime: 156 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+ Node[1] <--- Node[4] { SOURCE_ID: 7, QUERY_ID: 1, FORWARDER_ID: 4, SAMPLING_ID: 2 }
+
+DEBUG (1): WaitingTime: 220 
+ RemaingTime: 220 
+DEBUG (8): TIME_TO_MEASURE[0] = 5000 
+DEBUG (8): The query_ expired! @ 0:0:14.905353468
+DEBUG (8): WAITING_TIME: 20 
+
+
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ Node[8] ---> Node[5] { SOURCE_ID: 8, SAMPLING_ID: 2, FORWARDER_ID: 8, FATHER_ID: 5, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:14.924884698 
+
+DEBUG (8): NUMBER of Contributed NODES: 0
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+ Node[5] <--- Node[8] { SOURCE_ID: 8, QUERY_ID: 1, FORWARDER_ID: 8, SAMPLING_ID: 2 }
+
+DEBUG (5): WaitingTime: 186 
+ RemaingTime: 186 
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ Node[5] ---> Node[2] { SOURCE_ID: 8, SAMPLING_ID: 2, FORWARDER_ID: 5, FATHER_ID: 2, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:14.952198448 
+
+DEBUG (5): NUMBER of Contributed NODES: 1
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 186, RemaingTime: 186 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+ Node[2] <--- Node[5] { SOURCE_ID: 8, QUERY_ID: 1, FORWARDER_ID: 5, SAMPLING_ID: 2 }
+
+DEBUG (2): WaitingTime: 283 
+ RemaingTime: 283 
+DEBUG (9): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): The query_ expired! @ 0:0:15.024504093
+DEBUG (9): WAITING_TIME: 20 
+
+
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ Node[9] ---> Node[6] { SOURCE_ID: 9, SAMPLING_ID: 2, FORWARDER_ID: 9, FATHER_ID: 6, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:15.044035323 
+
+DEBUG (9): NUMBER of Contributed NODES: 0
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+ Node[6] <--- Node[9] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 9, SAMPLING_ID: 2 }
+
+DEBUG (6): WaitingTime: 213 
+ RemaingTime: 213 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ Node[6] ---> Node[3] { SOURCE_ID: 9, SAMPLING_ID: 2, FORWARDER_ID: 6, FATHER_ID: 3, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:15.073302198 
+
+DEBUG (6): NUMBER of Contributed NODES: 1
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 213, RemaingTime: 213 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+ Node[3] <--- Node[6] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 6, SAMPLING_ID: 2 }
+
+DEBUG (3): WaitingTime: 332 
+ RemaingTime: 332 
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ Node[3] ---> Node[2] { SOURCE_ID: 9, SAMPLING_ID: 2, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:15.094756572 
+
+DEBUG (3): NUMBER of Contributed NODES: 2
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 332, RemaingTime: 332 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+ Node[2] <--- Node[3] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 3, SAMPLING_ID: 2 }
+
+DEBUG (2): WaitingTime: 430 
+ RemaingTime: 430 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ Node[2] ---> Node[1] { SOURCE_ID: 9, SAMPLING_ID: 2, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 1, DESTINATION_ID: 1 } , @ 0:0:15.122090322 
+
+DEBUG (2): NUMBER of Contributed NODES: 3
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 430, RemaingTime: 430 , AQQ[0] 
+
+DEBUG (1): Sending SERIAL PACKET
+
+DEBUG (1): Serial message Done
+
+DEBUG (1): RECEPTION DELAY: 220 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+ Node[1] <--- Node[2] { SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 2, SAMPLING_ID: 2 }
+
+DEBUG (1): WaitingTime: 494 
+ RemaingTime: 494 
