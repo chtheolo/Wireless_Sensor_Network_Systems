@@ -70,7 +70,7 @@ class BinaryMsg(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self, 
                                 [('app_id', 'int', 1),
-                                 ('BinaryMessage', 'blob', 13),
+                                 ('BinaryMessage', 'blob', 25),
                                  ('mode', 'int', 1),
                                  ('state', 'int', 1)],
                                 packet)
@@ -181,10 +181,11 @@ def transmitter(tx_queue):
                                 binary_array.append(int(binary_code, 16))
                 
                     count_char = len(binary_array)
-                    count_char = 13 - count_char
+                    count_char = 25 - count_char
                     for i in range(count_char):
                         binary_array.append(int('00',16))
 
+                    print(binary_array)
                     print('Give a unique id for ' + binary_filename + ' application ')
                     app_id = int(raw_input(''))
 

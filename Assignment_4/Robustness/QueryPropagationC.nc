@@ -13,6 +13,7 @@
 #include "ResponseUpdate.h"
 #include "Serial_BinaryCode.h"
 #include "Binary_Response.h"
+#include "Application_Image.h"
 
 
 #define NUMBER_OF_MSGS 20
@@ -103,8 +104,9 @@ implementation
 	uint8_t new_entry_node;
 	uint8_t i,j;
 	uint8_t instruction;						/*The instructios that being decoded in the application's binary file.*/
-	uint8_t reg;								/*Registers for the instructions*/
 	uint8_t handler_start,handler_size;
+	uint8_t maxInterpreterIterations;
+	uint8_t pc;									/*program counter in Binary File*/
 
 /*  16-bit  */
 	uint16_t time4MeasurementStartAt;
@@ -115,6 +117,7 @@ implementation
 	uint16_t average;
 	uint16_t startDelay;
 	uint16_t dtDelay;
+	uint16_t rx,ry;								/*Registers mask variables*/
 
 /*	32-bit	*/
 	uint32_t t0,dt;
@@ -130,7 +133,7 @@ implementation
 
 /* ----------------------- ARRAYS -------------------- */	
 	message_t PacketBuffer[SIZE], SamplingPacketBuffer[SIZE], StatsSamplingPacketBuffer[SIZE];
-	binary_msg_t Apps_Queue[2];																		/* Active Applactions data structure*/
+	Application_Image_t Apps_Queue[2];																		/* Active Applactions data structure*/
 	ActiveQueryQueue_t AQQ[NUMBER_OF_QUERIES];
 	SendersHistory_t QuerySendersHistory[LAST_SENDERS];
 	contributed_nodes_t ContributedNodes[LAST_SENDERS];
@@ -161,74 +164,120 @@ implementation
 		for (start = 0; start < 2; start++) {
 			Apps_Queue[start].state = 0;
 			Apps_Queue[start].app_id = 0;
+			for (i=0; i<6; i++) {
+				Apps_Queue[start].registers[i] = 0;
+			}
 		}
 	}
 
 /* ------------------------------- Interpretation ----------------------------- */
 	task void Interpretation() {
 		/** The first byte depicts the binary size file. */
-		i = handler_start;
-		while(i<(handler_size+handler_start)) {
+		
+		pc = handler_start;
+		maxInterpreterIterations = handler_start+handler_size;
+
+		while (pc < maxInterpreterIterations && Apps_Queue[start].BinaryMessage[pc] != 0x00) {
 			
-			instruction = Apps_Queue[start].BinaryMessage[i] & 0xF0;
+			instruction = Apps_Queue[start].BinaryMessage[pc] & 0xF0;
 
 			switch (instruction) {
-				case 0x00:											/*return*/
-					call Leds.led2Off();
+				///case 0x00:											/*return*/
+
+				case 0x10:											/* set, rx = val (1rx)*/
+					rx = (Apps_Queue[start].BinaryMessage[pc] & 0x0F);
+					Apps_Queue[start].registers[--rx] = Apps_Queue[start].BinaryMessage[++pc];
+					pc++;
 					break;
-				case 0x10:											/*set*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0x20:											/* cpy, rx = ry */
+					rx = (Apps_Queue[start].BinaryMessage[pc] & 0x0F);
+					Apps_Queue[start].registers[--rx] = Apps_Queue[start].registers[Apps_Queue[start].BinaryMessage[++pc]];
+					pc++;
 					break;
-				case 0x20:											/*cpy*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0x30:											/* add, rx = rx + ry */
+					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					ry = Apps_Queue[start].BinaryMessage[++pc] & 0x0F;
+					Apps_Queue[start].registers[--rx] += Apps_Queue[start].registers[--ry];
+					pc++;
 					break;
-				case 0x30:											/*add*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0x40:											/* sub,rx = rx-ry */
+					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					ry = Apps_Queue[start].BinaryMessage[++pc] & 0x0F;
+					Apps_Queue[start].registers[--rx] -= Apps_Queue[start].registers[--ry];
+					pc++;
 					break;
-				case 0x40:											/*sub*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0x50:											/* inc, rx = rx + 1 */
+					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					Apps_Queue[start].registers[--rx]++;
+					pc++;
 					break;
-				case 0x50:											/*inc*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0x60:											/* dec, rx = rx - 1 */
+					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					Apps_Queue[start].registers[--rx]--;
+					pc++;
 					break;
-				case 0x60:											/*dec*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0x70:											/* max, rx = max(rx,ry) */
+					j=0;
+					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					while (j < 6) {
+						if (Apps_Queue[start].registers[--rx] < Apps_Queue[start].registers[j]) {
+							Apps_Queue[start].registers[--rx] = Apps_Queue[start].registers[j];
+						}
+						j++;
+					}
+					pc++;
 					break;
-				case 0x70:											/*max*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0x80:											/* min, rx = min(rx,ry) */
+					j=0;
+					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					while (j < 6) {
+						if (Apps_Queue[start].registers[--rx] > Apps_Queue[start].registers[j]) {
+							Apps_Queue[start].registers[--rx] = Apps_Queue[start].registers[j];
+						}
+						j++;
+					}
+					pc++;
 					break;
-				case 0x80:											/*min*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0x90:											/* bgz, if ( rx > 0 ) pc = pc + off */
+					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					if (Apps_Queue[start].registers[--rx] > 0) {
+						pc += (Apps_Queue[start].BinaryMessage[++pc]);
+						break;
+					}
+					pc+=2;;
 					break;
-				case 0x90:											/*bgz*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0xA0:											/* bez, if ( rx == 0 ) pc = pc + off */
+					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					if (Apps_Queue[start].registers[--rx] == 0) {
+						pc += Apps_Queue[start].BinaryMessage[++pc];
+						break;
+					}
+					pc+=2;
 					break;
-				case 0xA0:											/*bez*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0xB0:											/* bra, pc = pc + off */
+					pc += (Apps_Queue[start].BinaryMessage[++pc]);
 					break;
-				case 0xB0:											/*bra*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
-					break;
-				case 0xC0:											/*led*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
-					if (reg == 0x01){
+				case 0xC0:											/* led, f ( val != 0 ) turn led on else turn led off */
+					if ((Apps_Queue[start].BinaryMessage[pc] & 0x0F) == 0x01){
 						call Leds.led1On();
+						pc++;
 						break;
 					}
 					call Leds.led1Off();
+					pc++;
 					break;
-				case 0xD0:											/*rdb*/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0xD0:											/* rdb, rx = current brightness value */
+					//reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					pc++;
 					break;
-				case 0xE0:											/*tmr*/
-					i++;
-					call TimerApplications.startOneShot(Apps_Queue[start].BinaryMessage[i]*1000);
+				case 0xE0:											/* tmr */
+					call TimerApplications.startOneShot(Apps_Queue[start].BinaryMessage[++pc]*1000);
+					pc++;
 					break;
-				case 0xF0:											/**/
-					reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+				case 0xF0:											/* EOF */
+					//reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
 					break;
 			}
-			i++;
 		}
 	}
 	
@@ -571,6 +620,7 @@ implementation
 
 /* -------------------------------------------------------- TimerApplications ------------------------------------------------------------------ */
 	event void TimerApplications.fired() {
+		//call Leds.led0Toggle();
 		handler_start = Apps_Queue[start].BinaryMessage[0] - Apps_Queue[start].BinaryMessage[2];
 		handler_size = Apps_Queue[start].BinaryMessage[2];
 		post Interpretation();
@@ -1373,13 +1423,14 @@ implementation
 				while (start < 2) {
 					if (Apps_Queue[start].state == 0) { /* run if you are new app ,until the end of the array to find a position into the system*/
 						Apps_Queue[start].app_id = s_bin_code->app_id;
-						memcpy(Apps_Queue[start].BinaryMessage, s_bin_code->BinaryMessage, 13 * sizeof(nx_uint8_t));
+						memcpy(Apps_Queue[start].BinaryMessage, s_bin_code->BinaryMessage, 25 * sizeof(nx_uint8_t));
 						Apps_Queue[start].state = 1;
 						break;
 					}
 					start++;
 				}
 			}
+			
 			handler_start = 3;  //init handler
 			handler_size = Apps_Queue[start].BinaryMessage[1];
 			post Interpretation();
