@@ -21,6 +21,7 @@
 #define NUMBER_OF_QUERIES 3
 #define LAST_SENDERS 5
 #define OFFSET 20
+#define MAX_APPLICATIONS 2
 
 module QueryPropagationC @safe()
 {
@@ -103,10 +104,11 @@ implementation
 	uint8_t mode;
 	uint8_t new_entry_node;
 	uint8_t i,j;
-	uint8_t instruction;						/*The instructios that being decoded in the application's binary file.*/
-	uint8_t handler_start,handler_size;
-	uint8_t maxInterpreterIterations;
-	uint8_t pc;									/*program counter in Binary File*/
+	uint8_t instruction;						/*The instruction that is being decoded from the application that holds the controller.*/
+	uint8_t maxInterpreterIterations;			/*Set the max interpretations for an application in order to avoid calculate them every time in a while-loop. Reduce the calculations but increase by 8-bit the memory.*/
+	uint8_t appHoldingController;				/*Current Application that holds the controller.*/
+	uint8_t pc;
+	uint8_t number_of_active_apps;
 
 /*  16-bit  */
 	uint16_t time4MeasurementStartAt;
@@ -172,56 +174,78 @@ implementation
 
 /* ------------------------------- Interpretation ----------------------------- */
 	task void Interpretation() {
-		/** The first byte depicts the binary size file. */
 		
-		pc = handler_start;
-		maxInterpreterIterations = handler_start+handler_size;
+		pc = Apps_Queue[appHoldingController].pc;							/** set new program counter.*/
 
-		while (pc < maxInterpreterIterations && Apps_Queue[start].BinaryMessage[pc] != 0x00) {
+		while (pc < maxInterpreterIterations /*&& Apps_Queue[appHoldingController].BinaryMessage[pc] != 0x00*/) {
+
+			if ( pc == (Apps_Queue[appHoldingController].pc + 4) ) {
+				call Leds.led2On();
+				Apps_Queue[appHoldingController].pc = pc;					/**Save where current application pc points.*/
+
+				
+				start = appHoldingController;
+				appHoldingController++;
+				appHoldingController = appHoldingController%1;
+		
+				while (start != appHoldingController) {							/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei thn entolh return.
+																				** An 3anaftasw thn idia efarmogi tote sunexizw sthn idia. */
+					if (Apps_Queue[appHoldingController].state == 1 && Apps_Queue[appHoldingController].BinaryMessage[Apps_Queue[appHoldingController].pc] != 0x00 ) {  /* check if active application and has instructions to do.*/
+						maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];
+						post Interpretation();
+						return;
+					}
+					appHoldingController++;
+					appHoldingController = appHoldingController%1;
+				}
+			}
 			
-			instruction = Apps_Queue[start].BinaryMessage[pc] & 0xF0;
+			instruction = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0xF0;
 
 			switch (instruction) {
-				///case 0x00:											/*return*/
-
+				case 0x00:											/*return*/
+					if (Apps_Queue[appHoldingController].TimerCalled == FALSE) {	/*If an application returned before calling Timer Handler, means that the current finished its execution. */
+						Apps_Queue[appHoldingController].state = 0;
+					}
+					return;
 				case 0x10:											/* set, rx = val (1rx)*/
-					rx = (Apps_Queue[start].BinaryMessage[pc] & 0x0F);
-					Apps_Queue[start].registers[--rx] = Apps_Queue[start].BinaryMessage[++pc];
+					rx = (Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F);
+					Apps_Queue[appHoldingController].registers[--rx] = Apps_Queue[appHoldingController].BinaryMessage[++pc];
 					pc++;
 					break;
 				case 0x20:											/* cpy, rx = ry */
-					rx = (Apps_Queue[start].BinaryMessage[pc] & 0x0F);
-					Apps_Queue[start].registers[--rx] = Apps_Queue[start].registers[Apps_Queue[start].BinaryMessage[++pc]];
+					rx = (Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F);
+					Apps_Queue[appHoldingController].registers[--rx] = Apps_Queue[appHoldingController].registers[Apps_Queue[appHoldingController].BinaryMessage[++pc]];
 					pc++;
 					break;
 				case 0x30:											/* add, rx = rx + ry */
-					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
-					ry = Apps_Queue[start].BinaryMessage[++pc] & 0x0F;
-					Apps_Queue[start].registers[--rx] += Apps_Queue[start].registers[--ry];
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
+					ry = Apps_Queue[appHoldingController].BinaryMessage[++pc] & 0x0F;
+					Apps_Queue[appHoldingController].registers[--rx] += Apps_Queue[appHoldingController].registers[--ry];
 					pc++;
 					break;
 				case 0x40:											/* sub,rx = rx-ry */
-					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
-					ry = Apps_Queue[start].BinaryMessage[++pc] & 0x0F;
-					Apps_Queue[start].registers[--rx] -= Apps_Queue[start].registers[--ry];
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
+					ry = Apps_Queue[appHoldingController].BinaryMessage[++pc] & 0x0F;
+					Apps_Queue[appHoldingController].registers[--rx] -= Apps_Queue[appHoldingController].registers[--ry];
 					pc++;
 					break;
 				case 0x50:											/* inc, rx = rx + 1 */
-					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
-					Apps_Queue[start].registers[--rx]++;
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
+					Apps_Queue[appHoldingController].registers[--rx]++;
 					pc++;
 					break;
 				case 0x60:											/* dec, rx = rx - 1 */
-					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
-					Apps_Queue[start].registers[--rx]--;
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
+					Apps_Queue[appHoldingController].registers[--rx]--;
 					pc++;
 					break;
 				case 0x70:											/* max, rx = max(rx,ry) */
 					j=0;
-					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
 					while (j < 6) {
-						if (Apps_Queue[start].registers[--rx] < Apps_Queue[start].registers[j]) {
-							Apps_Queue[start].registers[--rx] = Apps_Queue[start].registers[j];
+						if (Apps_Queue[appHoldingController].registers[--rx] < Apps_Queue[appHoldingController].registers[j]) {
+							Apps_Queue[appHoldingController].registers[--rx] = Apps_Queue[appHoldingController].registers[j];
 						}
 						j++;
 					}
@@ -229,36 +253,36 @@ implementation
 					break;
 				case 0x80:											/* min, rx = min(rx,ry) */
 					j=0;
-					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
 					while (j < 6) {
-						if (Apps_Queue[start].registers[--rx] > Apps_Queue[start].registers[j]) {
-							Apps_Queue[start].registers[--rx] = Apps_Queue[start].registers[j];
+						if (Apps_Queue[appHoldingController].registers[--rx] > Apps_Queue[appHoldingController].registers[j]) {
+							Apps_Queue[appHoldingController].registers[--rx] = Apps_Queue[appHoldingController].registers[j];
 						}
 						j++;
 					}
 					pc++;
 					break;
 				case 0x90:											/* bgz, if ( rx > 0 ) pc = pc + off */
-					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
-					if (Apps_Queue[start].registers[--rx] > 0) {
-						pc += (Apps_Queue[start].BinaryMessage[++pc]);
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
+					if (Apps_Queue[appHoldingController].registers[--rx] > 0) {
+						pc += (Apps_Queue[appHoldingController].BinaryMessage[++pc]);
 						break;
 					}
-					pc+=2;;
+					pc+=2;
 					break;
 				case 0xA0:											/* bez, if ( rx == 0 ) pc = pc + off */
-					rx = Apps_Queue[start].BinaryMessage[pc] & 0x0F;
-					if (Apps_Queue[start].registers[--rx] == 0) {
-						pc += Apps_Queue[start].BinaryMessage[++pc];
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
+					if (Apps_Queue[appHoldingController].registers[--rx] == 0) {
+						pc += Apps_Queue[appHoldingController].BinaryMessage[++pc];
 						break;
 					}
 					pc+=2;
 					break;
 				case 0xB0:											/* bra, pc = pc + off */
-					pc += (Apps_Queue[start].BinaryMessage[++pc]);
+					pc += (Apps_Queue[appHoldingController].BinaryMessage[++pc]);
 					break;
 				case 0xC0:											/* led, f ( val != 0 ) turn led on else turn led off */
-					if ((Apps_Queue[start].BinaryMessage[pc] & 0x0F) == 0x01){
+					if ((Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F) == 0x01){
 						call Leds.led1On();
 						pc++;
 						break;
@@ -271,7 +295,9 @@ implementation
 					pc++;
 					break;
 				case 0xE0:											/* tmr */
-					call TimerApplications.startOneShot(Apps_Queue[start].BinaryMessage[++pc]*1000);
+					call TimerApplications.startOneShot(Apps_Queue[appHoldingController].BinaryMessage[++pc]*1000);
+					Apps_Queue[appHoldingController].TimerCalled = TRUE;
+					//timerStartAt = call TimerApplications.getNow();
 					pc++;
 					break;
 				case 0xF0:											/* EOF */
@@ -620,9 +646,11 @@ implementation
 
 /* -------------------------------------------------------- TimerApplications ------------------------------------------------------------------ */
 	event void TimerApplications.fired() {
-		//call Leds.led0Toggle();
-		handler_start = Apps_Queue[start].BinaryMessage[0] - Apps_Queue[start].BinaryMessage[2];
-		handler_size = Apps_Queue[start].BinaryMessage[2];
+
+		maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];										//refresh the maxInterpretations of this application
+		Apps_Queue[appHoldingController].pc = Apps_Queue[appHoldingController].BinaryMessage[0] - Apps_Queue[appHoldingController].BinaryMessage[2];		//refresh where the pc points in this application
+		Apps_Queue[appHoldingController].TimerCalled = FALSE;
+		
 		post Interpretation();
 	}
 
@@ -1411,7 +1439,7 @@ implementation
 
 			start = 0;
 			if (s_bin_code->mode == 0) {
-				while (start < 2) {
+				while (start < MAX_APPLICATIONS) {
 					if (Apps_Queue[start].state == 1 && Apps_Queue[start].app_id == s_bin_code->app_id) {
 						Apps_Queue[start].state = 0;
 						break;
@@ -1420,7 +1448,7 @@ implementation
 				}
 			}
 			else if (s_bin_code->mode == 1) {
-				while (start < 2) {
+				while (start < MAX_APPLICATIONS) {
 					if (Apps_Queue[start].state == 0) { /* run if you are new app ,until the end of the array to find a position into the system*/
 						Apps_Queue[start].app_id = s_bin_code->app_id;
 						memcpy(Apps_Queue[start].BinaryMessage, s_bin_code->BinaryMessage, 25 * sizeof(nx_uint8_t));
@@ -1431,9 +1459,20 @@ implementation
 				}
 			}
 			
-			handler_start = 3;  //init handler
-			handler_size = Apps_Queue[start].BinaryMessage[1];
-			post Interpretation();
+			Apps_Queue[start].pc = 3; 											/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
+			maxInterpreterIterations = 3 + Apps_Queue[start].BinaryMessage[1];
+
+			j=0;
+			number_of_active_apps = 0;
+			while (j < MAX_APPLICATIONS) {
+				if (Apps_Queue[j].state == 1) { number_of_active_apps++;}
+				j++;
+			}
+
+			if (number_of_active_apps == 1) {				/*Call interpreter, if only there is no other active application in the system.*/
+				appHoldingController = start;
+				post Interpretation();
+			}
 		}
 		return msg;
 	}
