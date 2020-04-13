@@ -103,19 +103,21 @@ implementation
 	uint8_t count_received_children;			/*A counter that informs in every iteration how many children send me a msg.*/
 	uint8_t mode;
 	uint8_t new_entry_node;
-	uint8_t i,j;
+	uint8_t i,j;								/*Helping Counters*/
 	uint8_t instruction;						/*The instruction that is being decoded from the application that holds the controller.*/
 	uint8_t maxInterpreterIterations;			/*Set the max interpretations for an application in order to avoid calculate them every time in a while-loop. Reduce the calculations but increase by 8-bit the memory.*/
 	uint8_t appHoldingController;				/*Current Application that holds the controller.*/
-	uint8_t pc;
-	uint8_t number_of_active_apps;
+	uint8_t appHoldingTimer;					/*Current Application that holds the timer.*/
+	uint8_t pc;									/*Program counter.*/
+	uint8_t number_of_active_apps;				/*The whole of active applications in the VM.*/
+	uint8_t count_instructions;
 
 /*  16-bit  */
-	uint16_t time4MeasurementStartAt;
+	uint16_t time4MeasurementStartAt;			/*Timer start flag for measurements scheduling.*/
 	uint16_t minPeriod; 
-	uint16_t sensor_data;
-	uint16_t min;
-	uint16_t max;
+	uint16_t sensor_data;						/*Variable to save the sensor's value.*/
+	uint16_t min;								/*The minimum brightness value from all wireless sensor network.*/
+	uint16_t max;								/*The maximum brightness value from all wireless sensor network.*/
 	uint16_t average;
 	uint16_t startDelay;
 	uint16_t dtDelay;
@@ -123,9 +125,10 @@ implementation
 
 /*	32-bit	*/
 	uint32_t t0,dt;
-	uint32_t runningTime;
-	uint32_t checkTimer;
-	uint32_t timerStartAt;
+	uint32_t runningTime;						/*The amount of time that the current timer is up and running.*/
+	uint32_t checkTimer;						/*Check the amount of time passed through the start time of the current timer.*/
+	uint32_t timerStartAt;						/*Timer Start at flag for query scheduling.*/
+	uint32_t timerApplicationStartAt;			/*Timer start at flag for application timer scheduling.*/
 
 
 /*  bool  */	
@@ -176,17 +179,18 @@ implementation
 	task void Interpretation() {
 		
 		pc = Apps_Queue[appHoldingController].pc;							/** set new program counter.*/
-
+		count_instructions = 0;
 		while (pc < maxInterpreterIterations /*&& Apps_Queue[appHoldingController].BinaryMessage[pc] != 0x00*/) {
 
-			if ( pc == (Apps_Queue[appHoldingController].pc + 4) ) {
-				call Leds.led2On();
+			//if ( pc == (Apps_Queue[appHoldingController].pc + 4) ) {
+			if (count_instructions == 1) {
+				count_instructions = 0;
 				Apps_Queue[appHoldingController].pc = pc;					/**Save where current application pc points.*/
 
 				
 				start = appHoldingController;
 				appHoldingController++;
-				appHoldingController = appHoldingController%1;
+				appHoldingController = appHoldingController%MAX_APPLICATIONS;
 		
 				while (start != appHoldingController) {							/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei thn entolh return.
 																				** An 3anaftasw thn idia efarmogi tote sunexizw sthn idia. */
@@ -196,8 +200,9 @@ implementation
 						return;
 					}
 					appHoldingController++;
-					appHoldingController = appHoldingController%1;
+					appHoldingController = appHoldingController%MAX_APPLICATIONS;
 				}
+
 			}
 			
 			instruction = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0xF0;
@@ -283,11 +288,14 @@ implementation
 					break;
 				case 0xC0:											/* led, f ( val != 0 ) turn led on else turn led off */
 					if ((Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F) == 0x01){
-						call Leds.led1On();
+						if (Apps_Queue[appHoldingController].app_id == 0) { call Leds.led1On(); }
+						else { call Leds.led2On(); }
+						
 						pc++;
 						break;
 					}
-					call Leds.led1Off();
+					if (Apps_Queue[appHoldingController].app_id == 0) { call Leds.led1Off(); }
+					else { call Leds.led2Off(); }
 					pc++;
 					break;
 				case 0xD0:											/* rdb, rx = current brightness value */
@@ -295,15 +303,45 @@ implementation
 					pc++;
 					break;
 				case 0xE0:											/* tmr */
-					call TimerApplications.startOneShot(Apps_Queue[appHoldingController].BinaryMessage[++pc]*1000);
+					if (call TimerApplications.isRunning() == TRUE) {
+						checkTimer = call TimerApplications.getNow();
+						runningTime = checkTimer - timerApplicationStartAt;
+						dt = Apps_Queue[appHoldingTimer].TimerRemainingTime - runningTime;
+						Apps_Queue[appHoldingController].TimerRemainingTime = Apps_Queue[appHoldingController].BinaryMessage[++pc] * 1000;
+
+						if (dt > (Apps_Queue[appHoldingController].BinaryMessage[pc]*1000)) {
+							appHoldingTimer = appHoldingController;
+							call TimerApplications.startOneShot(Apps_Queue[appHoldingController].BinaryMessage[pc]*1000);
+							timerApplicationStartAt = call TimerApplications.getNow();
+						}
+						else {
+							timerApplicationStartAt = call TimerApplications.getNow();
+						}
+						
+						j=0;
+						while (j < MAX_APPLICATIONS) {
+							if (Apps_Queue[j].state == 1 && j != appHoldingController) {
+								Apps_Queue[j].TimerRemainingTime -= runningTime;
+							}
+							j++;
+						}
+
+					}
+					else {
+						appHoldingTimer = appHoldingController;
+						Apps_Queue[appHoldingController].TimerRemainingTime = Apps_Queue[appHoldingController].BinaryMessage[++pc] * 1000;  /*Keep the remaining time*/
+						call TimerApplications.startOneShot(Apps_Queue[appHoldingController].BinaryMessage[pc]*1000);
+						//Apps_Queue[appHoldingController].TimerCalled = TRUE;
+						timerApplicationStartAt = call TimerApplications.getNow();
+					}
 					Apps_Queue[appHoldingController].TimerCalled = TRUE;
-					//timerStartAt = call TimerApplications.getNow();
 					pc++;
 					break;
 				case 0xF0:											/* EOF */
 					//reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
 					break;
 			}
+			count_instructions++;
 		}
 	}
 	
@@ -647,11 +685,43 @@ implementation
 /* -------------------------------------------------------- TimerApplications ------------------------------------------------------------------ */
 	event void TimerApplications.fired() {
 
+		/*The current application that holding the timer, is going to get the controller. */
+		appHoldingController = appHoldingTimer; 
+
 		maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];										//refresh the maxInterpretations of this application
 		Apps_Queue[appHoldingController].pc = Apps_Queue[appHoldingController].BinaryMessage[0] - Apps_Queue[appHoldingController].BinaryMessage[2];		//refresh where the pc points in this application
 		Apps_Queue[appHoldingController].TimerCalled = FALSE;
-		
 		post Interpretation();
+
+		j=0;
+		minQuery = 0;
+		while (j < MAX_APPLICATIONS) {
+			if (Apps_Queue[j].state == 1 && j != appHoldingController) {
+				minQuery = j;
+				break;
+			}
+			j++;
+		}
+
+		j=0;
+		while (j < MAX_APPLICATIONS) {
+			if (Apps_Queue[j].state == 1 && j != appHoldingController && Apps_Queue[j].TimerCalled == TRUE) {
+				Apps_Queue[j].TimerRemainingTime -= Apps_Queue[appHoldingController].TimerRemainingTime;
+				if (Apps_Queue[j].TimerRemainingTime <= Apps_Queue[minQuery].TimerRemainingTime &&  Apps_Queue[j].TimerRemainingTime != 0) {
+					minQuery = j;
+				}
+			}
+			j++;
+		}
+		Apps_Queue[appHoldingController].TimerRemainingTime = 0;
+		appHoldingTimer = minQuery;
+
+		if (Apps_Queue[appHoldingTimer].TimerRemainingTime > 0) {
+			call TimerApplications.startOneShot(Apps_Queue[appHoldingTimer].TimerRemainingTime);
+			timerApplicationStartAt = call TimerApplications.getNow();
+			Apps_Queue[appHoldingTimer].TimerCalled = TRUE;
+		}
+		
 	}
 
 /* -------------------------------------------- TimerQueryBroadcast =>  SOURCE QUERY BROADCAST ------------------------------------------------- */ 	

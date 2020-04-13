@@ -9,6 +9,7 @@ typedef nx_struct Application_Image {
 	nx_uint8_t pc;
 	nx_uint8_t state;
 	nx_uint8_t TimerCalled;
+	nx_uint32_t TimerRemainingTime;
 } Application_Image_t;
 
 #endif
