@@ -153,27 +153,54 @@ def transmitter(tx_queue):
                 print('Wrong input')
     elif sendVM == 1:
         active_ids = []
+        active_applications = []
         while True:
             try:
                 binary_array = []
                 state = 1;
 
-                print('Remove Application (0) or Run Application (1):')
+                print('\nRemove Application (0) or Run Application (1):')
                 mode = int(raw_input(''))
 
                 while mode != 1 and mode != 0:
-                    print('Wrong Input! Please Select -> Remove Application (0) or Run Application (1):')
+                    print('\nWrong Input! Please Select -> Remove Application (0) or Run Application (1):')
                     mode = int(raw_input(''))
 
                 if mode == 0 and len(active_ids) > 0:
-                    print('remove')
-                # code to send the id in order to stop and remove an application
+                    print('\n\nActive Applications | ID')
+                    id = 0
+                    for application in active_applications:
+                        print(application + " | " + str(active_ids[id]))
+                        id+=1
+                    print('\nType the application\'s name you wish to remove:')
+                    binary_filename = raw_input('')
+                    print('\nType the application\'s  you wish to remove:')
+                    app_id = int(raw_input(''))
+                    count_char = 25
+                    for i in range(count_char):
+                        binary_array.append(int('00',16))
+
+                    msg = BinaryMsg((app_id, binary_array, state, mode, []))
+
+                    print(msg)
+                    tx_queue.put(msg)
+                    print('Sent')
+
+                    active_ids.remove(app_id)
+                    active_applications.remove(binary_filename)
+
+                    print('\n\nActive Applications | ID')
+                    id = 0
+                    for application in active_applications:
+                        print(application + " | " + str(active_ids[id]))
+                        id+=1
+
                 elif mode == 0 and len(active_ids) == 0:
-                    print('No running applications in the system!')
+                    print('\nNo running applications in the system!')
                 elif mode == 1 and len(active_ids) >= 2:
-                    print('Not enough memory for new application!')
+                    print('\nNot enough memory for new application!')
                 elif mode == 1 and len(active_ids) < 2:
-                    print('Type a Binary Application file:')
+                    print('\nType a Binary Application file:')
                     binary_filename = raw_input('')
                     with open('Binary_Files/' + binary_filename + '.txt','r') as b_file:
                         for line in b_file:
@@ -185,23 +212,29 @@ def transmitter(tx_queue):
                     for i in range(count_char):
                         binary_array.append(int('00',16))
 
-                    print(binary_array)
-                    print('Give a unique id for ' + binary_filename + ' application ')
+                    print('\nGive a unique id for ' + binary_filename + ' application ')
                     app_id = int(raw_input(''))
 
                     while app_id in active_ids:
-                        print('This id is already in use! Try another one.')
+                        print('\nThis id is already in use! Try another one.')
                         app_id = int(raw_input(''))
 
-                    active_ids.append(app_id)
-                    print(active_ids)
+                    active_ids.append(app_id) #insert new id
                 
                     msg = BinaryMsg((app_id, binary_array, state, mode, []))
 
                     print(msg)
                     tx_queue.put(msg)
-                    print('Sent')
+                    print('Sent\n\n')
 
+                    print('Active Applications | ID')
+                    id = 0
+                    active_applications.append(binary_filename)
+                    for application in active_applications:
+                        print(application + " | " + str(active_ids[id]))
+                        id+=1
+
+                    print('\n')
             except ValueError:
                 print('Wrong input')
 

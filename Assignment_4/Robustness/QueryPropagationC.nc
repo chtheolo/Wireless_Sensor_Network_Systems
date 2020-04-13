@@ -180,9 +180,8 @@ implementation
 		
 		pc = Apps_Queue[appHoldingController].pc;							/** set new program counter.*/
 		count_instructions = 0;
-		while (pc < maxInterpreterIterations /*&& Apps_Queue[appHoldingController].BinaryMessage[pc] != 0x00*/) {
+		while (pc < maxInterpreterIterations && Apps_Queue[appHoldingController].state != 0) {
 
-			//if ( pc == (Apps_Queue[appHoldingController].pc + 4) ) {
 			if (count_instructions == 1) {
 				count_instructions = 0;
 				Apps_Queue[appHoldingController].pc = pc;					/**Save where current application pc points.*/
@@ -1512,6 +1511,10 @@ implementation
 				while (start < MAX_APPLICATIONS) {
 					if (Apps_Queue[start].state == 1 && Apps_Queue[start].app_id == s_bin_code->app_id) {
 						Apps_Queue[start].state = 0;
+						if (s_bin_code->app_id == 0) {
+							call Leds.led1Off();
+						}
+						else {call Leds.led2Off();}
 						break;
 					}
 					start++;
@@ -1535,7 +1538,7 @@ implementation
 			j=0;
 			number_of_active_apps = 0;
 			while (j < MAX_APPLICATIONS) {
-				if (Apps_Queue[j].state == 1) { number_of_active_apps++;}
+				if (Apps_Queue[j].state == 1 /*&& Apps_Queue[j].TimerCalled == TRUE && Apps_Queue[j].pc != 0x00*/) { number_of_active_apps++; }
 				j++;
 			}
 
