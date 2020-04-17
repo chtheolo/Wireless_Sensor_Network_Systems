@@ -121,7 +121,7 @@ implementation
 	uint16_t average;
 	uint16_t startDelay;
 	uint16_t dtDelay;
-	uint16_t rx,ry;								/*Registers mask variables*/
+	int16_t rx,ry;								/*Registers mask variables*/
 
 /*	32-bit	*/
 	uint32_t t0,dt;
@@ -169,6 +169,7 @@ implementation
 		for (start = 0; start < 2; start++) {
 			Apps_Queue[start].state = 0;
 			Apps_Queue[start].app_id = 0;
+			Apps_Queue[start].RegisterReadSensor = 0; // 0 value depicts that there isn't register which needs sensors data.
 			for (i=0; i<6; i++) {
 				Apps_Queue[start].registers[i] = 0;
 			}
@@ -210,6 +211,22 @@ implementation
 				case 0x00:											/*return*/
 					if (Apps_Queue[appHoldingController].TimerCalled == FALSE) {	/*If an application returned before calling Timer Handler, means that the current finished its execution. */
 						Apps_Queue[appHoldingController].state = 0;
+					}
+
+					Apps_Queue[appHoldingController].pc = pc;					/**Save where current application pc points.*/
+					start = appHoldingController;
+					appHoldingController++;
+					appHoldingController = appHoldingController%MAX_APPLICATIONS;
+			
+					while (start != appHoldingController) {							/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei thn entolh return.
+																					** An 3anaftasw thn idia efarmogi tote sunexizw sthn idia. */
+						if (Apps_Queue[appHoldingController].state == 1 && Apps_Queue[appHoldingController].BinaryMessage[Apps_Queue[appHoldingController].pc] != 0x00 ) {  /* check if active application and has instructions to do.*/
+							maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];
+							post Interpretation();
+							return;
+						}
+						appHoldingController++;
+						appHoldingController = appHoldingController%MAX_APPLICATIONS;
 					}
 					return;
 				case 0x10:											/* set, rx = val (1rx)*/
@@ -298,7 +315,8 @@ implementation
 					pc++;
 					break;
 				case 0xD0:											/* rdb, rx = current brightness value */
-					//reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
+					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
+					Apps_Queue[appHoldingController].RegisterReadSensor = rx;
 					pc++;
 					break;
 				case 0xE0:											/* tmr */
@@ -800,120 +818,123 @@ implementation
 
 /* --------------------------------------------------- READ VALUES DONE, SO SEND ------------------------------------------------------ */
 	event void Read.readDone(error_t result, uint16_t data) {
-		if(result == SUCCESS){
-			/** Save what query we are handling */
-			remindQuery = Hold_Sampling_Timer;
+		if (result == SUCCESS) {
 
-			/* IF i am the query originator */
-			if (TOS_NODE_ID == AQQ[Hold_Sampling_Timer].source_id) {
-				source_id = TOS_NODE_ID;
-				s_data_id = data_id;
-				forwarder_id = TOS_NODE_ID;
-							/*  . . .  */   	/* independs on the propagation_mode */
-				destination_id = AQQ[Hold_Sampling_Timer].source_id;
-				sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
-				sampling_id = AQQ[Hold_Sampling_Timer].sampling_id++;			/*new*/
-
-				if (AQQ[Hold_Sampling_Timer].propagation_mode == 0) {  // SIMPLE mode == 0
-					sensor_data = data;
-					mode = 0;
-
-					call TimerSendPCSerial.startOneShot(20);  // to serial send valto kalutera se ena task
-				}
-				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
-					hops = AQQ[Hold_Sampling_Timer].hops;
-					min = data;
-					max = data;
-					average = data;
-					//stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
-					mode = 1;
-
-					post DelayMeasurementScheduling();
-				}		
-			}
-			else { /* ELSE IF  MIDDLE NODE, then read and forward the values */ 
-				
-				/** My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
-				sendTofather = AQQ[Hold_Sampling_Timer].forwarder_id;	 
-
-				if (AQQ[Hold_Sampling_Timer].propagation_mode == 0) {  // SIMPLE mode == 0
-					sampling_save = sampling_save%SIZE;
-					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
-					if (ucast_pkt == NULL) {
-						return;
-					}
-					sampling_save++;
-
-					ucast_pkt->source_id = TOS_NODE_ID;
-					ucast_pkt->sampling_id = AQQ[Hold_Sampling_Timer].sampling_id++;		/*new*/
-					ucast_pkt->data_id = data_id;
-					ucast_pkt->forwarder_id = TOS_NODE_ID;
-					ucast_pkt->sensor_data = data;
-					ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
-					ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
-					ucast_pkt->mode = 0;
-					mode = 0;
-					
-					call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);  					   // Timer for Unicast Message - TOS_NODE_ID * 20				
-				}
-				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
-
-					stats_sampling_save = stats_sampling_save%SIZE;
-					stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_save], sizeof (stats_sampling_msg_t)));
-					if (stats_ucast_pkt == NULL) {
-						return;
-					}
-					stats_sampling_save++;
-
-					stats_ucast_pkt->source_id = TOS_NODE_ID;
-					stats_ucast_pkt->data_id = data_id;
-					stats_ucast_pkt->forwarder_id = TOS_NODE_ID;
-					stats_ucast_pkt->hops = AQQ[Hold_Sampling_Timer].hops;
-					stats_ucast_pkt->min = data;
-					stats_ucast_pkt->max = data;
-					stats_ucast_pkt->average = data;
-					stats_ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
-					stats_ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
-					stats_ucast_pkt->mode = 1;
-					mode = 1;//AQQ[Hold_Sampling_Timer].propagation_mode;
-
-					min = data;
-					max = data;
-					average = data;
-					post DelayMeasurementScheduling();
-				}
-			}
-			data_id++;
-			
-			if (number_Of_queries > 0) {
-			
-				expiredQuery = Hold_Sampling_Timer; // this points to the expired query sampling period
-				runningTime = TimeToMeasure[expiredQuery];
-				minPeriod = 0;
-				start = 0;	
-				while(start < NUMBER_OF_QUERIES) {
-					if (AQQ[start].state == 1) {
-						if (start == expiredQuery) {
-							TimeToMeasure[start] = AQQ[start].sampling_period; // if finished, initialize again the sampling period
-						}
-						else {
-							TimeToMeasure[start] = TimeToMeasure[start] - runningTime;
-						}
-
-						if (TimeToMeasure[start] <= TimeToMeasure[minPeriod] && TimeToMeasure[start] != 0) {	/*find the min but exclude the 0 time */
-							Hold_Sampling_Timer = start;
-						}
-					}
-					else {
-						minPeriod++; // if in first positions there is no active query,then move on and minPeriod moves on too
-					}
-					start++;
-				}
-
-				call TimerReadSensor.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
-				time4MeasurementStartAt = call TimerReadSensor.getNow();
-			}
 		}
+//		if(result == SUCCESS){
+//			/** Save what query we are handling */
+//			remindQuery = Hold_Sampling_Timer;
+//
+//			/* IF i am the query originator */
+//			if (TOS_NODE_ID == AQQ[Hold_Sampling_Timer].source_id) {
+//				source_id = TOS_NODE_ID;
+//				s_data_id = data_id;
+//				forwarder_id = TOS_NODE_ID;
+//							/*  . . .  */   	/* independs on the propagation_mode */
+//				destination_id = AQQ[Hold_Sampling_Timer].source_id;
+//				sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
+//				sampling_id = AQQ[Hold_Sampling_Timer].sampling_id++;			/*new*/
+//
+//				if (AQQ[Hold_Sampling_Timer].propagation_mode == 0) {  // SIMPLE mode == 0
+//					sensor_data = data;
+//					mode = 0;
+//
+//					call TimerSendPCSerial.startOneShot(20);  // to serial send valto kalutera se ena task
+//				}
+//				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
+//					hops = AQQ[Hold_Sampling_Timer].hops;
+//					min = data;
+//					max = data;
+//					average = data;
+//					//stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
+//					mode = 1;
+//
+//					post DelayMeasurementScheduling();
+//				}		
+//			}
+//			else { /* ELSE IF  MIDDLE NODE, then read and forward the values */ 
+//				
+//				/** My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
+//				sendTofather = AQQ[Hold_Sampling_Timer].forwarder_id;	 
+//
+//				if (AQQ[Hold_Sampling_Timer].propagation_mode == 0) {  // SIMPLE mode == 0
+//					sampling_save = sampling_save%SIZE;
+//					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
+//					if (ucast_pkt == NULL) {
+//						return;
+//					}
+//					sampling_save++;
+//
+//					ucast_pkt->source_id = TOS_NODE_ID;
+//					ucast_pkt->sampling_id = AQQ[Hold_Sampling_Timer].sampling_id++;		/*new*/
+//					ucast_pkt->data_id = data_id;
+//					ucast_pkt->forwarder_id = TOS_NODE_ID;
+//					ucast_pkt->sensor_data = data;
+//					ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
+//					ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
+//					ucast_pkt->mode = 0;
+//					mode = 0;
+//					
+//					call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);  					   // Timer for Unicast Message - TOS_NODE_ID * 20				
+//				}
+//				else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { // STATS mode == 1
+//
+//					stats_sampling_save = stats_sampling_save%SIZE;
+//					stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_save], sizeof (stats_sampling_msg_t)));
+//					if (stats_ucast_pkt == NULL) {
+//						return;
+//					}
+//					stats_sampling_save++;
+//
+//					stats_ucast_pkt->source_id = TOS_NODE_ID;
+//					stats_ucast_pkt->data_id = data_id;
+//					stats_ucast_pkt->forwarder_id = TOS_NODE_ID;
+//					stats_ucast_pkt->hops = AQQ[Hold_Sampling_Timer].hops;
+//					stats_ucast_pkt->min = data;
+//					stats_ucast_pkt->max = data;
+//					stats_ucast_pkt->average = data;
+//					stats_ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
+//					stats_ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
+//					stats_ucast_pkt->mode = 1;
+//					mode = 1;//AQQ[Hold_Sampling_Timer].propagation_mode;
+//
+//					min = data;
+//					max = data;
+//					average = data;
+//					post DelayMeasurementScheduling();
+//				}
+//			}
+//			data_id++;
+//			
+//			if (number_Of_queries > 0) {
+//			
+//				expiredQuery = Hold_Sampling_Timer; // this points to the expired query sampling period
+//				runningTime = TimeToMeasure[expiredQuery];
+//				minPeriod = 0;
+//				start = 0;	
+//				while(start < NUMBER_OF_QUERIES) {
+//					if (AQQ[start].state == 1) {
+//						if (start == expiredQuery) {
+//							TimeToMeasure[start] = AQQ[start].sampling_period; // if finished, initialize again the sampling period
+//						}
+//						else {
+//							TimeToMeasure[start] = TimeToMeasure[start] - runningTime;
+//						}
+//
+//						if (TimeToMeasure[start] <= TimeToMeasure[minPeriod] && TimeToMeasure[start] != 0) {	/*find the min but exclude the 0 time */
+//							Hold_Sampling_Timer = start;
+//						}
+//					}
+//					else {
+//						minPeriod++; // if in first positions there is no active query,then move on and minPeriod moves on too
+//					}
+//					start++;
+//				}
+//
+//				call TimerReadSensor.startOneShot(TimeToMeasure[Hold_Sampling_Timer]);
+//				time4MeasurementStartAt = call TimerReadSensor.getNow();
+//			}
+//		}
 	}
 
 /* ----------------------------------------- TimerSendPCSerial => SERIAL SEND : MOTE -> PC -------------------------------------------- */ 
@@ -1530,21 +1551,20 @@ implementation
 					}
 					start++;
 				}
-			}
-			
-			Apps_Queue[start].pc = 3; 											/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
-			maxInterpreterIterations = 3 + Apps_Queue[start].BinaryMessage[1];
+				Apps_Queue[start].pc = 3; 											/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
+				maxInterpreterIterations = 3 + Apps_Queue[start].BinaryMessage[1];
 
-			j=0;
-			number_of_active_apps = 0;
-			while (j < MAX_APPLICATIONS) {
-				if (Apps_Queue[j].state == 1 /*&& Apps_Queue[j].TimerCalled == TRUE && Apps_Queue[j].pc != 0x00*/) { number_of_active_apps++; }
-				j++;
-			}
+				j=0;
+				number_of_active_apps = 0;
+				while (j < MAX_APPLICATIONS) {
+					if (Apps_Queue[j].state == 1 /*&& Apps_Queue[j].TimerCalled == TRUE && Apps_Queue[j].pc != 0x00*/) { number_of_active_apps++; }
+					j++;
+				}
 
-			if (number_of_active_apps == 1) {				/*Call interpreter, if only there is no other active application in the system.*/
-				appHoldingController = start;
-				post Interpretation();
+				if (number_of_active_apps == 1) {				/*Call interpreter, if only there is no other active application in the system.*/
+					appHoldingController = start;
+					post Interpretation();
+				}
 			}
 		}
 		return msg;
