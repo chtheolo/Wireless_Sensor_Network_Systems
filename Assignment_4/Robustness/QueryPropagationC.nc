@@ -110,7 +110,8 @@ implementation
 	uint8_t appHoldingTimer;					/*Current Application that holds the timer.*/
 	uint8_t pc;									/*Program counter.*/
 	uint8_t number_of_active_apps;				/*The whole of active applications in the VM.*/
-	uint8_t count_instructions;
+	uint8_t count_instructions;					/*Count the instructions for context-switch.*/
+	uint8_t appWaitSensor;						/*The first application that called the ReadSensor.*/
 
 /*  16-bit  */
 	uint16_t time4MeasurementStartAt;			/*Timer start flag for measurements scheduling.*/
@@ -195,12 +196,21 @@ implementation
 				while (start != appHoldingController) {							/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei thn entolh return.
 																				** An 3anaftasw thn idia efarmogi tote sunexizw sthn idia. */
 					if (Apps_Queue[appHoldingController].state == 1 && Apps_Queue[appHoldingController].BinaryMessage[Apps_Queue[appHoldingController].pc] != 0x00 ) {  /* check if active application and has instructions to do.*/
-						maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];
-						post Interpretation();
+						if (Apps_Queue[start].RegisterReadSensor != 0) {
+							maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];
+							post Interpretation();
+							return;
+						}
+						call Read.read();
 						return;
 					}
 					appHoldingController++;
 					appHoldingController = appHoldingController%MAX_APPLICATIONS;
+				}
+
+				if (Apps_Queue[appHoldingController].RegisterReadSensor != 0) {
+					call Read.read();
+					return;
 				}
 
 			}
@@ -220,9 +230,13 @@ implementation
 			
 					while (start != appHoldingController) {							/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei thn entolh return.
 																					** An 3anaftasw thn idia efarmogi tote sunexizw sthn idia. */
-						if (Apps_Queue[appHoldingController].state == 1 && Apps_Queue[appHoldingController].BinaryMessage[Apps_Queue[appHoldingController].pc] != 0x00 ) {  /* check if active application and has instructions to do.*/
-							maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];
-							post Interpretation();
+						if (Apps_Queue[appHoldingController].state == 1 && Apps_Queue[appHoldingController].BinaryMessage[Apps_Queue[appHoldingController].pc] != 0x00) {  /* check if active application and has instructions to do.*/
+							if (Apps_Queue[start].RegisterReadSensor != 0) {
+								maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];
+								post Interpretation();
+								return;
+							}
+							call Read.read();
 							return;
 						}
 						appHoldingController++;
@@ -242,13 +256,17 @@ implementation
 				case 0x30:											/* add, rx = rx + ry */
 					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
 					ry = Apps_Queue[appHoldingController].BinaryMessage[++pc] & 0x0F;
-					Apps_Queue[appHoldingController].registers[--rx] += Apps_Queue[appHoldingController].registers[--ry];
+					rx--;
+					ry--;
+					Apps_Queue[appHoldingController].registers[rx] += Apps_Queue[appHoldingController].registers[ry];
 					pc++;
 					break;
 				case 0x40:											/* sub,rx = rx-ry */
 					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
 					ry = Apps_Queue[appHoldingController].BinaryMessage[++pc] & 0x0F;
-					Apps_Queue[appHoldingController].registers[--rx] -= Apps_Queue[appHoldingController].registers[--ry];
+					rx--;
+					ry--;
+					Apps_Queue[appHoldingController].registers[rx] -= Apps_Queue[appHoldingController].registers[ry];
 					pc++;
 					break;
 				case 0x50:											/* inc, rx = rx + 1 */
@@ -285,7 +303,8 @@ implementation
 					break;
 				case 0x90:											/* bgz, if ( rx > 0 ) pc = pc + off */
 					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
-					if (Apps_Queue[appHoldingController].registers[--rx] > 0) {
+					rx--;
+					if (Apps_Queue[appHoldingController].registers[rx] > 0) {
 						pc += (Apps_Queue[appHoldingController].BinaryMessage[++pc]);
 						break;
 					}
@@ -293,7 +312,8 @@ implementation
 					break;
 				case 0xA0:											/* bez, if ( rx == 0 ) pc = pc + off */
 					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
-					if (Apps_Queue[appHoldingController].registers[--rx] == 0) {
+					rx--;
+					if (Apps_Queue[appHoldingController].registers[rx] == 0) {
 						pc += Apps_Queue[appHoldingController].BinaryMessage[++pc];
 						break;
 					}
@@ -315,6 +335,7 @@ implementation
 					pc++;
 					break;
 				case 0xD0:											/* rdb, rx = current brightness value */
+					call Leds.led0Toggle();
 					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
 					Apps_Queue[appHoldingController].RegisterReadSensor = rx;
 					pc++;
@@ -324,7 +345,7 @@ implementation
 						checkTimer = call TimerApplications.getNow();
 						runningTime = checkTimer - timerApplicationStartAt;
 						dt = Apps_Queue[appHoldingTimer].TimerRemainingTime - runningTime;
-						Apps_Queue[appHoldingController].TimerRemainingTime = Apps_Queue[appHoldingController].BinaryMessage[++pc] * 1000;
+						Apps_Queue[appHoldingController].TimerRemainingTime = Apps_Queue[appHoldingController].BinaryMessage[++pc] * 1000; 
 
 						if (dt > (Apps_Queue[appHoldingController].BinaryMessage[pc]*1000)) {
 							appHoldingTimer = appHoldingController;
@@ -348,14 +369,10 @@ implementation
 						appHoldingTimer = appHoldingController;
 						Apps_Queue[appHoldingController].TimerRemainingTime = Apps_Queue[appHoldingController].BinaryMessage[++pc] * 1000;  /*Keep the remaining time*/
 						call TimerApplications.startOneShot(Apps_Queue[appHoldingController].BinaryMessage[pc]*1000);
-						//Apps_Queue[appHoldingController].TimerCalled = TRUE;
 						timerApplicationStartAt = call TimerApplications.getNow();
 					}
 					Apps_Queue[appHoldingController].TimerCalled = TRUE;
 					pc++;
-					break;
-				case 0xF0:											/* EOF */
-					//reg = Apps_Queue[start].BinaryMessage[i] & 0x0F;
 					break;
 			}
 			count_instructions++;
@@ -819,7 +836,17 @@ implementation
 /* --------------------------------------------------- READ VALUES DONE, SO SEND ------------------------------------------------------ */
 	event void Read.readDone(error_t result, uint16_t data) {
 		if (result == SUCCESS) {
-
+			j=0;
+			while (j < MAX_APPLICATIONS) {
+				if(Apps_Queue[j].RegisterReadSensor != 0) {
+					//rx = Apps_Queue[j
+					Apps_Queue[j].registers[--Apps_Queue[j].RegisterReadSensor] = data;
+					Apps_Queue[j].RegisterReadSensor = 0;
+				}
+				j++;
+			}
+			appHoldingController = appWaitSensor;
+			post Interpretation();
 		}
 //		if(result == SUCCESS){
 //			/** Save what query we are handling */
