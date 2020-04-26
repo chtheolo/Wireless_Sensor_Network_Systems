@@ -35,6 +35,7 @@ module QueryPropagationC @safe()
 	uses interface Timer<TMilli> as TimerQueryCancelResponse;
 	uses interface Timer<TMilli> as Timer_StatsUnicast_Unicast;
 	uses interface Timer<TMilli> as TimerApplications;
+	//uses interface Timer<TMilli> as TimerCacheDataSensor;
 
 	uses interface Read<uint16_t>;
 
@@ -180,24 +181,26 @@ implementation
 /* ------------------------------- Interpretation ----------------------------- */
 	task void Interpretation() {
 		
-		pc = Apps_Queue[appHoldingController].pc;							/** set new program counter.*/
+		pc = Apps_Queue[appHoldingController].pc;							/** set new program counter.*/ 
 		count_instructions = 0;
+		//maxInterpretations mporei na mhn xreiazetai 
 		while (pc < maxInterpreterIterations && Apps_Queue[appHoldingController].state != 0) {
 
-			if (count_instructions == 1) {
-				count_instructions = 0;
+			/* ---------------------------------------------------- CONTEXT SWITCHING -------------------------------------------------------- */
+			if (count_instructions >= 3 || Apps_Queue[appHoldingController].RegisterReadSensor != 0) {
 				Apps_Queue[appHoldingController].pc = pc;					/**Save where current application pc points.*/
-
 				
 				start = appHoldingController;
 				appHoldingController++;
 				appHoldingController = appHoldingController%MAX_APPLICATIONS;
 		
-				while (start != appHoldingController) {							/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei thn entolh return.
-																				** An 3anaftasw thn idia efarmogi tote sunexizw sthn idia. */
-					if (Apps_Queue[appHoldingController].state == 1 && Apps_Queue[appHoldingController].BinaryMessage[Apps_Queue[appHoldingController].pc] != 0x00 ) {  /* check if active application and has instructions to do.*/
-						if (Apps_Queue[start].RegisterReadSensor != 0) {
+				while (start != appHoldingController) {							/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei return.
+																				** An 3anaftasw thn idia efarmogi, profanws den uparxei kapoia allh gia na parei ton controller, opote sunexizw sthn idia. */
+					if (Apps_Queue[appHoldingController].state == 1 && Apps_Queue[appHoldingController].pc != 0x00 && Apps_Queue[appHoldingController].TimerCalled == FALSE ) {  /* check if there is any active application that hasn't return.*/
+						
+						if (Apps_Queue[appHoldingController].RegisterReadSensor == 0) {										/*there is an active app. check if this app waits Sensor's data in order to continue its execution.*/
 							maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];
+							count_instructions = 0;
 							post Interpretation();
 							return;
 						}
@@ -208,30 +211,34 @@ implementation
 					appHoldingController = appHoldingController%MAX_APPLICATIONS;
 				}
 
-				if (Apps_Queue[appHoldingController].RegisterReadSensor != 0) {
-					call Read.read();
+				if (Apps_Queue[appHoldingController].RegisterReadSensor != 0) {		/*This conditioin will be executed only if there is no other application in the system and the controller is back to the same application.*/
+					call Read.read();												/*Check if i want Sensor's data to continue.*/
 					return;
 				}
 
 			}
+			/* ------------------------------------------------- END OF CONTEXT SWITCHING ------------------------------------------------------- */
 			
 			instruction = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0xF0;
-
+			
 			switch (instruction) {
 				case 0x00:											/*return*/
-					if (Apps_Queue[appHoldingController].TimerCalled == FALSE) {	/*If an application returned before calling Timer Handler, means that the current finished its execution. */
+					if (Apps_Queue[appHoldingController].TimerCalled == FALSE) {	/*If an application returned before calling Timer Handler, means that the current application terminated its execution. */
 						Apps_Queue[appHoldingController].state = 0;
 					}
 
+					count_instructions = 0;
 					Apps_Queue[appHoldingController].pc = pc;					/**Save where current application pc points.*/
+
 					start = appHoldingController;
 					appHoldingController++;
 					appHoldingController = appHoldingController%MAX_APPLICATIONS;
 			
 					while (start != appHoldingController) {							/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei thn entolh return.
 																					** An 3anaftasw thn idia efarmogi tote sunexizw sthn idia. */
-						if (Apps_Queue[appHoldingController].state == 1 && Apps_Queue[appHoldingController].BinaryMessage[Apps_Queue[appHoldingController].pc] != 0x00) {  /* check if active application and has instructions to do.*/
-							if (Apps_Queue[start].RegisterReadSensor != 0) {
+						if (Apps_Queue[appHoldingController].state == 1 /*&& Apps_Queue[appHoldingController].pc != 0x00 && Apps_Queue[appHoldingController].TimerCalled == FALSE*/) {  /* check if active application and has instructions to do.*/
+							if (Apps_Queue[appHoldingController].RegisterReadSensor == 0) {
+								
 								maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];
 								post Interpretation();
 								return;
@@ -242,6 +249,7 @@ implementation
 						appHoldingController++;
 						appHoldingController = appHoldingController%MAX_APPLICATIONS;
 					}
+								/*if no other active application in the system, just return from the execution.*/
 					return;
 				case 0x10:											/* set, rx = val (1rx)*/
 					rx = (Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F);
@@ -324,8 +332,12 @@ implementation
 					break;
 				case 0xC0:											/* led, f ( val != 0 ) turn led on else turn led off */
 					if ((Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F) == 0x01){
-						if (Apps_Queue[appHoldingController].app_id == 0) { call Leds.led1On(); }
-						else { call Leds.led2On(); }
+						if (Apps_Queue[appHoldingController].app_id == 0) { 
+							call Leds.led1On();
+						}
+						else { 
+							call Leds.led2On();
+						}
 						
 						pc++;
 						break;
@@ -335,19 +347,33 @@ implementation
 					pc++;
 					break;
 				case 0xD0:											/* rdb, rx = current brightness value */
-					call Leds.led0Toggle();
+					//if (Apps_Queue[appHoldingController].app_id == 0) {
+					//	call Leds.led0Off();
+					//}
+					//else if (Apps_Queue[appHoldingController].app_id == 1) {
+					//	call Leds.led1On();
+					//}
 					rx = Apps_Queue[appHoldingController].BinaryMessage[pc] & 0x0F;
+					//if (call TimerCacheDataSensor.isRunning() == TRUE) {
+					//	Apps_Queue[appHoldingController].registers[--rx] = sensor_data;
+					//	pc++;
+					//	break;
+					//}
 					Apps_Queue[appHoldingController].RegisterReadSensor = rx;
 					pc++;
 					break;
 				case 0xE0:											/* tmr */
+					pc++;
+					Apps_Queue[appHoldingController].TimerRemainingTime = Apps_Queue[appHoldingController].BinaryMessage[pc] * 1000;  /*Keep the remaining time*/
+					Apps_Queue[appHoldingController].TimerCalled = TRUE;
+
 					if (call TimerApplications.isRunning() == TRUE) {
+
 						checkTimer = call TimerApplications.getNow();
 						runningTime = checkTimer - timerApplicationStartAt;
 						dt = Apps_Queue[appHoldingTimer].TimerRemainingTime - runningTime;
-						Apps_Queue[appHoldingController].TimerRemainingTime = Apps_Queue[appHoldingController].BinaryMessage[++pc] * 1000; 
 
-						if (dt > (Apps_Queue[appHoldingController].BinaryMessage[pc]*1000)) {
+						if (dt > Apps_Queue[appHoldingController].TimerRemainingTime /*(Apps_Queue[appHoldingController].BinaryMessage[pc]*1000)*/) {
 							appHoldingTimer = appHoldingController;
 							call TimerApplications.startOneShot(Apps_Queue[appHoldingController].BinaryMessage[pc]*1000);
 							timerApplicationStartAt = call TimerApplications.getNow();
@@ -358,7 +384,7 @@ implementation
 						
 						j=0;
 						while (j < MAX_APPLICATIONS) {
-							if (Apps_Queue[j].state == 1 && j != appHoldingController) {
+							if (Apps_Queue[j].state == 1 && j!= appHoldingController) {
 								Apps_Queue[j].TimerRemainingTime -= runningTime;
 							}
 							j++;
@@ -367,11 +393,10 @@ implementation
 					}
 					else {
 						appHoldingTimer = appHoldingController;
-						Apps_Queue[appHoldingController].TimerRemainingTime = Apps_Queue[appHoldingController].BinaryMessage[++pc] * 1000;  /*Keep the remaining time*/
-						call TimerApplications.startOneShot(Apps_Queue[appHoldingController].BinaryMessage[pc]*1000);
+						call TimerApplications.startOneShot(Apps_Queue[appHoldingController].TimerRemainingTime/*Apps_Queue[appHoldingController].BinaryMessage[pc]*1000*/);
 						timerApplicationStartAt = call TimerApplications.getNow();
 					}
-					Apps_Queue[appHoldingController].TimerCalled = TRUE;
+					
 					pc++;
 					break;
 			}
@@ -720,12 +745,17 @@ implementation
 	event void TimerApplications.fired() {
 
 		/*The current application that holding the timer, is going to get the controller. */
-		appHoldingController = appHoldingTimer; 
+		//if (appHoldingController != appHoldingTimer) { 
+		//	Apps_Queue[appHoldingController].pc = pc;
+		//}
+
+		appHoldingController = appHoldingTimer;
+		count_instructions = 0; 
 
 		maxInterpreterIterations = Apps_Queue[appHoldingController].BinaryMessage[0];										//refresh the maxInterpretations of this application
 		Apps_Queue[appHoldingController].pc = Apps_Queue[appHoldingController].BinaryMessage[0] - Apps_Queue[appHoldingController].BinaryMessage[2];		//refresh where the pc points in this application
 		Apps_Queue[appHoldingController].TimerCalled = FALSE;
-		post Interpretation();
+		
 
 		j=0;
 		minQuery = 0;
@@ -750,11 +780,12 @@ implementation
 		Apps_Queue[appHoldingController].TimerRemainingTime = 0;
 		appHoldingTimer = minQuery;
 
-		if (Apps_Queue[appHoldingTimer].TimerRemainingTime > 0) {
+		if (Apps_Queue[appHoldingTimer].TimerRemainingTime > 0 && Apps_Queue[appHoldingTimer].TimerCalled == TRUE) {
+			//Apps_Queue[appHoldingTimer].TimerCalled = TRUE;
 			call TimerApplications.startOneShot(Apps_Queue[appHoldingTimer].TimerRemainingTime);
 			timerApplicationStartAt = call TimerApplications.getNow();
-			Apps_Queue[appHoldingTimer].TimerCalled = TRUE;
 		}
+		post Interpretation();
 		
 	}
 
@@ -807,7 +838,7 @@ implementation
 			}		
 		}
 	}
-/* ------------------------- TimerQueryCancelResponse =>  WAITING UPPER BOUND TIME,TO CHECK WHO SEND CANCEL RESPONSE -------------------------- */ 
+/* -------------------- TimerQueryCancelResponse =>  WAITING UPPER BOUND TIME,TO CHECK WHO SEND CANCEL RESPONSE ---------------------- */ 
 	event void TimerQueryCancelResponse.fired() {
 		query_pos = 0;
 		start=0;
@@ -821,6 +852,11 @@ implementation
 			query_pos++;
 		}
 	}
+
+/* -------------------------------------- TimerCacheDataSensor =>  Deactivete the sensor value ---------------------------------------- */ 	
+	//event void TimerCacheDataSensor.fired() {
+	//	post Interpretation();
+	//}
 
 /* -------------------------------------- TimerReadSensor =>  START READING VALUES FROM SENSOR ---------------------------------------- */ 	
 	event void TimerReadSensor.fired() {	
@@ -836,16 +872,18 @@ implementation
 /* --------------------------------------------------- READ VALUES DONE, SO SEND ------------------------------------------------------ */
 	event void Read.readDone(error_t result, uint16_t data) {
 		if (result == SUCCESS) {
+			sensor_data = data;
 			j=0;
 			while (j < MAX_APPLICATIONS) {
 				if(Apps_Queue[j].RegisterReadSensor != 0) {
-					//rx = Apps_Queue[j
-					Apps_Queue[j].registers[--Apps_Queue[j].RegisterReadSensor] = data;
+					i = Apps_Queue[j].RegisterReadSensor;
+					Apps_Queue[j].registers[--i] = sensor_data;
 					Apps_Queue[j].RegisterReadSensor = 0;
 				}
 				j++;
 			}
-			appHoldingController = appWaitSensor;
+			
+			//call TimerCacheDataSensor.startOneShot(10000);		/*Cache data for 1 minute.*/
 			post Interpretation();
 		}
 //		if(result == SUCCESS){
@@ -1551,7 +1589,7 @@ implementation
 				}
 			}
 		}
-		else if (len == sizeof(binary_msg_t)) {
+		else if (len == sizeof(binary_msg_t)) {					/****** Get a binary application ******/
 			s_bin_code = (binary_msg_t*) payload;
 
 			start = 0;
@@ -1562,37 +1600,49 @@ implementation
 						if (s_bin_code->app_id == 0) {
 							call Leds.led1Off();
 						}
-						else {call Leds.led2Off();}
+						else { 
+							call Leds.led2Off(); 
+						}
 						break;
 					}
 					start++;
 				}
 			}
 			else if (s_bin_code->mode == 1) {
+
 				while (start < MAX_APPLICATIONS) {
+
 					if (Apps_Queue[start].state == 0) { /* run if you are new app ,until the end of the array to find a position into the system*/
 						Apps_Queue[start].app_id = s_bin_code->app_id;
 						memcpy(Apps_Queue[start].BinaryMessage, s_bin_code->BinaryMessage, 25 * sizeof(nx_uint8_t));
 						Apps_Queue[start].state = 1;
+
+
+						Apps_Queue[start].pc = 3; 											/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
+						maxInterpreterIterations = 3 + Apps_Queue[start].BinaryMessage[1];
+
+						j=0;
+						number_of_active_apps = 0;
+						while (j < MAX_APPLICATIONS) {
+							if (Apps_Queue[j].state == 1) { 	/*&& Apps_Queue[j].TimerCalled == TRUE && Apps_Queue[j].pc != 0x00*/
+							 	number_of_active_apps++; 
+							}
+							j++;
+						}
+
+						if (number_of_active_apps == 1) {				/*Call interpreter, if only there is no other active application in the system.*/
+							appHoldingController = start;				/*init*/
+							count_instructions = 0;
+							post Interpretation();
+						}
+
 						break;
 					}
+
 					start++;
-				}
-				Apps_Queue[start].pc = 3; 											/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
-				maxInterpreterIterations = 3 + Apps_Queue[start].BinaryMessage[1];
-
-				j=0;
-				number_of_active_apps = 0;
-				while (j < MAX_APPLICATIONS) {
-					if (Apps_Queue[j].state == 1 /*&& Apps_Queue[j].TimerCalled == TRUE && Apps_Queue[j].pc != 0x00*/) { number_of_active_apps++; }
-					j++;
-				}
-
-				if (number_of_active_apps == 1) {				/*Call interpreter, if only there is no other active application in the system.*/
-					appHoldingController = start;
-					post Interpretation();
-				}
+				}	
 			}
+
 		}
 		return msg;
 	}
