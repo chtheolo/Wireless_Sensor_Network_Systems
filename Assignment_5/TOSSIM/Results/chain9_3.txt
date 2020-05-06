@@ -1,0 +1,902 @@
+  1   2   0
+  2   1   0
+  2   3   0
+  3   2   0
+  3   4   0
+  4   3   0
+  4   5   0
+  5   4   0
+  5   6   0
+  6   5   0
+  6   7   0
+  7   6   0
+  7   8   0
+  8   7   0
+  8   9   0
+  9   8   0
+Creating noise model for  1
+Creating noise model for  2
+Creating noise model for  3
+Creating noise model for  4
+Creating noise model for  5
+Creating noise model for  6
+Creating noise model for  7
+Creating noise model for  8
+Creating noise model for  9
+DEBUG (1): RADIO_CONTROL = OK 0:0:0.000010040.
+DEBUG (1): SERIAL_CONTROL = OK 0:0:0.000010050.
+DEBUG (2): RADIO_CONTROL = OK 0:0:0.000020040.
+DEBUG (2): SERIAL_CONTROL = OK 0:0:0.000020050.
+DEBUG (3): RADIO_CONTROL = OK 0:0:0.000030040.
+DEBUG (3): SERIAL_CONTROL = OK 0:0:0.000030050.
+DEBUG (4): RADIO_CONTROL = OK 0:0:0.000040040.
+DEBUG (4): SERIAL_CONTROL = OK 0:0:0.000040050.
+DEBUG (5): RADIO_CONTROL = OK 0:0:0.000050040.
+DEBUG (5): SERIAL_CONTROL = OK 0:0:0.000050050.
+DEBUG (6): RADIO_CONTROL = OK 0:0:0.000060040.
+DEBUG (6): SERIAL_CONTROL = OK 0:0:0.000060050.
+DEBUG (7): RADIO_CONTROL = OK 0:0:0.000070040.
+DEBUG (7): SERIAL_CONTROL = OK 0:0:0.000070050.
+DEBUG (8): RADIO_CONTROL = OK 0:0:0.000080040.
+DEBUG (8): SERIAL_CONTROL = OK 0:0:0.000080050.
+DEBUG (1): Serial Received QUERY_ID: 1 , Sampling_Period: 10000, Query_Lifetime: 20000, Propagation_Mode: 1 ,@ 0:0:0.000090035 
+
+DEBUG (1): Serial Received QUERY_ID: 1 , FORWARDER_ID: 1 ,@ 0:0:0.000090035 
+
+DEBUG (9): RADIO_CONTROL = OK 0:0:0.000090040.
+DEBUG (9): SERIAL_CONTROL = OK 0:0:0.000090050.
+DEBUG (1): READY TO BROADCAST....
+DEBUG (1): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.029306885.
+DEBUG (2): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 1 ,@ 0:0:0.038279000 
+
+DEBUG (2): READY TO BROADCAST....
+DEBUG (2): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.096699697.
+DEBUG (3): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 2 ,@ 0:0:0.106541559 
+
+DEBUG (3): READY TO BROADCAST....
+DEBUG (3): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.194365947.
+DEBUG (4): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 3 ,@ 0:0:0.197295618 
+
+DEBUG (4): READY TO BROADCAST....
+DEBUG (4): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.313516572.
+DEBUG (5): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 4 ,@ 0:0:0.315988482 
+
+DEBUG (5): READY TO BROADCAST....
+DEBUG (5): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.461964073.
+DEBUG (6): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 5 ,@ 0:0:0.467792896 
+
+DEBUG (6): READY TO BROADCAST....
+DEBUG (6): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.642638135.
+DEBUG (7): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 6 ,@ 0:0:0.653166638 
+
+DEBUG (7): READY TO BROADCAST....
+DEBUG (7): BROADCASTING QUERY_ID: 1 ,@ 0:0:0.857491885.
+DEBUG (8): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 7 ,@ 0:0:0.866402966 
+
+DEBUG (8): READY TO BROADCAST....
+DEBUG (8): BROADCASTING QUERY_ID: 1 ,@ 0:0:1.100665948.
+DEBUG (9): NEW Radio Received QUERY_ID: 1, SOURCE_ID: 1, FORWARDER_ID: 8 ,@ 0:0:1.107456069 
+
+DEBUG (9): READY TO BROADCAST....
+DEBUG (9): BROADCASTING QUERY_ID: 1 ,@ 0:0:1.370207198.
+DEBUG (1): Enter, STATE: 1 
+DEBUG (1): TIME_TO_MEASURE[0] = 10000 
+DEBUG (2): Enter, STATE: 1 
+DEBUG (2): TIME_TO_MEASURE[0] = 10000 
+DEBUG (3): Enter, STATE: 1 
+DEBUG (3): TIME_TO_MEASURE[0] = 10000 
+DEBUG (4): Enter, STATE: 1 
+DEBUG (4): TIME_TO_MEASURE[0] = 10000 
+DEBUG (5): Enter, STATE: 1 
+DEBUG (5): TIME_TO_MEASURE[0] = 10000 
+DEBUG (6): Enter, STATE: 1 
+DEBUG (6): TIME_TO_MEASURE[0] = 10000 
+DEBUG (7): Enter, STATE: 1 
+DEBUG (7): TIME_TO_MEASURE[0] = 10000 
+DEBUG (8): Enter, STATE: 1 
+DEBUG (8): TIME_TO_MEASURE[0] = 10000 
+DEBUG (9): Enter, STATE: 1 
+DEBUG (9): TIME_TO_MEASURE[0] = 10000 
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 9, FATHER_ID: 8, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:10.891691573 
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (8): Stats_Measurement_Sampling Message Received 
+DEBUG (8): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 9, SAMPLING_ID: 0 
+DEBUG (8): WaitingTime: 467 
+ RemaingTime: 467 
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 8, FATHER_ID: 7, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:10.893370040 
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 467, RemaingTime: 467 , AQQ[0] 
+
+DEBUG (7): Stats_Measurement_Sampling Message Received 
+DEBUG (7): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 8, SAMPLING_ID: 0 
+DEBUG (7): WaitingTime: 691 
+ RemaingTime: 691 
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 7, FATHER_ID: 6, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:10.898359645 
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 691, RemaingTime: 691 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+DEBUG (6): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 7, SAMPLING_ID: 0 
+DEBUG (6): WaitingTime: 891 
+ RemaingTime: 891 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 6, FATHER_ID: 5, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:10.908033671 
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 891, RemaingTime: 891 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+DEBUG (5): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 6, SAMPLING_ID: 0 
+DEBUG (5): WaitingTime: 1055 
+ RemaingTime: 1055 
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 5, FATHER_ID: 4, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:10.916090274 
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 1055, RemaingTime: 1055 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+DEBUG (4): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 5, SAMPLING_ID: 0 
+DEBUG (4): WaitingTime: 1183 
+ RemaingTime: 1183 
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 4, FATHER_ID: 3, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:10.922376869 
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 1183, RemaingTime: 1183 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+DEBUG (3): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 4, SAMPLING_ID: 0 
+DEBUG (3): WaitingTime: 1285 
+ RemaingTime: 1285 
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:10.932554432 
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 1285, RemaingTime: 1285 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+DEBUG (2): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 3, SAMPLING_ID: 0 
+DEBUG (2): WaitingTime: 1364 
+ RemaingTime: 1364 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 0, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:10.940916209 
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 1364, RemaingTime: 1364 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+DEBUG (1): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 2, SAMPLING_ID: 0 
+DEBUG (1): WaitingTime: 1405 
+ RemaingTime: 1405 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (1): Enter, STATE: 1 
+DEBUG (1): TIME_TO_MEASURE[0] = 10000 
+DEBUG (1): The query_ expired! @ 0:0:19.531260030
+DEBUG (2): Enter, STATE: 1 
+DEBUG (2): TIME_TO_MEASURE[0] = 10000 
+DEBUG (2): The query_ expired! @ 0:0:19.569355967
+DEBUG (3): Enter, STATE: 1 
+DEBUG (3): TIME_TO_MEASURE[0] = 10000 
+DEBUG (3): The query_ expired! @ 0:0:19.637725342
+DEBUG (4): Enter, STATE: 1 
+DEBUG (4): TIME_TO_MEASURE[0] = 10000 
+DEBUG (4): The query_ expired! @ 0:0:19.727579092
+DEBUG (5): Enter, STATE: 1 
+DEBUG (5): TIME_TO_MEASURE[0] = 10000 
+DEBUG (5): The query_ expired! @ 0:0:19.846729718
+DEBUG (6): Enter, STATE: 1 
+DEBUG (6): TIME_TO_MEASURE[0] = 10000 
+DEBUG (6): The query_ expired! @ 0:0:19.998106905
+DEBUG (7): Enter, STATE: 1 
+DEBUG (7): TIME_TO_MEASURE[0] = 10000 
+DEBUG (7): The query_ expired! @ 0:0:20.183663780
+DEBUG (8): Enter, STATE: 1 
+DEBUG (8): TIME_TO_MEASURE[0] = 10000 
+DEBUG (8): The query_ expired! @ 0:0:20.397540968
+DEBUG (9): Enter, STATE: 1 
+DEBUG (9): TIME_TO_MEASURE[0] = 10000 
+DEBUG (9): The query_ expired! @ 0:0:20.637785343
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 9, FATHER_ID: 8, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:20.657316573 
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (8): Stats_Measurement_Sampling Message Received 
+DEBUG (8): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 9, SAMPLING_ID: 1 
+DEBUG (8): WaitingTime: 476 
+ RemaingTime: 476 
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 8, FATHER_ID: 7, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:20.667768792 
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 476, RemaingTime: 476 , AQQ[0] 
+
+DEBUG (7): Stats_Measurement_Sampling Message Received 
+DEBUG (7): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 8, SAMPLING_ID: 1 
+DEBUG (7): WaitingTime: 706 
+ RemaingTime: 706 
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 7, FATHER_ID: 6, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:20.678114201 
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 706, RemaingTime: 706 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+DEBUG (6): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 7, SAMPLING_ID: 1 
+DEBUG (6): WaitingTime: 902 
+ RemaingTime: 902 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 6, FATHER_ID: 5, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:20.684477089 
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 902, RemaingTime: 902 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+DEBUG (5): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 6, SAMPLING_ID: 1 
+DEBUG (5): WaitingTime: 1067 
+ RemaingTime: 1067 
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 5, FATHER_ID: 4, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:20.693632319 
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 1067, RemaingTime: 1067 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+DEBUG (4): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 5, SAMPLING_ID: 1 
+DEBUG (4): WaitingTime: 1198 
+ RemaingTime: 1198 
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 4, FATHER_ID: 3, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:20.702909619 
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 1198, RemaingTime: 1198 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+DEBUG (3): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 4, SAMPLING_ID: 1 
+DEBUG (3): WaitingTime: 1297 
+ RemaingTime: 1297 
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:20.709623457 
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 1297, RemaingTime: 1297 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+DEBUG (2): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 3, SAMPLING_ID: 1 
+DEBUG (2): WaitingTime: 1374 
+ RemaingTime: 1374 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 1, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 1, DESTINATION_ID: 1  , @ 0:0:20.716550916 
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 1374, RemaingTime: 1374 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+DEBUG (1): SOURCE_ID: 9, QUERY_ID: 1, FORWARDER_ID: 2, SAMPLING_ID: 1 
+DEBUG (1): WaitingTime: 1417 
+ RemaingTime: 1417 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (1): Enter, STATE: 0 
+DEBUG (2): Enter, STATE: 0 
+DEBUG (3): Enter, STATE: 0 
+DEBUG (4): Enter, STATE: 0 
+DEBUG (5): Enter, STATE: 0 
+DEBUG (6): Enter, STATE: 0 
+DEBUG (7): Enter, STATE: 0 
+DEBUG (8): Enter, STATE: 0 
+DEBUG (9): Enter, STATE: 0 
+DEBUG (1): Serial Received QUERY_ID: 2 , Sampling_Period: 5000, Query_Lifetime: 20000, Propagation_Mode: 1 ,@ 0:0:40.000090030 
+
+DEBUG (1): Serial Received QUERY_ID: 2 , FORWARDER_ID: 1 ,@ 0:0:40.000090030 
+
+DEBUG (1): READY TO BROADCAST....
+DEBUG (1): BROADCASTING QUERY_ID: 2 ,@ 0:0:40.029306885.
+DEBUG (2): NEW Radio Received QUERY_ID: 2, SOURCE_ID: 1, FORWARDER_ID: 1 ,@ 0:0:40.037531324 
+
+DEBUG (2): READY TO BROADCAST....
+DEBUG (2): BROADCASTING QUERY_ID: 2 ,@ 0:0:40.095723135.
+DEBUG (3): NEW Radio Received QUERY_ID: 2, SOURCE_ID: 1, FORWARDER_ID: 2 ,@ 0:0:40.103276191 
+
+DEBUG (3): READY TO BROADCAST....
+DEBUG (3): BROADCASTING QUERY_ID: 2 ,@ 0:0:40.190459697.
+DEBUG (4): NEW Radio Received QUERY_ID: 2, SOURCE_ID: 1, FORWARDER_ID: 3 ,@ 0:0:40.194381183 
+
+DEBUG (4): READY TO BROADCAST....
+DEBUG (4): BROADCASTING QUERY_ID: 2 ,@ 0:0:40.311563447.
+DEBUG (5): NEW Radio Received QUERY_ID: 2, SOURCE_ID: 1, FORWARDER_ID: 4 ,@ 0:0:40.314905103 
+
+DEBUG (5): READY TO BROADCAST....
+DEBUG (5): BROADCASTING QUERY_ID: 2 ,@ 0:0:40.460987510.
+DEBUG (6): NEW Radio Received QUERY_ID: 2, SOURCE_ID: 1, FORWARDER_ID: 5 ,@ 0:0:40.467090990 
+
+DEBUG (6): READY TO BROADCAST....
+DEBUG (6): BROADCASTING QUERY_ID: 2 ,@ 0:0:40.642638135.
+DEBUG (7): NEW Radio Received QUERY_ID: 2, SOURCE_ID: 1, FORWARDER_ID: 6 ,@ 0:0:40.645018492 
+
+DEBUG (7): READY TO BROADCAST....
+DEBUG (7): BROADCASTING QUERY_ID: 2 ,@ 0:0:40.849679385.
+DEBUG (8): NEW Radio Received QUERY_ID: 2, SOURCE_ID: 1, FORWARDER_ID: 7 ,@ 0:0:40.858346327 
+
+DEBUG (8): READY TO BROADCAST....
+DEBUG (8): BROADCASTING QUERY_ID: 2 ,@ 0:0:41.091876885.
+DEBUG (9): NEW Radio Received QUERY_ID: 2, SOURCE_ID: 1, FORWARDER_ID: 8 ,@ 0:0:41.102466423 
+
+DEBUG (9): READY TO BROADCAST....
+DEBUG (9): BROADCASTING QUERY_ID: 2 ,@ 0:0:41.365324385.
+DEBUG (1): Enter, STATE: 1 
+DEBUG (1): TIME_TO_MEASURE[0] = 5000 
+DEBUG (2): Enter, STATE: 1 
+DEBUG (2): TIME_TO_MEASURE[0] = 5000 
+DEBUG (3): Enter, STATE: 1 
+DEBUG (3): TIME_TO_MEASURE[0] = 5000 
+DEBUG (4): Enter, STATE: 1 
+DEBUG (4): TIME_TO_MEASURE[0] = 5000 
+DEBUG (5): Enter, STATE: 1 
+DEBUG (5): TIME_TO_MEASURE[0] = 5000 
+DEBUG (6): Enter, STATE: 1 
+DEBUG (6): TIME_TO_MEASURE[0] = 5000 
+DEBUG (7): Enter, STATE: 1 
+DEBUG (7): TIME_TO_MEASURE[0] = 5000 
+DEBUG (8): Enter, STATE: 1 
+DEBUG (8): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): Enter, STATE: 1 
+DEBUG (9): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 2, FORWARDER_ID: 9, FATHER_ID: 8, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:46.003996260 
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (8): Stats_Measurement_Sampling Message Received 
+DEBUG (8): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 9, SAMPLING_ID: 2 
+DEBUG (8): WaitingTime: 478 
+ RemaingTime: 478 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 2, SAMPLING_ID: 2, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:48.826191885 
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 4000, RemaingTime: 4000 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+DEBUG (1): SOURCE_ID: 2, QUERY_ID: 2, FORWARDER_ID: 2, SAMPLING_ID: 2 
+DEBUG (1): WaitingTime: 4247 
+ RemaingTime: 4247 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 3, SAMPLING_ID: 2, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:48.891631572 
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 4000, RemaingTime: 4000 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+DEBUG (2): SOURCE_ID: 3, QUERY_ID: 2, FORWARDER_ID: 3, SAMPLING_ID: 2 
+DEBUG (2): WaitingTime: 4276 
+ RemaingTime: 4276 
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 4, SAMPLING_ID: 2, FORWARDER_ID: 4, FATHER_ID: 3, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:48.983438447 
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 4000, RemaingTime: 4000 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+DEBUG (3): SOURCE_ID: 4, QUERY_ID: 2, FORWARDER_ID: 4, SAMPLING_ID: 2 
+DEBUG (3): WaitingTime: 4298 
+ RemaingTime: 4298 
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 5, SAMPLING_ID: 2, FORWARDER_ID: 5, FATHER_ID: 4, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:49.103565635 
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 4000, RemaingTime: 4000 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+DEBUG (4): SOURCE_ID: 5, QUERY_ID: 2, FORWARDER_ID: 5, SAMPLING_ID: 2 
+DEBUG (4): WaitingTime: 4324 
+ RemaingTime: 4324 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 6, SAMPLING_ID: 2, FORWARDER_ID: 6, FATHER_ID: 5, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:49.255919385 
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 4000, RemaingTime: 4000 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+DEBUG (5): SOURCE_ID: 6, QUERY_ID: 2, FORWARDER_ID: 6, SAMPLING_ID: 2 
+DEBUG (5): WaitingTime: 4364 
+ RemaingTime: 4364 
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 7, SAMPLING_ID: 2, FORWARDER_ID: 7, FATHER_ID: 6, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:49.433663760 
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 4000, RemaingTime: 4000 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+DEBUG (6): SOURCE_ID: 7, QUERY_ID: 2, FORWARDER_ID: 7, SAMPLING_ID: 2 
+DEBUG (6): WaitingTime: 4389 
+ RemaingTime: 4389 
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 2, FORWARDER_ID: 8, FATHER_ID: 7, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:49.646564385 
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 478, RemaingTime: 478 , AQQ[0] 
+
+DEBUG (7): Stats_Measurement_Sampling Message Received 
+DEBUG (7): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 8, SAMPLING_ID: 2 
+DEBUG (7): WaitingTime: 4419 
+ RemaingTime: 4419 
+DEBUG (1): Enter, STATE: 1 
+DEBUG (1): TIME_TO_MEASURE[0] = 5000 
+DEBUG (2): Enter, STATE: 1 
+DEBUG (2): TIME_TO_MEASURE[0] = 5000 
+DEBUG (3): Enter, STATE: 1 
+DEBUG (3): TIME_TO_MEASURE[0] = 5000 
+DEBUG (4): Enter, STATE: 1 
+DEBUG (4): TIME_TO_MEASURE[0] = 5000 
+DEBUG (5): Enter, STATE: 1 
+DEBUG (5): TIME_TO_MEASURE[0] = 5000 
+DEBUG (6): Enter, STATE: 1 
+DEBUG (6): TIME_TO_MEASURE[0] = 5000 
+DEBUG (7): Enter, STATE: 1 
+DEBUG (7): TIME_TO_MEASURE[0] = 5000 
+DEBUG (8): Enter, STATE: 1 
+DEBUG (8): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): Enter, STATE: 1 
+DEBUG (9): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 3, FORWARDER_ID: 9, FATHER_ID: 8, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:50.886808760 
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (8): Stats_Measurement_Sampling Message Received 
+DEBUG (8): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 9, SAMPLING_ID: 3 
+DEBUG (8): WaitingTime: 479 
+ RemaingTime: 479 
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 3, FORWARDER_ID: 8, FATHER_ID: 7, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:51.089923760 
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 479, RemaingTime: 479 , AQQ[0] 
+
+DEBUG (7): Stats_Measurement_Sampling Message Received 
+DEBUG (7): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 8, SAMPLING_ID: 3 
+DEBUG (7): WaitingTime: 904 
+ RemaingTime: 904 
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 3, FORWARDER_ID: 7, FATHER_ID: 6, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:51.098087175 
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 904, RemaingTime: 904 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+DEBUG (6): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 7, SAMPLING_ID: 3 
+DEBUG (6): WaitingTime: 1091 
+ RemaingTime: 1091 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 3, FORWARDER_ID: 6, FATHER_ID: 5, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:51.102969969 
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 1091, RemaingTime: 1091 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+DEBUG (5): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 6, SAMPLING_ID: 3 
+DEBUG (5): WaitingTime: 1253 
+ RemaingTime: 1253 
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 3, FORWARDER_ID: 5, FATHER_ID: 4, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:51.108646215 
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 1253, RemaingTime: 1253 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+DEBUG (4): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 5, SAMPLING_ID: 3 
+DEBUG (4): WaitingTime: 1382 
+ RemaingTime: 1382 
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 3, FORWARDER_ID: 4, FATHER_ID: 3, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:51.114734447 
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 1382, RemaingTime: 1382 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+DEBUG (3): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 4, SAMPLING_ID: 3 
+DEBUG (3): WaitingTime: 1486 
+ RemaingTime: 1486 
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 3, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:51.124088040 
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 1486, RemaingTime: 1486 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+DEBUG (2): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 3, SAMPLING_ID: 3 
+DEBUG (2): WaitingTime: 1559 
+ RemaingTime: 1559 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 3, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:51.129947390 
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 1559, RemaingTime: 1559 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+DEBUG (1): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 2, SAMPLING_ID: 3 
+DEBUG (1): WaitingTime: 1605 
+ RemaingTime: 1605 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (1): Enter, STATE: 1 
+DEBUG (1): TIME_TO_MEASURE[0] = 5000 
+DEBUG (2): Enter, STATE: 1 
+DEBUG (2): TIME_TO_MEASURE[0] = 5000 
+DEBUG (3): Enter, STATE: 1 
+DEBUG (3): TIME_TO_MEASURE[0] = 5000 
+DEBUG (4): Enter, STATE: 1 
+DEBUG (4): TIME_TO_MEASURE[0] = 5000 
+DEBUG (5): Enter, STATE: 1 
+DEBUG (5): TIME_TO_MEASURE[0] = 5000 
+DEBUG (6): Enter, STATE: 1 
+DEBUG (6): TIME_TO_MEASURE[0] = 5000 
+DEBUG (7): Enter, STATE: 1 
+DEBUG (7): TIME_TO_MEASURE[0] = 5000 
+DEBUG (8): Enter, STATE: 1 
+DEBUG (8): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): Enter, STATE: 1 
+DEBUG (9): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 4, FORWARDER_ID: 9, FATHER_ID: 8, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:55.769621260 
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (8): Stats_Measurement_Sampling Message Received 
+DEBUG (8): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 9, SAMPLING_ID: 4 
+DEBUG (8): WaitingTime: 474 
+ RemaingTime: 474 
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 4, FORWARDER_ID: 8, FATHER_ID: 7, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:55.973712823 
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 474, RemaingTime: 474 , AQQ[0] 
+
+DEBUG (7): Stats_Measurement_Sampling Message Received 
+DEBUG (7): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 8, SAMPLING_ID: 4 
+DEBUG (7): WaitingTime: 904 
+ RemaingTime: 904 
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 4, FORWARDER_ID: 7, FATHER_ID: 6, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:56.175851260 
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 904, RemaingTime: 904 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+DEBUG (6): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 7, SAMPLING_ID: 4 
+DEBUG (6): WaitingTime: 1289 
+ RemaingTime: 1289 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 4, FORWARDER_ID: 6, FATHER_ID: 5, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:56.180724073 
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 1289, RemaingTime: 1289 , AQQ[0] 
+
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 5, SAMPLING_ID: 4, FORWARDER_ID: 5, FATHER_ID: 4, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:56.186573448 
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 1253, RemaingTime: 1253 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+DEBUG (4): SOURCE_ID: 5, QUERY_ID: 2, FORWARDER_ID: 5, SAMPLING_ID: 4 
+DEBUG (4): WaitingTime: 1577 
+ RemaingTime: 1577 
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+DEBUG (5): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 6, SAMPLING_ID: 4 
+DEBUG (5): WaitingTime: 1457 
+ RemaingTime: 1457 
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 5, SAMPLING_ID: 4, FORWARDER_ID: 4, FATHER_ID: 3, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:56.192422822 
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 1577, RemaingTime: 1577 , AQQ[0] 
+
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 3, SAMPLING_ID: 4, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:56.202178447 
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 1486, RemaingTime: 1486 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+DEBUG (3): SOURCE_ID: 5, QUERY_ID: 2, FORWARDER_ID: 4, SAMPLING_ID: 4 
+DEBUG (3): WaitingTime: 1686 
+ RemaingTime: 1686 
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+DEBUG (2): SOURCE_ID: 3, QUERY_ID: 2, FORWARDER_ID: 3, SAMPLING_ID: 4 
+DEBUG (2): WaitingTime: 1756 
+ RemaingTime: 1756 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 3, SAMPLING_ID: 4, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:0:56.208027822 
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 1756, RemaingTime: 1756 , AQQ[0] 
+
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+DEBUG (1): SOURCE_ID: 3, QUERY_ID: 2, FORWARDER_ID: 2, SAMPLING_ID: 4 
+DEBUG (1): WaitingTime: 1806 
+ RemaingTime: 1806 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (1): Enter, STATE: 1 
+DEBUG (1): TIME_TO_MEASURE[0] = 5000 
+DEBUG (1): The query_ expired! @ 0:0:59.531260030
+DEBUG (2): Enter, STATE: 1 
+DEBUG (2): TIME_TO_MEASURE[0] = 5000 
+DEBUG (2): The query_ expired! @ 0:0:59.568379405
+DEBUG (3): Enter, STATE: 1 
+DEBUG (3): TIME_TO_MEASURE[0] = 5000 
+DEBUG (3): The query_ expired! @ 0:0:59.633819092
+DEBUG (4): Enter, STATE: 1 
+DEBUG (4): TIME_TO_MEASURE[0] = 5000 
+DEBUG (4): The query_ expired! @ 0:0:59.725625967
+DEBUG (5): Enter, STATE: 1 
+DEBUG (5): TIME_TO_MEASURE[0] = 5000 
+DEBUG (5): The query_ expired! @ 0:0:59.845753155
+DEBUG (6): Enter, STATE: 1 
+DEBUG (6): TIME_TO_MEASURE[0] = 5000 
+DEBUG (6): The query_ expired! @ 0:0:59.998106905
+DEBUG (1): Serial Received QUERY_ID: 3 , Sampling_Period: 6000, Query_Lifetime: 12000, Propagation_Mode: 1 ,@ 0:1:0.000090030 
+
+DEBUG (1): Serial Received QUERY_ID: 3 , FORWARDER_ID: 1 ,@ 0:1:0.000090030 
+
+DEBUG (1): READY TO BROADCAST....
+DEBUG (1): BROADCASTING QUERY_ID: 3 ,@ 0:1:0.029306885.
+DEBUG (2): NEW Radio Received QUERY_ID: 3, SOURCE_ID: 1, FORWARDER_ID: 1 ,@ 0:1:0.035105191 
+
+DEBUG (2): READY TO BROADCAST....
+DEBUG (2): BROADCASTING QUERY_ID: 3 ,@ 0:1:0.092793447.
+DEBUG (3): NEW Radio Received QUERY_ID: 3, SOURCE_ID: 1, FORWARDER_ID: 2 ,@ 0:1:0.102925224 
+
+DEBUG (7): Enter, STATE: 1 
+DEBUG (7): TIME_TO_MEASURE[0] = 5000 
+DEBUG (7): The query_ expired! @ 0:1:0.175851280
+DEBUG (3): READY TO BROADCAST....
+DEBUG (3): BROADCASTING QUERY_ID: 3 ,@ 0:1:0.190459697.
+DEBUG (4): NEW Radio Received QUERY_ID: 3, SOURCE_ID: 1, FORWARDER_ID: 3 ,@ 0:1:0.193374109 
+
+DEBUG (4): READY TO BROADCAST....
+DEBUG (4): BROADCASTING QUERY_ID: 3 ,@ 0:1:0.309610322.
+DEBUG (5): NEW Radio Received QUERY_ID: 3, SOURCE_ID: 1, FORWARDER_ID: 4 ,@ 0:1:0.319055458 
+
+DEBUG (8): Enter, STATE: 1 
+DEBUG (8): TIME_TO_MEASURE[0] = 5000 
+DEBUG (8): The query_ expired! @ 0:1:0.388751905
+DEBUG (5): READY TO BROADCAST....
+DEBUG (5): BROADCASTING QUERY_ID: 3 ,@ 0:1:0.464893760.
+DEBUG (6): NEW Radio Received QUERY_ID: 3, SOURCE_ID: 1, FORWARDER_ID: 5 ,@ 0:1:0.472660438 
+
+DEBUG (9): Enter, STATE: 1 
+DEBUG (9): TIME_TO_MEASURE[0] = 5000 
+DEBUG (9): The query_ expired! @ 0:1:0.632902530
+DEBUG (6): READY TO BROADCAST....
+DEBUG (6): BROADCASTING QUERY_ID: 3 ,@ 0:1:0.647520948.
+DEBUG (7): NEW Radio Received QUERY_ID: 3, SOURCE_ID: 1, FORWARDER_ID: 6 ,@ 0:1:0.650435359 
+
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 5, FORWARDER_ID: 9, FATHER_ID: 8, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:1:0.652433760 
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (8): Stats_Measurement_Sampling Message Received 
+DEBUG (8): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 9, SAMPLING_ID: 5 
+DEBUG (8): WaitingTime: 479 
+ RemaingTime: 479 
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 5, FORWARDER_ID: 8, FATHER_ID: 7, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:1:0.851642510 
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 479, RemaingTime: 479 , AQQ[0] 
+
+DEBUG (7): READY TO BROADCAST....
+DEBUG (7): BROADCASTING QUERY_ID: 3 ,@ 0:1:0.854562198.
+DEBUG (8): NEW Radio Received QUERY_ID: 3, SOURCE_ID: 1, FORWARDER_ID: 7 ,@ 0:1:0.859170325 
+
+DEBUG (7): Stats_Measurement_Sampling Message Received 
+DEBUG (7): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 8, SAMPLING_ID: 5 
+DEBUG (7): WaitingTime: 684 
+ RemaingTime: 684 
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 5, FORWARDER_ID: 7, FATHER_ID: 6, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:1:1.058663760 
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+DEBUG (6): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 7, SAMPLING_ID: 5 
+DEBUG (6): WaitingTime: 1110 
+ RemaingTime: 1110 
+DEBUG (8): READY TO BROADCAST....
+DEBUG (8): BROADCASTING QUERY_ID: 3 ,@ 0:1:1.092853448.
+DEBUG (9): NEW Radio Received QUERY_ID: 3, SOURCE_ID: 1, FORWARDER_ID: 8 ,@ 0:1:1.098605978 
+
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 5, FORWARDER_ID: 6, FATHER_ID: 5, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:1:1.256895948 
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 5000, RemaingTime: 5000 , AQQ[0] 
+
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 4, SAMPLING_ID: 5, FORWARDER_ID: 4, FATHER_ID: 3, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:1:1.265665010 
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 5000, RemaingTime: 5000 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+DEBUG (5): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 6, SAMPLING_ID: 5 
+DEBUG (5): WaitingTime: 1499 
+ RemaingTime: 1499 
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 5, FORWARDER_ID: 5, FATHER_ID: 4, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:1:1.268604698 
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 5000, RemaingTime: 5000 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+DEBUG (3): SOURCE_ID: 4, QUERY_ID: 2, FORWARDER_ID: 4, SAMPLING_ID: 5 
+DEBUG (3): WaitingTime: 1786 
+ RemaingTime: 1786 
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+DEBUG (4): SOURCE_ID: 9, QUERY_ID: 2, FORWARDER_ID: 5, SAMPLING_ID: 5 
+DEBUG (4): WaitingTime: 1665 
+ RemaingTime: 1665 
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 4, SAMPLING_ID: 5, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:1:1.280303447 
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 5000, RemaingTime: 5000 , AQQ[0] 
+
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 2, SAMPLING_ID: 5, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 2, DESTINATION_ID: 1  , @ 0:1:1.283223135 
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 5000, RemaingTime: 5000 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+DEBUG (2): SOURCE_ID: 4, QUERY_ID: 2, FORWARDER_ID: 3, SAMPLING_ID: 5 
+DEBUG (2): WaitingTime: 1889 
+ RemaingTime: 1889 
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+DEBUG (1): SOURCE_ID: 2, QUERY_ID: 2, FORWARDER_ID: 2, SAMPLING_ID: 5 
+DEBUG (1): WaitingTime: 1958 
+ RemaingTime: 1958 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (9): READY TO BROADCAST....
+DEBUG (9): BROADCASTING QUERY_ID: 3 ,@ 0:1:1.361418135.
+DEBUG (1): Enter, STATE: 1 
+DEBUG (1): TIME_TO_MEASURE[0] = 6000 
+DEBUG (2): Enter, STATE: 1 
+DEBUG (2): TIME_TO_MEASURE[0] = 6000 
+DEBUG (3): Enter, STATE: 1 
+DEBUG (3): TIME_TO_MEASURE[0] = 6000 
+DEBUG (4): Enter, STATE: 1 
+DEBUG (4): TIME_TO_MEASURE[0] = 6000 
+DEBUG (5): Enter, STATE: 1 
+DEBUG (5): TIME_TO_MEASURE[0] = 6000 
+DEBUG (6): Enter, STATE: 1 
+DEBUG (6): TIME_TO_MEASURE[0] = 6000 
+DEBUG (7): Enter, STATE: 1 
+DEBUG (7): TIME_TO_MEASURE[0] = 6000 
+DEBUG (8): Enter, STATE: 1 
+DEBUG (8): TIME_TO_MEASURE[0] = 6000 
+DEBUG (9): Enter, STATE: 1 
+DEBUG (9): TIME_TO_MEASURE[0] = 6000 
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 6, FORWARDER_ID: 9, FATHER_ID: 8, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:5.535246260 
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (8): Stats_Measurement_Sampling Message Received 
+DEBUG (8): SOURCE_ID: 9, QUERY_ID: 3, FORWARDER_ID: 9, SAMPLING_ID: 6 
+DEBUG (8): WaitingTime: 476 
+ RemaingTime: 476 
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 6, SAMPLING_ID: 6, FORWARDER_ID: 6, FATHER_ID: 5, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:6.344786573 
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 1499, RemaingTime: 1499 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+DEBUG (5): SOURCE_ID: 6, QUERY_ID: 3, FORWARDER_ID: 6, SAMPLING_ID: 6 
+DEBUG (5): WaitingTime: 1859 
+ RemaingTime: 1859 
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 4, SAMPLING_ID: 6, FORWARDER_ID: 4, FATHER_ID: 3, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:6.352579072 
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 1786, RemaingTime: 1786 , AQQ[0] 
+
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 6, SAMPLING_ID: 6, FORWARDER_ID: 5, FATHER_ID: 4, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:6.354542198 
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 1859, RemaingTime: 1859 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+DEBUG (4): SOURCE_ID: 6, QUERY_ID: 3, FORWARDER_ID: 5, SAMPLING_ID: 6 
+DEBUG (4): WaitingTime: 1991 
+ RemaingTime: 1991 
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 3, SAMPLING_ID: 6, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:6.361358135 
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 1889, RemaingTime: 1889 , AQQ[0] 
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+DEBUG (3): SOURCE_ID: 4, QUERY_ID: 3, FORWARDER_ID: 4, SAMPLING_ID: 6 
+DEBUG (3): WaitingTime: 2090 
+ RemaingTime: 2090 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 2, SAMPLING_ID: 6, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:6.363301260 
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 1958, RemaingTime: 1958 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+DEBUG (1): SOURCE_ID: 2, QUERY_ID: 3, FORWARDER_ID: 2, SAMPLING_ID: 6 
+DEBUG (1): WaitingTime: 2201 
+ RemaingTime: 2201 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+DEBUG (2): SOURCE_ID: 3, QUERY_ID: 3, FORWARDER_ID: 3, SAMPLING_ID: 6 
+DEBUG (2): WaitingTime: 2166 
+ RemaingTime: 2166 
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 7, SAMPLING_ID: 6, FORWARDER_ID: 7, FATHER_ID: 6, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:9.941476260 
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 5000, RemaingTime: 5000 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+DEBUG (6): SOURCE_ID: 7, QUERY_ID: 3, FORWARDER_ID: 7, SAMPLING_ID: 6 
+DEBUG (6): WaitingTime: 5385 
+ RemaingTime: 5385 
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 6, FORWARDER_ID: 8, FATHER_ID: 7, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:10.154376885 
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 476, RemaingTime: 476 , AQQ[0] 
+
+DEBUG (7): Stats_Measurement_Sampling Message Received 
+DEBUG (7): SOURCE_ID: 9, QUERY_ID: 3, FORWARDER_ID: 8, SAMPLING_ID: 6 
+DEBUG (7): WaitingTime: 5420 
+ RemaingTime: 5420 
+DEBUG (1): Enter, STATE: 1 
+DEBUG (1): TIME_TO_MEASURE[0] = 6000 
+DEBUG (2): Enter, STATE: 1 
+DEBUG (2): TIME_TO_MEASURE[0] = 6000 
+DEBUG (3): Enter, STATE: 1 
+DEBUG (3): TIME_TO_MEASURE[0] = 6000 
+DEBUG (4): Enter, STATE: 1 
+DEBUG (4): TIME_TO_MEASURE[0] = 6000 
+DEBUG (5): Enter, STATE: 1 
+DEBUG (5): TIME_TO_MEASURE[0] = 6000 
+DEBUG (6): Enter, STATE: 1 
+DEBUG (6): TIME_TO_MEASURE[0] = 6000 
+DEBUG (7): Enter, STATE: 1 
+DEBUG (7): TIME_TO_MEASURE[0] = 6000 
+DEBUG (8): Enter, STATE: 1 
+DEBUG (8): TIME_TO_MEASURE[0] = 6000 
+DEBUG (9): Enter, STATE: 1 
+DEBUG (9): TIME_TO_MEASURE[0] = 6000 
+DEBUG (9): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 7, FORWARDER_ID: 9, FATHER_ID: 8, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:11.394621260 
+DEBUG (9): Timer_StatsUnicast_Unicast -- WaitingTime: 20, RemaingTime: 20 , AQQ[0] 
+
+DEBUG (8): Stats_Measurement_Sampling Message Received 
+DEBUG (8): SOURCE_ID: 9, QUERY_ID: 3, FORWARDER_ID: 9, SAMPLING_ID: 7 
+DEBUG (8): WaitingTime: 474 
+ RemaingTime: 474 
+DEBUG (8): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 7, FORWARDER_ID: 8, FATHER_ID: 7, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:11.595783135 
+DEBUG (8): Timer_StatsUnicast_Unicast -- WaitingTime: 474, RemaingTime: 474 , AQQ[0] 
+
+DEBUG (7): Stats_Measurement_Sampling Message Received 
+DEBUG (7): SOURCE_ID: 9, QUERY_ID: 3, FORWARDER_ID: 8, SAMPLING_ID: 7 
+DEBUG (7): WaitingTime: 895 
+ RemaingTime: 895 
+DEBUG (1): The query_ expired! @ 0:1:11.718760010
+DEBUG (2): The query_ expired! @ 0:1:11.752949697
+DEBUG (3): The query_ expired! @ 0:1:11.821319072
+DEBUG (4): The query_ expired! @ 0:1:11.911172822
+DEBUG (5): The query_ expired! @ 0:1:12.037159385
+DEBUG (6): The query_ expired! @ 0:1:12.190489698
+DEBUG (7): The query_ expired! @ 0:1:12.368234073
+DEBUG (5): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 5, SAMPLING_ID: 7, FORWARDER_ID: 5, FATHER_ID: 4, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:12.403370323 
+DEBUG (5): Timer_StatsUnicast_Unicast -- WaitingTime: 1859, RemaingTime: 1859 , AQQ[0] 
+
+DEBUG (4): Stats_Measurement_Sampling Message Received 
+DEBUG (4): SOURCE_ID: 5, QUERY_ID: 3, FORWARDER_ID: 5, SAMPLING_ID: 7 
+DEBUG (4): WaitingTime: 2188 
+ RemaingTime: 2188 
+DEBUG (4): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 5, SAMPLING_ID: 7, FORWARDER_ID: 4, FATHER_ID: 3, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:12.412149385 
+DEBUG (4): Timer_StatsUnicast_Unicast -- WaitingTime: 2188, RemaingTime: 2188 , AQQ[0] 
+
+DEBUG (3): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 3, SAMPLING_ID: 7, FORWARDER_ID: 3, FATHER_ID: 2, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:12.417022197 
+DEBUG (3): Timer_StatsUnicast_Unicast -- WaitingTime: 2090, RemaingTime: 2090 , AQQ[0] 
+
+DEBUG (2): Stats_Measurement_Sampling Message Received 
+DEBUG (2): SOURCE_ID: 3, QUERY_ID: 3, FORWARDER_ID: 3, SAMPLING_ID: 7 
+DEBUG (2): WaitingTime: 2360 
+ RemaingTime: 2360 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (3): Stats_Measurement_Sampling Message Received 
+DEBUG (3): SOURCE_ID: 5, QUERY_ID: 3, FORWARDER_ID: 4, SAMPLING_ID: 7 
+DEBUG (3): WaitingTime: 2297 
+ RemaingTime: 2297 
+DEBUG (2): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 3, SAMPLING_ID: 7, FORWARDER_ID: 2, FATHER_ID: 1, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:12.425801260 
+DEBUG (2): Timer_StatsUnicast_Unicast -- WaitingTime: 2360, RemaingTime: 2360 , AQQ[0] 
+
+DEBUG (1): Stats_Measurement_Sampling Message Received 
+DEBUG (1): SOURCE_ID: 3, QUERY_ID: 3, FORWARDER_ID: 2, SAMPLING_ID: 7 
+DEBUG (1): WaitingTime: 2410 
+ RemaingTime: 2410 
+DEBUG (1): Start sending serial packet
+
+ DEBUG (1): Serial message Done
+
+DEBUG (8): The query_ expired! @ 0:1:12.577228448
+DEBUG (9): The query_ expired! @ 0:1:12.816496260
+DEBUG (6): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 6, SAMPLING_ID: 7, FORWARDER_ID: 6, FATHER_ID: 5, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:15.999083448 
+DEBUG (6): Timer_StatsUnicast_Unicast -- WaitingTime: 5385, RemaingTime: 5385 , AQQ[0] 
+
+DEBUG (5): Stats_Measurement_Sampling Message Received 
+DEBUG (5): SOURCE_ID: 6, QUERY_ID: 3, FORWARDER_ID: 6, SAMPLING_ID: 7 
+DEBUG (5): WaitingTime: 5749 
+ RemaingTime: 5749 
+DEBUG (1): Enter, STATE: 0 
+DEBUG (2): Enter, STATE: 0 
+DEBUG (7): UNICAST TRANSMISSION -- TSU 
+ SOURCE_ID: 9, SAMPLING_ID: 7, FORWARDER_ID: 7, FATHER_ID: 6, QUERY_ID: 3, DESTINATION_ID: 1  , @ 0:1:16.211007510 
+DEBUG (7): Timer_StatsUnicast_Unicast -- WaitingTime: 895, RemaingTime: 895 , AQQ[0] 
+
+DEBUG (6): Stats_Measurement_Sampling Message Received 
+DEBUG (6): SOURCE_ID: 9, QUERY_ID: 3, FORWARDER_ID: 7, SAMPLING_ID: 7 
+DEBUG (6): WaitingTime: 5808 
+ RemaingTime: 5808 
+DEBUG (3): Enter, STATE: 0 
+DEBUG (4): Enter, STATE: 0 
+DEBUG (5): Enter, STATE: 0 
+DEBUG (6): Enter, STATE: 0 
+DEBUG (7): Enter, STATE: 0 
+DEBUG (8): Enter, STATE: 0 
+DEBUG (9): Enter, STATE: 0 
