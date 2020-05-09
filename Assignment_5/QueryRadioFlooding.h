@@ -11,10 +11,14 @@ typedef nx_struct query_flooding_msg {
 	nx_uint8_t forwarder_id;
 	nx_uint8_t father_node;
 	nx_uint8_t hops;
-	nx_uint16_t sampling_period;
+	//nx_uint16_t sampling_period;
 	//nx_uint16_t query_lifetime;
 	nx_uint32_t query_lifetime;
-	nx_uint8_t propagation_mode;
+	//nx_uint8_t propagation_mode;
+	nx_uint8_t app_id;
+	nx_uint8_t BinaryMessage[25];
+	nx_uint8_t state;
+	nx_uint8_t action;
 } query_flooding_msg_t;
 
 #endif

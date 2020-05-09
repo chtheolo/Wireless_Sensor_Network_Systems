@@ -11,7 +11,7 @@ typedef nx_struct binary_msg {
 	nx_uint8_t state;
 	nx_uint8_t action;
 	nx_uint32_t query_lifetime;
-	nx_uint8_t propagation_mode;	/*simple = 0, stats = 1, cancel = 2*/
+	//nx_uint8_t propagation_mode;	/*simple = 0, stats = 1, cancel = 2*/
 } binary_msg_t;
 
 #endif
