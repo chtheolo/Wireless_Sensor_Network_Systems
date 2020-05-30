@@ -215,30 +215,33 @@ implementation
 					break;
 			}
 		}
-//		else { 																/* ELSE IF  MIDDLE NODE, then read and forward the values */
-//			sendTofather = AQQ[Hold_Sampling_Timer].forwarder_id;	 		/* My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
-//
-//			if (AQQ[Hold_Sampling_Timer].propagation_mode == 0) {  			/* SIMPLE mode == 0 */
-//				sampling_save = sampling_save%SIZE;
-//				ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
-//				if (ucast_pkt == NULL) {
-//					return;
-//				}
-//				sampling_save++;
-//
-//				ucast_pkt->source_id = TOS_NODE_ID;
-//				ucast_pkt->sampling_id = AQQ[Hold_Sampling_Timer].sampling_id++;		/*new*/
-//				ucast_pkt->data_id = data_id;
-//				ucast_pkt->forwarder_id = TOS_NODE_ID;
-//				ucast_pkt->sensor_data = data;
-//				ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
-//				ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
-//				ucast_pkt->mode = 0;
-//				mode = 0;
-//				
-//				call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);  	// Timer for Unicast Message - TOS_NODE_ID * 20				
-//			}
-//		}
+		else { 																/* ELSE IF  MIDDLE NODE, then read and forward the values */
+			sendTofather = AQQ[Hold_Sampling_Timer].forwarder_id;	 		/* My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
+
+			switch (mode) {
+				case 0:
+					sampling_save = sampling_save%SIZE;
+					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
+					if (ucast_pkt == NULL) {
+						return;
+					}
+					sampling_save++;
+
+					ucast_pkt->source_id = TOS_NODE_ID;
+					ucast_pkt->application_id = application_id;
+					ucast_pkt->data_id = data_id;
+					ucast_pkt->forwarder_id = TOS_NODE_ID;
+					ucast_pkt->sensor_data = AQQ[appHoldingController].registers[6];
+					ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
+					ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
+					ucast_pkt->mode = mode;
+					
+					call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);  	// Timer for Unicast Message - TOS_NODE_ID * 20				
+					break;
+				case 1:
+					break;
+			}
+		}
 	}
 
 /* ------------------------------- Interpretation ----------------------------- */
@@ -517,6 +520,7 @@ implementation
 		}
 
 		/**** i should check if there is an application, but is not running the interpreter, because maybe it is waiting the TimerAplication ****/
+
 		//if (number_of_active_apps == 1) {							/*Call interpreter, if only there is no other active application in the system.*/
 		//	appHoldingController = sendQuery;							/*init*/
 		//	count_instructions = 0;
@@ -1167,50 +1171,48 @@ implementation
 /* ---------------------------------------- Timer_StatsUnicast_Unicast => UNICAST MEASUREMENTS --------------------------------------------- */
 	event void Timer_StatsUnicast_Unicast.fired() {
 		if (!unicast_busy) {
-			if (/*AQQ[remindQuery].propagation_mode*/mode == 0) {
-				ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
-				if (ucast_pkt == NULL) {
-					return;
-				}
 
-				memcpy(&pkt, &SamplingPacketBuffer[sampling_send], sizeof(message_t));
-
-				if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (sampling_msg_t)) == SUCCESS){
-					unicast_busy = TRUE;
-					call Leds.led2On();
-				}
-			}
-			else if (/*AQQ[remindQuery].propagation_mode*/mode == 1) {
-				count_received_children = 0;	/*init the counter for the next ucast transmission */
-				stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_send], sizeof (stats_sampling_msg_t)));
-				if (stats_ucast_pkt == NULL) {
-					return;
-				}
-
-				start = 0;
-				while(start < LAST_SENDERS) {
-					if (ContributedNodes[start].node_id == 0) {
-						ContributedNodes[start].node_id = TOS_NODE_ID;
-						break;
+			switch (mode) {
+								/*Simple Mode*/
+				case 0:	
+					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
+					if (ucast_pkt == NULL) {
+						return;
 					}
-					start++;
-				}
-				memcpy(stats_ucast_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
+					memcpy(&pkt, &SamplingPacketBuffer[sampling_send], sizeof(message_t));
 
-
-				memcpy(&pkt, &StatsSamplingPacketBuffer[stats_sampling_send], sizeof(message_t));
-
-				if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
-					unicast_busy = TRUE;
-					call Leds.led2On();
-				}
+					if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (sampling_msg_t)) == SUCCESS){
+						unicast_busy = TRUE;
+					}
+					break;
+								/*Stats Mode*/
+				case 1:
+					count_received_children = 0;	/*init the counter for the next ucast transmission */
+					stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_send], sizeof (stats_sampling_msg_t)));
+					if (stats_ucast_pkt == NULL) {
+						return;
+					}
+					start = 0;
+					while(start < LAST_SENDERS) {
+						if (ContributedNodes[start].node_id == 0) {
+							ContributedNodes[start].node_id = TOS_NODE_ID;
+							break;
+						}
+						start++;
+					}
+					memcpy(stats_ucast_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
+					memcpy(&pkt, &StatsSamplingPacketBuffer[stats_sampling_send], sizeof(message_t));
+					if (call SamplingRadioAMSend.send(sendTofather, &pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
+						unicast_busy = TRUE;
+					}
+					break;
 			}
 		}
 	}
 
 /* ----------------------------------------- SAMPLING RADIO RECEIVE MESSAGES ------------------------------------------------ */
 	event message_t* SamplingRadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
-		if (len == sizeof(sampling_msg_t)) {					/** RECEIVE SIMPLE SAMPLING MESSAGE **/
+		if (len == sizeof(sampling_msg_t)) {													/** RECEIVE SIMPLE SAMPLING MESSAGE **/
 			r_sampling_pkt = (sampling_msg_t*) payload;
 
 			/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
@@ -1224,7 +1226,7 @@ implementation
 				sampling_save++;	
 
 				ucast_pkt->source_id = r_sampling_pkt->source_id;
-				//ucast_pkt->sampling_id = r_sampling_pkt->sampling_id;   /*new*/
+				ucast_pkt->application_id = r_sampling_pkt->application_id;   /*new*/
 				ucast_pkt->data_id = r_sampling_pkt->data_id;
 				ucast_pkt->forwarder_id = TOS_NODE_ID;
 				ucast_pkt->sensor_data = r_sampling_pkt->sensor_data;
@@ -1245,7 +1247,7 @@ implementation
 			}
 			else {  /* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
 				source_id = r_sampling_pkt->source_id;
-				//sampling_id = r_sampling_pkt->sampling_id;
+				application_id = r_sampling_pkt->application_id;
 				s_data_id =  r_sampling_pkt->data_id;
 				forwarder_id = r_sampling_pkt->forwarder_id;
 				sensor_data = r_sampling_pkt->sensor_data;
@@ -1256,7 +1258,7 @@ implementation
 				call TimerSendPCSerial.startOneShot(20);
 			}
 		} 
-		else if (len == sizeof(stats_sampling_msg_t)) {				/** RECEIVE STATS SAMPLING MESSAGE */
+		else if (len == sizeof(stats_sampling_msg_t)) {													/** RECEIVE STATS SAMPLING MESSAGE */
 			r_stats_sampling_pkt = (stats_sampling_msg_t*) payload;
 			count_received_children++;
 
@@ -1744,20 +1746,22 @@ implementation
 		if (&pkt == msg) {
 			unicast_busy = FALSE;
 
-			call Leds.led2Off(); // blue
-			if (AQQ[remindQuery].propagation_mode == 0) {
-				sampling_send++;
-				if (sampling_send > SIZE) {
-					sampling_send = 0;
-				}
+			switch (mode) {
+				case 0:
+					sampling_send++;
+					if (sampling_send > SIZE) {
+						sampling_send = 0;
+					}
+					break;
+				case 1:
+					stats_sampling_send++;
+					if (stats_sampling_send > SIZE) {
+						stats_sampling_send = 0;
+					}
+					break;		
 			}
-			else if (AQQ[remindQuery].propagation_mode == 1) {
-				stats_sampling_send++;
-				if (stats_sampling_send > SIZE) {
-					stats_sampling_send = 0;
-				}
-			}	
 			post init_ContributedNodes();
+			post Interpretation();
 		}		
 	}
 
