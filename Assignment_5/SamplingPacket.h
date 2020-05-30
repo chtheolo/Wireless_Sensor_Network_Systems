@@ -9,7 +9,7 @@ enum {
 
 typedef nx_struct sampling_msg {
 	nx_uint8_t source_id;
-	nx_uint8_t sampling_id;   /*new*/
+	//nx_uint8_t sampling_id;   /*new*/
 	nx_uint8_t data_id;
 	nx_uint8_t forwarder_id;
 	nx_uint16_t sensor_data;
