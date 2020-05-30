@@ -40,7 +40,7 @@ class SamplingMsg(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self, 
                                 [('source_id', 'int', 1),
-                                 # ('sampling_id', 'int', 1),
+                                 ('application_id', 'int', 1),
                                  ('data_id', 'int', 1),
                                  ('forwarder_id', 'int', 1),
                                  ('sensor_data', 'int', 2),
@@ -97,7 +97,7 @@ def receiver(rx_queue):
             print('TelosB -> PC: ')
 
             print('Sampling_Source_Node: ', str(sampling_msg.source_id))
-            # print('Sampling Data_ID: ', str(sampling_msg.sampling_id))
+            print('Application_id: ', str(sampling_msg.application_id))
             print('Summary Data_ID: ', str(sampling_msg.data_id))
             print('Forwarder_id: ', str(sampling_msg.forwarder_id))
             print('Sensor_data: ', str(sampling_msg.sensor_data))
@@ -253,7 +253,7 @@ class SerialManager(object):
             try:
                 pkt = self.am.read(timeout=0.5)
                 
-                if pkt is not None and len(pkt.data) == 8:          #Simple mode bfr(9)
+                if pkt is not None and len(pkt.data) == 9:          #Simple mode bfr(9)
                     print(pkt.data)
                     msg = SamplingMsg(pkt.data)
                     sampling_msg = SamplingMsg(pkt.data)

@@ -114,6 +114,7 @@ implementation
 	uint8_t number_of_active_apps;				/*The whole of active applications in the VM.*/
 	uint8_t count_instructions;					/*Count the instructions for context-switch.*/
 	uint8_t appWaitSensor;						/*The first application that called the ReadSensor.*/
+	uint8_t application_id;						/*Send application_id*/
 
 /*  16-bit  */
 	uint16_t time4MeasurementStartAt;			/*Timer start flag for measurements scheduling.*/
@@ -189,29 +190,30 @@ implementation
 		/** Save what query we are handling */
 		//remindQuery = Hold_Sampling_Timer;
 
-																			/* IF i am the query ORIGINATOR */
+		/* IF i am the query ORIGINATOR */
 		if (TOS_NODE_ID == AQQ[appHoldingController].source_id) {			/*AQQ[Hold_Sampling_Timer].source_id*/
 			source_id = TOS_NODE_ID;
 			s_data_id = data_id;
 			forwarder_id = TOS_NODE_ID;
 			destination_id = AQQ[Hold_Sampling_Timer].source_id;
 			sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
-			//sampling_id = AQQ[Hold_Sampling_Timer].sampling_id++;			/*new*/
 
-			if (mode == 0) {  												/* SIMPLE mode == 0 */
-				sensor_data = AQQ[appHoldingController].registers[6];
-				call TimerSendPCSerial.startOneShot(20);  					
+			switch (mode) {
+				case 0:														/* SIMPLE mode == 0 */
+					sensor_data = AQQ[appHoldingController].registers[6];
+					call TimerSendPCSerial.startOneShot(20);  					
+					break;
+				case 1:														/* STATS mode == 1 */
+//					hops = AQQ[Hold_Sampling_Timer].hops;
+//					min = data;
+//					max = data;
+//					average = data;
+//					//stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
+//					mode = 1;
+//	
+//					post DelayMeasurementScheduling();
+					break;
 			}
-//			else if (AQQ[Hold_Sampling_Timer].propagation_mode == 1) { 		/* STATS mode == 1 */
-//				hops = AQQ[Hold_Sampling_Timer].hops;
-//				min = data;
-//				max = data;
-//				average = data;
-//				//stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
-//				mode = 1;
-//
-//				post DelayMeasurementScheduling();
-//			}		
 		}
 //		else { 																/* ELSE IF  MIDDLE NODE, then read and forward the values */
 //			sendTofather = AQQ[Hold_Sampling_Timer].forwarder_id;	 		/* My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
@@ -414,6 +416,7 @@ implementation
 					call Leds.led2Toggle();
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
 					AQQ[appHoldingController].RegisterReadSensor = rx;
+					data_id++;
 					pc++;
 					break;
 				case 0xE0:											/* tmr */
@@ -460,6 +463,7 @@ implementation
 					break;
 				case 0xF0:											/* snd (0 -> r7 only, 1 -> r7 and r8) */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
+					application_id = AQQ[appHoldingController].app_id;
 
 					if (rx == 0x00) {												/* 0x00 -> r7 only */
 						mode = 0;
@@ -511,6 +515,8 @@ implementation
 			post Interpretation();													/* auto edw den mou aresei. Mhpws na to valw na kaleite afou oloklirwthei to broadcast.(dhldh sto telos tou kwdika)*/
 			call Leds.led0On();
 		}
+
+		/**** i should check if there is an application, but is not running the interpreter, because maybe it is waiting the TimerAplication ****/
 		//if (number_of_active_apps == 1) {							/*Call interpreter, if only there is no other active application in the system.*/
 		//	appHoldingController = sendQuery;							/*init*/
 		//	count_instructions = 0;
@@ -623,7 +629,7 @@ implementation
 				}
 				
 				s_sampling_pkt->source_id = source_id;
-				//s_sampling_pkt->sampling_id = sampling_id;
+				s_sampling_pkt->application_id = application_id;
 				s_sampling_pkt->data_id = s_data_id;
 				s_sampling_pkt->forwarder_id = forwarder_id;
 				s_sampling_pkt->sensor_data = sensor_data;
@@ -1649,7 +1655,6 @@ implementation
 					}	
 				}		
 
-
 				AQQ[start].source_id = TOS_NODE_ID; 
 				AQQ[start].sequence_number = sequence_number;
 				AQQ[start].sampling_id = 0;
@@ -1657,7 +1662,7 @@ implementation
 				AQQ[start].father_node = TOS_NODE_ID;
 				AQQ[start].number_of_children = 0;
 				AQQ[start].hops = 0;
-				//AQQ[query_pos].sampling_period = s_pkt->sampling_period;
+
 				AQQ[start].query_lifetime = s_bin_code->query_lifetime;
 				//AQQ[query_pos].propagation_mode = s_pkt->propagation_mode;
 				AQQ[start].WaitingTime = OFFSET;
@@ -1682,7 +1687,6 @@ implementation
 				bcast_pkt->forwarder_id = AQQ[sendQuery].forwarder_id;
 				bcast_pkt->father_node = AQQ[sendQuery].father_node;
 				bcast_pkt->hops = 0;													//AQQ[sendQuery].hops;
-				//bcast_pkt->sampling_period = AQQ[sendQuery].sampling_period;
 				bcast_pkt->query_lifetime = AQQ[sendQuery].query_lifetime;
 				bcast_pkt->app_id = s_bin_code->app_id;
 				memcpy(bcast_pkt->BinaryMessage, s_bin_code->BinaryMessage, 25 * sizeof(nx_uint8_t));
