@@ -247,7 +247,7 @@ implementation
 /* ------------------------------- Interpretation ----------------------------- */
 	task void Interpretation() {
 		
-		pc = AQQ[appHoldingController].pc;														/** set new program counter.*/
+		//pc = AQQ[appHoldingController].pc;														/** set new program counter.*/
 		count_instructions = count_instructions%CONTEXT_SWITCH_INSTRUCTIONS;
 		
 		while (AQQ[appHoldingController].state != 0) {
@@ -267,6 +267,7 @@ implementation
 						
 						if (AQQ[appHoldingController].RegisterReadSensor == 0) {				/*there is an active app. check if this app waits Sensor's data in order to continue its execution.*/
 							count_instructions = 0;
+							pc = AQQ[appHoldingController].pc;
 							post Interpretation();
 							return;
 						}
@@ -305,6 +306,7 @@ implementation
 						if (AQQ[appHoldingController].state == 1) {  							/* check if active application and has instructions to do.*/
 							if (AQQ[appHoldingController].RegisterReadSensor == 0) {
 								count_instructions = 0;
+								pc = AQQ[appHoldingController].pc;
 								post Interpretation();
 								return;
 							}
@@ -314,17 +316,21 @@ implementation
 						appHoldingController++;
 						appHoldingController = appHoldingController%MAX_APPLICATIONS;
 					}
+					//count_instructions++;
 					/*if no other active application in the system, just return from the execution.*/
 					return;
 				case 0x10:											/* set, rx = val (1rx)*/
 					rx = (AQQ[appHoldingController].BinaryMessage[pc] & 0x0F);
 					AQQ[appHoldingController].registers[--rx] = AQQ[appHoldingController].BinaryMessage[++pc];
 					pc++;
+					//count_instructions++;
 					break;
 				case 0x20:											/* cpy, rx = ry */
 					rx = (AQQ[appHoldingController].BinaryMessage[pc] & 0x0F);
-					AQQ[appHoldingController].registers[--rx] = AQQ[appHoldingController].registers[AQQ[appHoldingController].BinaryMessage[++pc]];
+					ry = AQQ[appHoldingController].BinaryMessage[++pc];
+					AQQ[appHoldingController].registers[--rx] = AQQ[appHoldingController].registers[--ry];
 					pc++;
+					//count_instructions++;
 					break;
 				case 0x30:											/* add, rx = rx + ry */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
@@ -333,6 +339,7 @@ implementation
 					ry--;
 					AQQ[appHoldingController].registers[rx] += AQQ[appHoldingController].registers[ry];
 					pc++;
+					//count_instructions++;
 					break;
 				case 0x40:											/* sub,rx = rx-ry */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
@@ -341,16 +348,19 @@ implementation
 					ry--;
 					AQQ[appHoldingController].registers[rx] -= AQQ[appHoldingController].registers[ry];
 					pc++;
+					//count_instructions++;
 					break;
 				case 0x50:											/* inc, rx = rx + 1 */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
 					AQQ[appHoldingController].registers[--rx]++;
 					pc++;
+					//count_instructions++;
 					break;
 				case 0x60:											/* dec, rx = rx - 1 */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
 					AQQ[appHoldingController].registers[--rx]--;
 					pc++;
+					//count_instructions++;
 					break;
 				case 0x70:											/* max, rx = max(rx,ry) */
 					j=0;
@@ -362,6 +372,7 @@ implementation
 						j++;
 					}
 					pc++;
+					//count_instructions++;
 					break;
 				case 0x80:											/* min, rx = min(rx,ry) */
 					j=0;
@@ -373,27 +384,33 @@ implementation
 						j++;
 					}
 					pc++;
+					//count_instructions++;
 					break;
 				case 0x90:											/* bgz, if ( rx > 0 ) pc = pc + off */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
 					rx--;
 					if (AQQ[appHoldingController].registers[rx] > 0) {
 						pc += (AQQ[appHoldingController].BinaryMessage[++pc]);
+						count_instructions++;
 						break;
 					}
 					pc+=2;
+					//count_instructions++;
 					break;
 				case 0xA0:											/* bez, if ( rx == 0 ) pc = pc + off */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
 					rx--;
 					if (AQQ[appHoldingController].registers[rx] == 0) {
 						pc += AQQ[appHoldingController].BinaryMessage[++pc];
+						count_instructions++;
 						break;
 					}
 					pc+=2;
+					//count_instructions++;
 					break;
 				case 0xB0:											/* bra, pc = pc + off */
 					pc += (AQQ[appHoldingController].BinaryMessage[++pc]);
+					//count_instructions++;
 					break;
 				case 0xC0:											/* led, f ( val != 0 ) turn led on else turn led off */
 					if ((AQQ[appHoldingController].BinaryMessage[pc] & 0x0F) == 0x01){
@@ -405,6 +422,7 @@ implementation
 						}
 						
 						pc++;
+						//count_instructions++;
 						break;
 					}
 					if (AQQ[appHoldingController].app_id == 0) { 
@@ -414,6 +432,7 @@ implementation
 						call Leds.led2Off(); 
 					}
 					pc++;
+					//count_instructions++;
 					break;
 				case 0xD0:											/* rdb, rx = current brightness value */
 					call Leds.led2Toggle();
@@ -421,6 +440,7 @@ implementation
 					AQQ[appHoldingController].RegisterReadSensor = rx;
 					data_id++;
 					pc++;
+					//count_instructions++;
 					break;
 				case 0xE0:											/* tmr */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
@@ -463,6 +483,7 @@ implementation
 					}
 					
 					pc++;
+					//count_instructions++;
 					break;
 				case 0xF0:											/* snd (0 -> r7 only, 1 -> r7 and r8) */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
@@ -478,7 +499,7 @@ implementation
 
 					pc++;
 					AQQ[appHoldingController].pc = pc;							/* Save where current application pc points. */
-					count_instructions++;
+					//count_instructions++;
 					return;
 			}
 			count_instructions++;
@@ -513,8 +534,9 @@ implementation
 			HoldTimer = sendQuery; 
 			call TimerQueryFired.startOneShot(AQQ[HoldTimer].query_lifetime); 		/* end query lifetime when TimerQueryFired fire */
 			timerStartAt = call TimerQueryFired.getNow();
-			count_instructions = 0;													/* It is the first application, or generally is the only one application in the system. So init count_instru*/
 			appHoldingController = sendQuery;
+			count_instructions = 0;													/* It's the only one application in the system. So init count_instructions*/
+			pc = AQQ[appHoldingController].pc;
 			post Interpretation();													/* auto edw den mou aresei. Mhpws na to valw na kaleite afou oloklirwthei to broadcast.(dhldh sto telos tou kwdika)*/
 			call Leds.led0On();
 		}
@@ -834,13 +856,13 @@ implementation
 /* -------------------------------------------------------- TimerApplications ------------------------------------------------------------------ */
 	event void TimerApplications.fired() {
 
+		if (AQQ[appHoldingController].BinaryMessage[pc] != 0x00) {							/* If the timer cut the execution from the application that was running in the interpreter.*/
+			AQQ[appHoldingController].pc = pc;												/* ,then save the current program counter in order to continue its execution from that point.*/
+		}
 		appHoldingController = appHoldingTimer;
-		count_instructions = 0; 
-		//count_instructions = count_instructions%CONTEXT_SWITCH_INSTRUCTIONS;
-
-		AQQ[appHoldingController].pc = 4 + AQQ[appHoldingController].BinaryMessage[1]; 					/* 4 + Sz(InH) refresh where the pc points in this application */
+		AQQ[appHoldingController].pc = 4 + AQQ[appHoldingController].BinaryMessage[1]; 		/* 4 + Sz(InH) refresh where the pc points in this application */
 		AQQ[appHoldingController].TimerCalled = FALSE;
-		
+		//count_instructions = count_instructions%CONTEXT_SWITCH_INSTRUCTIONS;
 
 		j=0;
 		minQuery = 0;
@@ -869,6 +891,8 @@ implementation
 			call TimerApplications.startOneShot(AQQ[appHoldingTimer].TimerRemainingTime);
 			timerApplicationStartAt = call TimerApplications.getNow();
 		}
+		count_instructions = 0;
+		pc = AQQ[appHoldingController].pc;
 		post Interpretation();	
 	}
 
@@ -964,6 +988,9 @@ implementation
 			}
 			
 			//call TimerCacheDataSensor.startOneShot(10000);		/*Cache data for 1 minute.*/
+			/* Check if it is needed to init count_instructions and pc......*/
+			count_instructions = 0;
+			pc = AQQ[appHoldingController].pc;
 			post Interpretation();
 		}
 //		if(result == SUCCESS){
@@ -1215,47 +1242,65 @@ implementation
 		if (len == sizeof(sampling_msg_t)) {													/** RECEIVE SIMPLE SAMPLING MESSAGE **/
 			r_sampling_pkt = (sampling_msg_t*) payload;
 
-			/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
-			if (r_sampling_pkt->destination_id != TOS_NODE_ID) {
-
-				sampling_save = sampling_save%SIZE;
-				ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
-				if (ucast_pkt == NULL) {
-					return;
+			AQQ[appHoldingController].pc = pc; 							/* Save the state of the current application running in the interpreter.*/
+			start = 0;
+			while (start < MAX_APPLICATIONS) {
+				if (AQQ[start].app_id == r_sampling_pkt->application_id) {
+					break;
 				}
-				sampling_save++;	
-
-				ucast_pkt->source_id = r_sampling_pkt->source_id;
-				ucast_pkt->application_id = r_sampling_pkt->application_id;   /*new*/
-				ucast_pkt->data_id = r_sampling_pkt->data_id;
-				ucast_pkt->forwarder_id = TOS_NODE_ID;
-				ucast_pkt->sensor_data = r_sampling_pkt->sensor_data;
-				ucast_pkt->destination_id = r_sampling_pkt->destination_id;
-				ucast_pkt->sequence_number = r_sampling_pkt->sequence_number;
-				ucast_pkt->mode = 0;
-				mode = 0;
-				
-				query_pos = 0;
-				while (AQQ[query_pos].source_id != r_sampling_pkt->destination_id && AQQ[query_pos].sequence_number != r_sampling_pkt->sequence_number && query_pos < NUMBER_OF_QUERIES) {
-					query_pos++;
-				}
-				if (query_pos < NUMBER_OF_QUERIES) {
-					sendTofather = AQQ[query_pos].forwarder_id;
-				}
-				
-				call TimerReUnicast.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
 			}
-			else {  /* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
-				source_id = r_sampling_pkt->source_id;
-				application_id = r_sampling_pkt->application_id;
-				s_data_id =  r_sampling_pkt->data_id;
-				forwarder_id = r_sampling_pkt->forwarder_id;
-				sensor_data = r_sampling_pkt->sensor_data;
-				destination_id = r_sampling_pkt->destination_id;
-				sequence_number = r_sampling_pkt->sequence_number;
-				mode = 0;
 
-				call TimerSendPCSerial.startOneShot(20);
+			switch (AQQ[start].BinaryMessage[3]) {						/*Check if that application has Message Handler or not.*/
+
+				case 0:
+					/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
+					if (r_sampling_pkt->destination_id != TOS_NODE_ID) {
+
+						sampling_save = sampling_save%SIZE;
+						ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
+						if (ucast_pkt == NULL) {
+							return;
+						}
+						sampling_save++;	
+
+						ucast_pkt->source_id = r_sampling_pkt->source_id;
+						ucast_pkt->application_id = r_sampling_pkt->application_id;   /*new*/
+						ucast_pkt->data_id = r_sampling_pkt->data_id;
+						ucast_pkt->forwarder_id = TOS_NODE_ID;
+						ucast_pkt->sensor_data = r_sampling_pkt->sensor_data;
+						ucast_pkt->destination_id = r_sampling_pkt->destination_id;
+						ucast_pkt->sequence_number = r_sampling_pkt->sequence_number;
+						ucast_pkt->mode = 0;
+						mode = 0;
+						
+						query_pos = 0;
+						while (AQQ[query_pos].source_id != r_sampling_pkt->destination_id && AQQ[query_pos].sequence_number != r_sampling_pkt->sequence_number && query_pos < NUMBER_OF_QUERIES) {
+							query_pos++;
+						}
+						if (query_pos < NUMBER_OF_QUERIES) {
+							sendTofather = AQQ[query_pos].forwarder_id;
+						}
+						
+						call TimerReUnicast.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
+					}
+					else {  /* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
+						source_id = r_sampling_pkt->source_id;
+						application_id = r_sampling_pkt->application_id;
+						s_data_id =  r_sampling_pkt->data_id;
+						forwarder_id = r_sampling_pkt->forwarder_id;
+						sensor_data = r_sampling_pkt->sensor_data;
+						destination_id = r_sampling_pkt->destination_id;
+						sequence_number = r_sampling_pkt->sequence_number;
+						mode = 0;
+
+						call TimerSendPCSerial.startOneShot(20);
+					}
+					break;
+				case !0:
+					pc = 4 + AQQ[start].BinaryMessage[1] + AQQ[start].BinaryMessage[2] + AQQ[start].BinaryMessage[3];
+					count_instructions = 0;
+					post Interpretation();
+					break;
 			}
 		} 
 		else if (len == sizeof(stats_sampling_msg_t)) {													/** RECEIVE STATS SAMPLING MESSAGE */
