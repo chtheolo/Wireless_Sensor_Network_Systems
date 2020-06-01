@@ -192,16 +192,18 @@ implementation
 
 		/* IF i am the query ORIGINATOR */
 		if (TOS_NODE_ID == AQQ[appHoldingController].source_id) {			/*AQQ[Hold_Sampling_Timer].source_id*/
-			source_id = TOS_NODE_ID;
-			s_data_id = data_id;
-			forwarder_id = TOS_NODE_ID;
-			destination_id = AQQ[Hold_Sampling_Timer].source_id;
-			sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
+			if (AQQ[appHoldingController].registers[8] == 0) {
+				source_id = TOS_NODE_ID;
+				s_data_id = data_id;
+				forwarder_id = TOS_NODE_ID;
+				destination_id = AQQ[appHoldingController].source_id;
+				sequence_number = AQQ[appHoldingController].sequence_number;
+			}	
 
 			switch (mode) {
 				case 0:														/* SIMPLE mode == 0 */
 					sensor_data = AQQ[appHoldingController].registers[6];
-					call TimerSendPCSerial.startOneShot(20);  					
+					call TimerSendPCSerial.startOneShot(10);  					
 					break;
 				case 1:														/* STATS mode == 1 */
 //					hops = AQQ[Hold_Sampling_Timer].hops;
@@ -216,8 +218,8 @@ implementation
 			}
 		}
 		else { 																/* ELSE IF  MIDDLE NODE, then read and forward the values */
-			sendTofather = AQQ[Hold_Sampling_Timer].forwarder_id;	 		/* My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
-
+			sendTofather = AQQ[appHoldingController].forwarder_id;	 		/* My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
+			call Leds.led1Toggle();
 			switch (mode) {
 				case 0:
 					sampling_save = sampling_save%SIZE;
@@ -231,9 +233,9 @@ implementation
 					ucast_pkt->application_id = application_id;
 					ucast_pkt->data_id = data_id;
 					ucast_pkt->forwarder_id = TOS_NODE_ID;
-					ucast_pkt->sensor_data = AQQ[appHoldingController].registers[6];
-					ucast_pkt->destination_id = AQQ[Hold_Sampling_Timer].source_id;
-					ucast_pkt->sequence_number = AQQ[Hold_Sampling_Timer].sequence_number;
+					ucast_pkt->sensor_data = AQQ[appHoldingController].registers[6];			/*send reg_7.*/
+					ucast_pkt->destination_id = AQQ[appHoldingController].forwarder_id;
+					ucast_pkt->sequence_number = AQQ[appHoldingController].sequence_number;
 					ucast_pkt->mode = mode;
 					
 					call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);  	// Timer for Unicast Message - TOS_NODE_ID * 20				
@@ -988,7 +990,7 @@ implementation
 			}
 			
 			//call TimerCacheDataSensor.startOneShot(10000);		/*Cache data for 1 minute.*/
-			/* Check if it is needed to init count_instructions and pc......*/
+			
 			count_instructions = 0;
 			pc = AQQ[appHoldingController].pc;
 			post Interpretation();
@@ -1200,7 +1202,7 @@ implementation
 		if (!unicast_busy) {
 
 			switch (mode) {
-								/*Simple Mode*/
+								/*SIMPLE MODE*/
 				case 0:	
 					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
 					if (ucast_pkt == NULL) {
@@ -1212,7 +1214,7 @@ implementation
 						unicast_busy = TRUE;
 					}
 					break;
-								/*Stats Mode*/
+								/*STATS MODE*/
 				case 1:
 					count_received_children = 0;	/*init the counter for the next ucast transmission */
 					stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_send], sizeof (stats_sampling_msg_t)));
@@ -1241,6 +1243,7 @@ implementation
 	event message_t* SamplingRadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
 		if (len == sizeof(sampling_msg_t)) {													/** RECEIVE SIMPLE SAMPLING MESSAGE **/
 			r_sampling_pkt = (sampling_msg_t*) payload;
+			call Leds.led1Toggle();
 
 			AQQ[appHoldingController].pc = pc; 							/* Save the state of the current application running in the interpreter.*/
 			start = 0;
@@ -1248,11 +1251,10 @@ implementation
 				if (AQQ[start].app_id == r_sampling_pkt->application_id) {
 					break;
 				}
+				start++;
 			}
 
-			switch (AQQ[start].BinaryMessage[3]) {						/*Check if that application has Message Handler or not.*/
-
-				case 0:
+			if (AQQ[start].BinaryMessage[3] == 0x00) {						/* Application does not have Message Handler. */
 					/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
 					if (r_sampling_pkt->destination_id != TOS_NODE_ID) {
 
@@ -1295,12 +1297,50 @@ implementation
 
 						call TimerSendPCSerial.startOneShot(20);
 					}
-					break;
-				case !0:
-					pc = 4 + AQQ[start].BinaryMessage[1] + AQQ[start].BinaryMessage[2] + AQQ[start].BinaryMessage[3];
-					count_instructions = 0;
-					post Interpretation();
-					break;
+			}
+			else {				/* Application have Message Handler. */
+				if (r_sampling_pkt->destination_id != TOS_NODE_ID) {	/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
+					sampling_save = sampling_save%SIZE;
+					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
+					if (ucast_pkt == NULL) {
+						return;
+					}
+					sampling_save++;	
+
+					ucast_pkt->source_id = r_sampling_pkt->source_id;
+					ucast_pkt->application_id = r_sampling_pkt->application_id;   /*new*/
+					ucast_pkt->data_id = r_sampling_pkt->data_id;
+					ucast_pkt->forwarder_id = TOS_NODE_ID;
+					AQQ[appHoldingController].registers[8] = r_sampling_pkt->sensor_data;
+					//ucast_pkt->sensor_data = r_sampling_pkt->sensor_data;
+					ucast_pkt->destination_id = r_sampling_pkt->destination_id;
+					ucast_pkt->sequence_number = r_sampling_pkt->sequence_number;
+					ucast_pkt->mode = 0;
+					
+					query_pos = 0;
+					while (AQQ[query_pos].source_id != r_sampling_pkt->destination_id && AQQ[query_pos].sequence_number != r_sampling_pkt->sequence_number && query_pos < NUMBER_OF_QUERIES) {
+						query_pos++;
+					}
+					if (query_pos < NUMBER_OF_QUERIES) {
+						sendTofather = AQQ[query_pos].forwarder_id;
+					}
+					//call TimerReUnicast.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
+				}
+				else {		/* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
+					source_id = r_sampling_pkt->source_id;
+					application_id = r_sampling_pkt->application_id;
+					s_data_id =  r_sampling_pkt->data_id;
+					forwarder_id = r_sampling_pkt->forwarder_id;
+					AQQ[start].registers[8] = r_sampling_pkt->sensor_data;			/* save incoming data to reg_9. */
+					//sensor_data = r_sampling_pkt->sensor_data;
+					destination_id = r_sampling_pkt->destination_id;
+					sequence_number = r_sampling_pkt->sequence_number;
+				}
+
+				call Leds.led1Toggle();
+				pc = 4 + AQQ[start].BinaryMessage[1] + AQQ[start].BinaryMessage[2];
+				count_instructions = 0;
+				post Interpretation();
 			}
 		} 
 		else if (len == sizeof(stats_sampling_msg_t)) {													/** RECEIVE STATS SAMPLING MESSAGE */
