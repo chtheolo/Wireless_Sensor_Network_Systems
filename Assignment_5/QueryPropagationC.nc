@@ -501,7 +501,7 @@ implementation
 
 					pc++;
 					AQQ[appHoldingController].pc = pc;							/* Save where current application pc points. */
-					//count_instructions++;
+					count_instructions++;
 					return;
 			}
 			count_instructions++;
