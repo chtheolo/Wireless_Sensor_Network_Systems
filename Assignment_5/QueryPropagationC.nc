@@ -139,6 +139,7 @@ implementation
 	bool busy = FALSE;
 	bool unicast_busy = FALSE;
 	bool serial_busy = FALSE;
+	bool incoming = FALSE;
 
 /* ----------------------- ARRAYS -------------------- */	
 	message_t PacketBuffer[SIZE], SamplingPacketBuffer[SIZE], StatsSamplingPacketBuffer[SIZE];
@@ -192,13 +193,14 @@ implementation
 
 		/* IF i am the query ORIGINATOR */
 		if (TOS_NODE_ID == AQQ[appHoldingController].source_id) {			/*AQQ[Hold_Sampling_Timer].source_id*/
-			if (AQQ[appHoldingController].registers[8] == 0) {
+			if (incoming == FALSE) {
 				source_id = TOS_NODE_ID;
 				s_data_id = data_id;
 				forwarder_id = TOS_NODE_ID;
 				destination_id = AQQ[appHoldingController].source_id;
 				sequence_number = AQQ[appHoldingController].sequence_number;
-			}	
+			}
+			incoming = FALSE;
 
 			switch (mode) {
 				case 0:														/* SIMPLE mode == 0 */
@@ -1251,8 +1253,8 @@ implementation
 				}
 				start++;
 			}
-
-			if (AQQ[start].BinaryMessage[3] == 0x00) {						/* Application does not have Message Handler. */
+														/* Application does not have MESSAGE HANDLER. */
+			if (AQQ[start].BinaryMessage[3] == 0x00) {
 					/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
 					if (r_sampling_pkt->destination_id != TOS_NODE_ID) {
 
@@ -1296,7 +1298,7 @@ implementation
 						call TimerSendPCSerial.startOneShot(20);
 					}
 			}
-			else {				/* Application have Message Handler. */
+			else {				/* Application have MESSAGE HANDLER. */
 				if (r_sampling_pkt->destination_id != TOS_NODE_ID) {	/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
 					sampling_save = sampling_save%SIZE;
 					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
@@ -1325,23 +1327,25 @@ implementation
 					//call TimerReUnicast.startOneShot(TOS_NODE_ID * 20); // Re-Unicast the received sampling packet - TOS_NODE_ID * 20
 				}
 				else {		/* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
+					incoming = TRUE;
 					source_id = r_sampling_pkt->source_id;
 					application_id = r_sampling_pkt->application_id;
 					s_data_id =  r_sampling_pkt->data_id;
 					forwarder_id = r_sampling_pkt->forwarder_id;
-					AQQ[start].registers[8] = r_sampling_pkt->sensor_data;			/* save incoming data to reg_9. */
+					AQQ[start].registers[8] = r_sampling_pkt->sensor_data;				/* save incoming data to reg_9. */
 					//sensor_data = r_sampling_pkt->sensor_data;
 					destination_id = r_sampling_pkt->destination_id;
 					sequence_number = r_sampling_pkt->sequence_number;
 				}
 
+				appHoldingController = start;
 				call Leds.led1Toggle();
-				pc = 4 + AQQ[start].BinaryMessage[1] + AQQ[start].BinaryMessage[2];
+				pc = 4 + AQQ[appHoldingController].BinaryMessage[1] + AQQ[appHoldingController].BinaryMessage[2];		/**PC points to MESSAGE Handler. */
 				count_instructions = 0;
 				post Interpretation();
 			}
 		} 
-		else if (len == sizeof(stats_sampling_msg_t)) {													/** RECEIVE STATS SAMPLING MESSAGE */
+		else if (len == sizeof(stats_sampling_msg_t)) {									/** RECEIVE STATS SAMPLING MESSAGE */
 			r_stats_sampling_pkt = (stats_sampling_msg_t*) payload;
 			count_received_children++;
 
