@@ -249,8 +249,8 @@ implementation
 /* ------------------------------- Interpretation ----------------------------- */
 	task void Interpretation() {
 		
-		//pc = AQQ[appHoldingController].pc;														/** set new program counter.*/
-		count_instructions = count_instructions%CONTEXT_SWITCH_INSTRUCTIONS;
+		if (AQQ[appHoldingController].app_id == 0) { call Leds.led1Toggle(); }
+		else if (AQQ[appHoldingController].app_id == 1) { call Leds.led2Toggle(); }
 		
 		while (AQQ[appHoldingController].state != 0) {
 
@@ -305,7 +305,7 @@ implementation
 			
 					while (start != appHoldingController) {										/* Psaxnw ws epomeno application ena energo kai kapoio pou den exei kanei thn entolh return.
 																								** An 3anaftasw thn idia efarmogi tote sunexizw sthn idia. */
-						if (AQQ[appHoldingController].state == 1) {  							/* check if active application and has instructions to do.*/
+						if (AQQ[appHoldingController].state == 1 && AQQ[appHoldingController].pc != 0x00) {  	/* check if active application and has instructions to do.*/
 							if (AQQ[appHoldingController].RegisterReadSensor == 0) {
 								count_instructions = 0;
 								pc = AQQ[appHoldingController].pc;
@@ -318,7 +318,7 @@ implementation
 						appHoldingController++;
 						appHoldingController = appHoldingController%MAX_APPLICATIONS;
 					}
-					//count_instructions++;
+					count_instructions++;
 					/*if no other active application in the system, just return from the execution.*/
 					return;
 				case 0x10:											/* set, rx = val (1rx)*/
@@ -437,7 +437,7 @@ implementation
 					//count_instructions++;
 					break;
 				case 0xD0:											/* rdb, rx = current brightness value */
-					call Leds.led2Toggle();
+					//call Leds.led2Toggle();
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
 					AQQ[appHoldingController].RegisterReadSensor = rx;
 					data_id++;
@@ -459,9 +459,9 @@ implementation
 							runningTime = checkTimer - timerApplicationStartAt;
 							dt = AQQ[appHoldingTimer].TimerRemainingTime - runningTime;
 
-							if (dt > AQQ[appHoldingController].TimerRemainingTime ) {
+							if (dt > AQQ[appHoldingController].TimerRemainingTime ) {			/*The second app gets the timer*/
 								appHoldingTimer = appHoldingController;
-								call TimerApplications.startOneShot(AQQ[appHoldingController].BinaryMessage[pc]*1000);
+								call TimerApplications.startOneShot(AQQ[appHoldingController].TimerRemainingTime); //BinaryMessage[pc]*1000);
 								timerApplicationStartAt = call TimerApplications.getNow();
 							}
 							else {
@@ -469,7 +469,7 @@ implementation
 							}
 							
 							j=0;
-							while (j < MAX_APPLICATIONS) {
+							while (j < MAX_APPLICATIONS) {										/*Update the Remaining time of every application.*/
 								if (AQQ[j].state == 1 && j!= appHoldingController) {
 									AQQ[j].TimerRemainingTime -= runningTime;
 								}
@@ -543,13 +543,12 @@ implementation
 			call Leds.led0On();
 		}
 
-		/**** i should check if there is an application, but is not running the interpreter, because maybe it is waiting the TimerAplication ****/
-
-		//if (number_of_active_apps == 1) {							/*Call interpreter, if only there is no other active application in the system.*/
-		//	appHoldingController = sendQuery;							/*init*/
-		//	count_instructions = 0;
-		//	post Interpretation();
-		//}
+		if (number_of_active_apps > 1 && AQQ[appHoldingController].BinaryMessage[pc] == 0x00 && call TimerApplications.isRunning() == TRUE) {/*Call interpreter, if only there is no other active application in the system.*/
+			appHoldingController = sendQuery;
+			pc = AQQ[appHoldingController].pc;										/*init*/
+			count_instructions = 0;
+			post Interpretation();
+		}
 
 		if (call TimerQueryBroadcast.isRunning() == TRUE) {							/* Send A Broadcast message after TOS_NODE_ID * 30 time. */
 			t0 = call TimerQueryBroadcast.gett0();
@@ -864,7 +863,6 @@ implementation
 		appHoldingController = appHoldingTimer;
 		AQQ[appHoldingController].pc = 4 + AQQ[appHoldingController].BinaryMessage[1]; 		/* 4 + Sz(InH) refresh where the pc points in this application */
 		AQQ[appHoldingController].TimerCalled = FALSE;
-		//count_instructions = count_instructions%CONTEXT_SWITCH_INSTRUCTIONS;
 
 		j=0;
 		minQuery = 0;
@@ -879,8 +877,8 @@ implementation
 		j=0;
 		while (j < MAX_APPLICATIONS) {
 			if (AQQ[j].state == 1 && j != appHoldingController && AQQ[j].TimerCalled == TRUE) {
-				AQQ[j].TimerRemainingTime -= AQQ[appHoldingController].TimerRemainingTime;
-				if (AQQ[j].TimerRemainingTime <= AQQ[minQuery].TimerRemainingTime &&  AQQ[j].TimerRemainingTime != 0) {
+				AQQ[j].TimerRemainingTime -= AQQ[appHoldingController].TimerRemainingTime;						/*afairw oso xrono etrexe to app apo thn teleutaio interupt*/
+				if (AQQ[j].TimerRemainingTime <= AQQ[minQuery].TimerRemainingTime) {
 					minQuery = j;
 				}
 			}
@@ -1823,7 +1821,12 @@ implementation
 			if (send > SIZE) {
 				send = 0;
 			}
-			//post Interpretation();
+			//if (number_of_active_apps > 1 && pc == 0x00 && call TimerApplications.isRunning() == TRUE) {/*Call interpreter, if only there is no other active application in the system.*/
+			//	appHoldingController = sendQuery;
+			//	pc = AQQ[appHoldingController].pc;										/*init*/
+			//	count_instructions = 0;
+			//	post Interpretation();
+			//}
 		}		
 	}
 
