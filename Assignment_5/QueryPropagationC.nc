@@ -36,6 +36,7 @@ module QueryPropagationC @safe()
 	uses interface Timer<TMilli> as TimerQueryCancelResponse;
 	uses interface Timer<TMilli> as Timer_StatsUnicast_Unicast;
 	uses interface Timer<TMilli> as TimerApplications;
+	uses interface Timer<TMilli> as TimerCallingInterpretation;
 	//uses interface Timer<TMilli> as TimerCacheDataSensor;
 
 	uses interface Read<uint16_t>;
@@ -242,8 +243,7 @@ implementation
 				AQQ[Hold_Waiting_Timer].startDelay = call Timer_StatsUnicast_Unicast.getNow();		/* Keep a flag, to remember when you start the clock */
 			}
 		}
-		//pc = AQQ[appHoldingController].pc;
-		//post interpretation();	
+		call TimerCallingInterpretation.startOneShot(10);
 	}
 
 /* --------------------- Configure Measurement AND Send ------------------------ */
@@ -268,17 +268,12 @@ implementation
 					call TimerSendPCSerial.startOneShot(10);  					
 					break;
 				case 1:														/* STATS mode == 1 */
-					//if (AQQ[appHoldingController].registers[6] == 1) {
-					//	call Leds.led1Toggle();
-					//}
 					hops = AQQ[appHoldingController].hops;
 					data_1 = AQQ[appHoldingController].registers[6];		/* reg_7 */
 					data_2 = AQQ[appHoldingController].registers[7];		/* reg_8*/
-					//average = data;
-					//stats_ucast_pkt->contributed_ids[0] = TOS_NODE_ID;
 					post DelayMeasurementScheduling();
-					return;
-					//break;
+					break;
+					//return;
 			}
 		}
 		else { 																/* ELSE IF  MIDDLE NODE, then read and forward the values */
@@ -559,9 +554,6 @@ implementation
 					break;
 				case 0xF0:											/* snd (0 -> r7 only, 1 -> r7 and r8) */
 					rx = AQQ[appHoldingController].BinaryMessage[pc] & 0x0F;
-					if (AQQ[appHoldingController].registers[6] == 1) {
-						call Leds.led1Toggle();
-					}
 					application_id = AQQ[appHoldingController].app_id;
 					mode = rx;
 					post configurePacketBeforeSend();	
@@ -620,7 +612,7 @@ implementation
 			count_instructions = 0;													/* It's the only one application in the system. So init count_instructions*/
 			pc = AQQ[appHoldingController].pc;
 			post Interpretation();													/* auto edw den mou aresei. Mhpws na to valw na kaleite afou oloklirwthei to broadcast.(dhldh sto telos tou kwdika)*/
-			//call Leds.led0On();
+			call Leds.led0On();
 		}
 		/*Call interpreter, if only there is no other active application in the system.*/
 		if (number_of_active_apps > 1 && AQQ[appHoldingController].BinaryMessage[pc] == 0x00 && call TimerApplications.isRunning() == TRUE) {
@@ -879,6 +871,12 @@ implementation
 	}
 	
 	event void SerialAMControl.stopDone(error_t err) { /* do nothing */ }
+
+/* ----------------------------------------------------- TimerCallingInterpretation ------------------------------------------------------------ */
+	event void TimerCallingInterpretation.fired() {			/*call interpreter after the delayMeasurement.*/
+		pc = AQQ[appHoldingController].pc;
+		post Interpretation();
+	}
 
 /* -------------------------------------------------------- TimerApplications ------------------------------------------------------------------ */
 	event void TimerApplications.fired() {
