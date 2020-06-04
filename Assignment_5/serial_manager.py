@@ -54,15 +54,16 @@ class StatsSamplingMsg(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self, 
                                 [('source_id', 'int', 1),
+                                 ('application_id', 'int', 1),
                                  ('data_id', 'int', 1),
                                  ('forwarder_id', 'int', 1),
                                  ('hops', 'int', 1),
-                                 ('min', 'int', 2),
-                                 ('max', 'int', 2),
-                                 ('average', 'int', 2),
+                                 ('data_1', 'int', 2),
+                                 ('data_2', 'int', 2),
+                                 # ('average', 'int', 2),
                                  ('destination_id','int', 1),
                                  ('sequence_number', 'int',1),
-                                 ('contributed_ids', 'blob', 5), #'blob' 
+                                 # ('contributed_ids', 'blob', 5), #'blob' 
                                  ('mode', 'int', 1)],
                                 packet)
 
@@ -70,7 +71,7 @@ class BinaryMsg(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self, 
                                 [('app_id', 'int', 1),
-                                 ('BinaryMessage', 'blob', 25),
+                                 ('BinaryMessage', 'blob', 30),
                                  ('action', 'int', 1),
                                  ('state', 'int', 1),
                                  # ('propagation_mode', 'int', 1),
@@ -108,15 +109,16 @@ def receiver(rx_queue):
             
         elif sampling_msg.mode == 1:
             print('TelosB -> PC: ')
-            
+            print('Sampling_Source_Node: ', str(sampling_msg.source_id))
+            print('Application_id: ', str(sampling_msg.application_id))
             print('Sampling Data_ID: ', str(sampling_msg.data_id))
-            print('Min: ', str(sampling_msg.min))
-            print('Max: ', str(sampling_msg.max))
-            print('Average: ', str(sampling_msg.average))
+            print('Data_1: ', str(sampling_msg.data_1))
+            print('Data_2: ', str(sampling_msg.data_2))
+            # print('Average: ', str(sampling_msg.average))
             print('Destination_ID: ', str(sampling_msg.destination_id))
             print('Query_id: ', str(sampling_msg.sequence_number))
-            print('Contributed Nodes: ')
-            print(sampling_msg.contributed_ids)
+            # print('Contributed Nodes: ')
+            # print(sampling_msg.contributed_ids)
         
             print('\n')
 
@@ -129,6 +131,7 @@ def receiver(rx_queue):
 
 def transmitter(tx_queue):
 
+    # file_size = int(30)
     active_ids = []
     active_applications = []
     print('Transmitter ready to take input\n')
@@ -154,7 +157,8 @@ def transmitter(tx_queue):
                 binary_filename = raw_input('')
                 print('\nType the application\'s  you wish to remove:')
                 app_id = int(raw_input(''))
-                count_char = 25
+                count_char = 30
+                # count_char = file_size
                 for i in range(count_char):
                     binary_array.append(int('00',16))
 
@@ -193,7 +197,8 @@ def transmitter(tx_queue):
                             binary_array.append(int(binary_code, 16))
             
                 count_char = len(binary_array)                  #Fill in the remaining file with '0x00'.
-                count_char = 25 - count_char
+                # count_char = file_size - count_char
+                count_char = 30 - count_char
                 for i in range(count_char):
                     binary_array.append(int('00',16))
                                                                 #Select a unique ID for each application.
@@ -258,7 +263,7 @@ class SerialManager(object):
                     msg = SamplingMsg(pkt.data)
                     sampling_msg = SamplingMsg(pkt.data)
                     self.rx_queue.put(sampling_msg)
-                elif pkt is not None and len(pkt.data) == 18:       #stats mode
+                elif pkt is not None and len(pkt.data) == 12:       #stats mode bfr(18)
                     print(pkt)
                     msg = StatsSamplingMsg(pkt.data)
                     sampling_msg = StatsSamplingMsg(pkt.data)

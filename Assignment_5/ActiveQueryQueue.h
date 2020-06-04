@@ -18,7 +18,7 @@ typedef nx_struct ActiveQueryQueue {
 	nx_uint8_t state;
 /* 	------------------------  */
 	nx_uint8_t app_id;				/* application info */
-	nx_uint8_t BinaryMessage[25];
+	nx_uint8_t BinaryMessage[30];
 	nx_int16_t registers[10];
 	nx_uint8_t pc;
 	nx_uint8_t TimerCalled;
