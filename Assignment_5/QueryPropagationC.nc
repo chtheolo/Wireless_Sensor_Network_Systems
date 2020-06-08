@@ -227,7 +227,7 @@ implementation
 
 				if (dt > AQQ[appHoldingController].WaitingTime) {											/*If WT for new q is smaller than one that hold the timer */
 					Hold_Waiting_Timer = appHoldingController;
-					call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+					call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime +(20 * TOS_NODE_ID));
 				}
 
 				query_pos = 0;
@@ -240,7 +240,7 @@ implementation
 			}
 			else {																					/** else if the new waiting time calculation is for the same query */
 				Hold_Waiting_Timer = appHoldingController;
-				call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime);
+				call Timer_StatsUnicast_Unicast.startOneShot(AQQ[Hold_Waiting_Timer].WaitingTime + (20* TOS_NODE_ID));
 				AQQ[Hold_Waiting_Timer].startDelay = call Timer_StatsUnicast_Unicast.getNow();		/* Keep a flag, to remember when you start the clock */
 			}
 		}
@@ -292,7 +292,6 @@ implementation
 				case 0x00:											/*return*/
 					if (pc > (4 + AQQ[appHoldingController].BinaryMessage[1] + AQQ[appHoldingController].BinaryMessage[2]) && mode == 1 && incoming == TRUE) {
 						call TimerConfigurePacket.startOneShot(10);
-						//post configurePacketBeforeSend();
 						return;
 					}
 					if (AQQ[appHoldingController].TimerCalled == FALSE) {						/*If an application returned before calling Timer Handler, means that the current application terminated its execution. */
@@ -483,7 +482,6 @@ implementation
 					mode = rx;
 					AQQ[appHoldingController].propagation_mode = mode;
 					//incoming = FALSE;
-					//post configurePacketBeforeSend();	
 
 					pc++;
 					AQQ[appHoldingController].pc = pc;							/* Save where current application pc points. */
@@ -527,7 +525,7 @@ implementation
 			count_instructions = 0;													/* It's the only one application in the system. So init count_instructions*/
 			pc = AQQ[appHoldingController].pc;
 			post Interpretation();													/* auto edw den mou aresei. Mhpws na to valw na kaleite afou oloklirwthei to broadcast.(dhldh sto telos tou kwdika)*/
-			//call Leds.led0On();
+			call Leds.led0On();
 		}
 		/*Call interpreter, if only there is no other active application in the system.*/
 		if (number_of_active_apps > 1 && AQQ[appHoldingController].BinaryMessage[pc] == 0x00 && call TimerApplications.isRunning() == TRUE) {
@@ -616,7 +614,6 @@ implementation
 				s_stats_sampling_pkt->hops = hops;
 				s_stats_sampling_pkt->data_1 = data_1;
 				s_stats_sampling_pkt->data_2 = data_2;
-				//s_stats_sampling_pkt->average = average;
 				s_stats_sampling_pkt->destination_id = destination_id;
 				s_stats_sampling_pkt->sequence_number = sequence_number;
 				s_stats_sampling_pkt->mode = mode;
@@ -880,6 +877,7 @@ implementation
 			}
 		}
 	}
+
 /* -------------------- TimerQueryCancelResponse =>  WAITING UPPER BOUND TIME,TO CHECK WHO SEND CANCEL RESPONSE ---------------------- */ 
 	event void TimerQueryCancelResponse.fired() {
 		query_pos = 0;
@@ -920,17 +918,18 @@ implementation
 					call TimerSendPCSerial.startOneShot(10);  					
 					break;
 				case 1:														/* STATS mode == 1 */
-					data_1 = AQQ[appHoldingController].registers[6];		/* reg_7 */
-					data_2 = AQQ[appHoldingController].registers[7];		/* reg_8*/
-
 					if (incoming == FALSE) {
+						data_1 = AQQ[appHoldingController].registers[6];		/* reg_7 */
+						data_2 = AQQ[appHoldingController].registers[7];		/* reg_8*/
 						post DelayMeasurementScheduling();
 						break;
 					}
 					else if (incoming == TRUE) {
 						incoming = FALSE;
-						AQQ[appHoldingController].registers[6] = AQQ[appHoldingController].temporary_reg7;
-						AQQ[appHoldingController].registers[7] = AQQ[appHoldingController].temporary_reg8;
+						data_1 = AQQ[appHoldingController].registers[6];		/* reg_7 */
+						data_2 = AQQ[appHoldingController].registers[7];		/* reg_8*/
+						AQQ[appHoldingController].registers[6] = AQQ[appHoldingController].temporary_reg7;		/*init registers*/
+						AQQ[appHoldingController].registers[7] = AQQ[appHoldingController].temporary_reg8;		/*init registers*/
 					}
 
 					if (AQQ[appHoldingController].count_received_children == AQQ[appHoldingController].number_of_children) {
@@ -938,22 +937,25 @@ implementation
 						call TimerSendPCSerial.startOneShot(10);
 						break;
 					}
+					else {									/*in case i have to wait for the rest of my children, give back the execution to interpreter*/
+						pc = AQQ[appHoldingController].pc;
+						post Interpretation();
+					}
 			}
-		}
-		else {/****** MIDDLE NODE *******/
+		}	/****** MIDDLE NODE *******/
+		else {
 			sendTofather = AQQ[appHoldingController].forwarder_id;	 		/* My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
 			
 			switch (mode) {
 				case 0:
-					
-					sampling_save = sampling_save%SIZE;
-					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
-					if (ucast_pkt == NULL) {
-						return;
-					}
-					sampling_save++;
+					if (incoming == FALSE) {
+						sampling_save = sampling_save%SIZE;
+						ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
+						if (ucast_pkt == NULL) {
+							return;
+						}
+						sampling_save++;
 
-					//if (incoming == FALSE) {
 						ucast_pkt->source_id = TOS_NODE_ID;
 						ucast_pkt->application_id = application_id;
 						ucast_pkt->data_id = data_id;
@@ -965,7 +967,7 @@ implementation
 
 						call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);  	// Timer for Unicast Message - TOS_NODE_ID * 20				
 						break;
-					//}
+					}
 					/* kane to configuration twn data sto shmeio pou kanei receive kai edw alla3e mono to sendor_data*/
 					
 					ucast_pkt->sensor_data = AQQ[appHoldingController].registers[6];
@@ -974,7 +976,6 @@ implementation
 					break;
 				case 1:
 					if (incoming == FALSE) {								/* IF it is my packet. . . */
-						call Leds.led0Toggle();
 						stats_sampling_save = stats_sampling_save%SIZE;
 						stats_ucast_pkt = (stats_sampling_msg_t*) (call SamplingAMPacket.getPayload(&StatsSamplingPacketBuffer[stats_sampling_save], sizeof (stats_sampling_msg_t)));
 						if (stats_ucast_pkt == NULL) {
@@ -996,13 +997,15 @@ implementation
 					}
 					else if(incoming == TRUE) {
 						incoming = FALSE;			/*make incoming FALSE and if another packet received, it will be responsible to make it TRUE*/
-						AQQ[appHoldingController].registers[6] = AQQ[appHoldingController].temporary_reg7;
+						stats_ucast_pkt->data_1 = AQQ[appHoldingController].registers[6];						/* set the values coming from the application.*/
+						stats_ucast_pkt->data_2 = AQQ[appHoldingController].registers[7];
+						AQQ[appHoldingController].registers[6] = AQQ[appHoldingController].temporary_reg7;		/* restore the init values for the next ecexution. */
 						AQQ[appHoldingController].registers[7] = AQQ[appHoldingController].temporary_reg8;
 					}
 
 					if (AQQ[appHoldingController].count_received_children == AQQ[appHoldingController].number_of_children) {
 						AQQ[appHoldingController].count_received_children = 0;
-						call Timer_StatsUnicast_Unicast.startOneShot(20);
+						call Timer_StatsUnicast_Unicast.startOneShot(TOS_NODE_ID * 20);
 						break;
 					}
 			}
@@ -1207,6 +1210,7 @@ implementation
 		if (len == sizeof(sampling_msg_t)) {													/** RECEIVE SIMPLE SAMPLING MESSAGE **/
 			r_sampling_pkt = (sampling_msg_t*) payload;
 
+			incoming = TRUE;											/*depicts that it is an incoming packet, not generated by me.*/
 			AQQ[appHoldingController].pc = pc; 							/* Save the state of the current application running in the interpreter.*/
 			start = 0;
 			while (start < MAX_APPLICATIONS) {
@@ -1259,8 +1263,8 @@ implementation
 
 						call TimerSendPCSerial.startOneShot(20);
 					}
-			}
-			else {				/* Application have MESSAGE HANDLER. */
+			}				/****** Application MESSAGE HANDLER. ******/
+			else {
 				if (r_sampling_pkt->destination_id != TOS_NODE_ID) {	/** If i receive a msg and i am the MIDDLE node then i will re-unicast the msg to my father. */
 					sampling_save = sampling_save%SIZE;
 					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_save], sizeof (sampling_msg_t)));
@@ -1273,7 +1277,7 @@ implementation
 					ucast_pkt->application_id = r_sampling_pkt->application_id;   /*new*/
 					ucast_pkt->data_id = r_sampling_pkt->data_id;
 					ucast_pkt->forwarder_id = TOS_NODE_ID;
-					AQQ[appHoldingController].registers[8] = r_sampling_pkt->sensor_data;
+					AQQ[appHoldingController].registers[8] = r_sampling_pkt->sensor_data; 	/*receive the data and save them into r9*/ 
 					//ucast_pkt->sensor_data = r_sampling_pkt->sensor_data;
 					ucast_pkt->destination_id = r_sampling_pkt->destination_id;
 					ucast_pkt->sequence_number = r_sampling_pkt->sequence_number;
@@ -1288,7 +1292,6 @@ implementation
 					}
 				}
 				else {		/* if i am the one who send the query (TOS_NODE_ID == destination_id )then call TimerSendPCSerial to print the values*/
-					incoming = TRUE;
 					source_id = r_sampling_pkt->source_id;
 					application_id = r_sampling_pkt->application_id;
 					s_data_id =  r_sampling_pkt->data_id;
@@ -1319,7 +1322,7 @@ implementation
 			}
 			mode = 1;
 			appHoldingController = start;
-			incoming = TRUE;				/*depicts that it is an incoming packet, not generated by me.*/
+			incoming = TRUE;																	/*depicts that it is an incoming packet, not generated by me.*/
 			AQQ[appHoldingController].temporary_reg7 = AQQ[appHoldingController].registers[6];	/*Save the current state of the r7,r8*/
 			AQQ[appHoldingController].temporary_reg8 = AQQ[appHoldingController].registers[7];
 			AQQ[appHoldingController].registers[6] = data_1;									/*restore the r7,r8 state in order to execute the Message Handler instructions.*/
