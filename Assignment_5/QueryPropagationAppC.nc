@@ -17,6 +17,7 @@ implementation
 	components new TimerMilliC() as Timer_StatsUnicast_Unicast;
 	components new TimerMilliC() as TimerApplications;
 	components new TimerMilliC() as TimerCallingInterpretation;
+	components new TimerMilliC() as TimerConfigurePacket;
 	//components new TimerMilliC() as TimerCacheDataSensor;
 
 	components new  HamamatsuS1087ParC() as Sensor;
@@ -49,6 +50,7 @@ implementation
 	App.TimerQueryCancelResponse -> TimerQueryCancelResponse;
 	App.TimerApplications -> TimerApplications;
 	App.TimerCallingInterpretation -> TimerCallingInterpretation;
+	App.TimerConfigurePacket -> TimerConfigurePacket;
 	//App.TimerCacheDataSensor -> TimerCacheDataSensor;
 
 	App.SerialReceive -> SerialAMReceiverC;

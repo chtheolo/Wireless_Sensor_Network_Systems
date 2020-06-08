@@ -9,12 +9,15 @@ typedef nx_struct ActiveQueryQueue {
 	nx_uint8_t father_node;
 	nx_uint8_t children[5];
 	nx_uint8_t number_of_children;
+	nx_uint8_t count_received_children;
 	nx_uint8_t hops;
 	nx_uint32_t query_lifetime;
 	nx_uint16_t startDelay;
 	nx_uint16_t WaitingTime;
 	nx_uint16_t RemaingTime;
 	nx_uint8_t propagation_mode;
+	nx_uint8_t temporary_reg7;
+	nx_uint8_t temporary_reg8;
 	nx_uint8_t state;
 /* 	------------------------  */
 	nx_uint8_t app_id;				/* application info */
