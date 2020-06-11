@@ -16,14 +16,16 @@ AM_STATS_SAMPLING_MSG = 46
 AM_BINARY_MSG = 76
 AM_BINARY_RSP = 86
 
+active_applications = []
 
 #application defined messages
 class QueryCancelMsg(tos.Packet):
     def __init__(self, packet = None):
         tos.Packet.__init__(self, 
                                 [('source_id','int', 1),
+                                 ('app_id', 'int', 1),
                                  ('sequence_number','int', 1),
-                                 ('propagation_mode', 'int', 1),
+                                 ('mode', 'int', 1),
                                  ('forwarder_id', 'int', 1)], 
                                 packet)
 
@@ -122,18 +124,37 @@ def receiver(rx_queue):
         
             print('\n')
 
-        elif sampling_msg.mode == 5:
-            print("Application start!!\n")
+        elif sampling_msg.mode == 2:
+            print('TelosB -> PC: ')
+            print('Sampling_Source_Node: ', str(sampling_msg.source_id))
+            print('Application_id: ', str(sampling_msg.app_id))
+            app_id = int(sampling_msg.app_id)
+            
+            for application in active_applications:
+                if str(app_id) in application:
+                    app = application
+                    active_applications.remove(app)
+
+            print('\n\nActive Applications | ID')
+            for application in active_applications:
+                print(application)
+
+            print('\n\n')
 
         elif sampling_msg.mode == 6:
             print("Not Allocated!!\n")
 
+def Id_Exists(app_id):
+    for application in active_applications:
+        if (app_id in application):
+            return True
+    return False
 
 def transmitter(tx_queue):
 
     # file_size = int(30)
-    active_ids = []
-    active_applications = []
+    # active_ids = []
+    # active_applications = []
     print('Transmitter ready to take input\n')
     while True:
         try:
@@ -147,43 +168,36 @@ def transmitter(tx_queue):
                 print('\nWrong Input! Please Select -> Remove Application (0) or Run Application (1):')
                 action = int(raw_input(''))
 
-            if action == 0 and len(active_ids) > 0:
+            if action == 0 and len(active_applications) > 0:     #Delete application 
                 print('\n\nActive Applications | ID')
-                id = 0
+
                 for application in active_applications:
-                    print(application + " | " + str(active_ids[id]))
-                    id+=1
+                    print(application)
+
                 print('\nType the application\'s name you wish to remove:')
                 binary_filename = raw_input('')
+
                 print('\nType the application\'s  you wish to remove:')
                 app_id = int(raw_input(''))
+
                 count_char = 30
                 # count_char = file_size
                 for i in range(count_char):
                     binary_array.append(int('00',16))
 
-                msg = BinaryMsg((app_id, binary_array, state, action, []))
+                msg = BinaryMsg((app_id, binary_array, state, action, query_lifetime, []))
 
                 print(msg)
                 tx_queue.put(msg)
                 print('Sent')
 
-                active_ids.remove(app_id)
-                active_applications.remove(binary_filename)
-
-                print('\n\nActive Applications | ID')
-                id = 0
-                for application in active_applications:
-                    print(application + " | " + str(active_ids[id]))
-                    id+=1
-
-            elif action == 0 and len(active_ids) == 0:          #Delete failure -No active applications.
+            elif action == 0 and len(active_applications) == 0:          #Delete failure -No active applications.
                 print('\nNo running applications in the system!')
 
-            elif action == 1 and len(active_ids) >= 2:          #Memory failure -Not possible to enter new application.
+            elif action == 1 and len(active_applications) >= 2:          #Memory failure -Not possible to enter new application.
                 print('\nNot enough memory for new application!')
 
-            elif action == 1 and len(active_ids) < 2:           #Enter a new application.
+            elif action == 1 and len(active_applications) < 2:           #Enter a new application.
 
                 print('Enter the app\'s lifetime (minutes): ')  #Choose the query lifetime (in minutes).
                 query_lifetime = int(raw_input(''))
@@ -205,11 +219,12 @@ def transmitter(tx_queue):
                 print('\nGive a unique id for ' + binary_filename + ' application ')
                 app_id = int(raw_input(''))
 
-                while app_id in active_ids:                     #Loop-comparing the active ids with the new one.
+                exist = Id_Exists(str(app_id))
+                while exist == True:
                     print('\nThis id is already in use! Try another one.')
                     app_id = int(raw_input(''))
+                    exist = Id_Exists(str(app_id))
 
-                active_ids.append(app_id)                       #insert new id to the buffer array.
             
                 msg = BinaryMsg((app_id, binary_array, state, action, query_lifetime, []))    #Configure the message. ,propagation_mode?
 
@@ -218,11 +233,10 @@ def transmitter(tx_queue):
                 print('Sent\n\n') 
 
                 print('Active Applications | ID')               #Update with the active applications in the network.
-                id = 0
-                active_applications.append(binary_filename)
+                active_applications.append(binary_filename +" | " + str(app_id))
                 for application in active_applications:
-                    print(application + " | " + str(active_ids[id]))
-                    id+=1
+                    print(application)
+                   
 
                 print('\n')
         except ValueError:
@@ -268,6 +282,11 @@ class SerialManager(object):
                     msg = StatsSamplingMsg(pkt.data)
                     sampling_msg = StatsSamplingMsg(pkt.data)
                     self.rx_queue.put(sampling_msg)
+                elif pkt is not None and len(pkt.data) == 5:        #delete confirmation
+                    print(pkt)
+                    msg = QueryCancelMsg(pkt.data)
+                    delete_msg = QueryCancelMsg(pkt.data)
+                    self.rx_queue.put(delete_msg)
                 elif pkt is not None and len(pkt.data) == 3:
                     print(pkt)
                     msg = ResponseBinaryMsg(pkt.data)
