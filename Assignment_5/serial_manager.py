@@ -24,7 +24,7 @@ class QueryCancelMsg(tos.Packet):
         tos.Packet.__init__(self, 
                                 [('source_id','int', 1),
                                  ('app_id', 'int', 1),
-                                 ('sequence_number','int', 1),
+                                 # ('sequence_number','int', 1),
                                  ('mode', 'int', 1),
                                  ('forwarder_id', 'int', 1)], 
                                 packet)
@@ -282,7 +282,7 @@ class SerialManager(object):
                     msg = StatsSamplingMsg(pkt.data)
                     sampling_msg = StatsSamplingMsg(pkt.data)
                     self.rx_queue.put(sampling_msg)
-                elif pkt is not None and len(pkt.data) == 5:        #delete confirmation
+                elif pkt is not None and len(pkt.data) == 4:        #delete confirmation
                     print(pkt)
                     msg = QueryCancelMsg(pkt.data)
                     delete_msg = QueryCancelMsg(pkt.data)
