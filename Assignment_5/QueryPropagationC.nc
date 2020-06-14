@@ -481,6 +481,7 @@ implementation
 					application_id = AQQ[appHoldingController].app_id;
 					mode = rx;
 					AQQ[appHoldingController].propagation_mode = mode;
+					//incoming = FALSE;
 
 					pc++;
 					AQQ[appHoldingController].pc = pc;							/* Save where current application pc points. */
@@ -509,7 +510,7 @@ implementation
 			}
 
 			query_pos = 0;
-			while(query_pos < NUMBER_OF_QUERIES) {
+			while(query_pos < MAX_APPLICATIONS) {
 				if (AQQ[query_pos].state == 1 && query_pos != sendQuery) {
 					AQQ[query_pos].query_lifetime = AQQ[query_pos].query_lifetime - runningTime; 	/* remaining_timer to expire */
 				}
@@ -579,96 +580,87 @@ implementation
 /* ------------------------------- Serial Send -------------------------------- */
 	task void SendSerial() {
 		if (!serial_busy) {															/* SIMPLE mode == 0 */
+			if (mode == 0) {
+				s_sampling_pkt = (sampling_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (sampling_msg_t) ));
+				if (s_sampling_pkt == NULL) {
+					return;
+				}
+				
+				s_sampling_pkt->source_id = source_id;
+				s_sampling_pkt->application_id = application_id;
+				s_sampling_pkt->data_id = s_data_id;
+				s_sampling_pkt->forwarder_id = forwarder_id;
+				s_sampling_pkt->sensor_data = sensor_data;
+				s_sampling_pkt->destination_id = destination_id;
+				s_sampling_pkt->sequence_number = sequence_number;
+				s_sampling_pkt->mode = 0;
 
-			switch (mode) {
-				case 0:
-					s_sampling_pkt = (sampling_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (sampling_msg_t) ));
-					if (s_sampling_pkt == NULL) {
-						return;
-					}
-					
-					s_sampling_pkt->source_id = source_id;
-					s_sampling_pkt->application_id = application_id;
-					s_sampling_pkt->data_id = s_data_id;
-					s_sampling_pkt->forwarder_id = forwarder_id;
-					s_sampling_pkt->sensor_data = sensor_data;
-					s_sampling_pkt->destination_id = destination_id;
-					s_sampling_pkt->sequence_number = sequence_number;
-					s_sampling_pkt->mode = 0;
+				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (sampling_msg_t)) == SUCCESS){
+					dbg("BroadcastingC", "Start sending serial packet\n\n ");
+					serial_busy = TRUE;
+				}
 
-					if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (sampling_msg_t)) == SUCCESS){
-						dbg("BroadcastingC", "Start sending serial packet\n\n ");
-						serial_busy = TRUE;
-					}
-					break;
-				case 1:
-					s_stats_sampling_pkt = (stats_sampling_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (stats_sampling_msg_t) ));
-					if (s_stats_sampling_pkt == NULL) {
-						return;
-					}
-					
-					s_stats_sampling_pkt->source_id = source_id;
-					s_stats_sampling_pkt->application_id = application_id;
-					s_stats_sampling_pkt->data_id = s_data_id;
-					s_stats_sampling_pkt->forwarder_id = forwarder_id;
-					s_stats_sampling_pkt->hops = hops;
-					s_stats_sampling_pkt->data_1 = data_1;
-					s_stats_sampling_pkt->data_2 = data_2;
-					s_stats_sampling_pkt->destination_id = destination_id;
-					s_stats_sampling_pkt->sequence_number = sequence_number;
-					s_stats_sampling_pkt->mode = mode;
+			}																		/* STATS mode == 1 */
+			else if (mode == 1) {
+				s_stats_sampling_pkt = (stats_sampling_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (stats_sampling_msg_t) ));
+				if (s_stats_sampling_pkt == NULL) {
+					return;
+				}
+				
+				s_stats_sampling_pkt->source_id = source_id;
+				s_stats_sampling_pkt->application_id = application_id;
+				s_stats_sampling_pkt->data_id = s_data_id;
+				s_stats_sampling_pkt->forwarder_id = forwarder_id;
+				s_stats_sampling_pkt->hops = hops;
+				s_stats_sampling_pkt->data_1 = data_1;
+				s_stats_sampling_pkt->data_2 = data_2;
+				s_stats_sampling_pkt->destination_id = destination_id;
+				s_stats_sampling_pkt->sequence_number = sequence_number;
+				s_stats_sampling_pkt->mode = mode;
 
-					//start = 0;
-					//while(start < LAST_SENDERS) {
-					//	if (ContributedNodes[start].node_id == 0) {
-					//		ContributedNodes[start].node_id = TOS_NODE_ID;
-					//		break;
-					//	}
-					//	start++;
-					//}
-					//memcpy(s_stats_sampling_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
-		
-					if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
-						dbg("BroadcastingC", "Start sending serial packet\n\n ");
-						serial_busy = TRUE;
-					}
-					break;
-				case 2:
-					srl_query_cancel = (query_cancel_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (query_cancel_msg_t) ));
-					if (srl_query_cancel == NULL) {
-						return;
-					}
-					srl_query_cancel->source_id = TOS_NODE_ID;
-					srl_query_cancel->app_id = AQQ[query_cancel].app_id;
-					//srl_query_cancel->sequence_number = AQQ[query_cancel].sequence_number;
-					srl_query_cancel->mode = mode;
-					srl_query_cancel->forwarder_id = TOS_NODE_ID;
+				//start = 0;
+				//while(start < LAST_SENDERS) {
+				//	if (ContributedNodes[start].node_id == 0) {
+				//		ContributedNodes[start].node_id = TOS_NODE_ID;
+				//		break;
+				//	}
+				//	start++;
+				//}
+				//memcpy(s_stats_sampling_pkt->contributed_ids, ContributedNodes, LAST_SENDERS * sizeof(nx_uint8_t));
+	
+				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (stats_sampling_msg_t)) == SUCCESS){
+					dbg("BroadcastingC", "Start sending serial packet\n\n ");
+					serial_busy = TRUE;
+				}
+			}
+			else if (mode == 2) {
+				srl_query_cancel = (query_cancel_msg_t*) (call SerialPacket.getPayload(&serial_pkt, sizeof (query_cancel_msg_t) ));
+				if (srl_query_cancel == NULL) {
+					return;
+				}
+				srl_query_cancel->source_id = TOS_NODE_ID;
+				srl_query_cancel->app_id = AQQ[query_cancel].app_id;
+				//srl_query_cancel->sequence_number = AQQ[query_cancel].sequence_number;
+				srl_query_cancel->mode = mode;
+				srl_query_cancel->forwarder_id = TOS_NODE_ID;
 
-					if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (query_cancel_msg_t)) == SUCCESS){
-						dbg("BroadcastingC", "Start sending serial packet\n\n ");
-						serial_busy = TRUE;
-					}
-					break;
+				if (call SerialAMSend.send(AM_BROADCAST_ADDR, &serial_pkt, sizeof (query_cancel_msg_t)) == SUCCESS){
+					dbg("BroadcastingC", "Start sending serial packet\n\n ");
+					serial_busy = TRUE;
+				}
 			}
 		}
 	}
 /* ------------------------------- Query Canceling -------------------------------- */
 	task void QueryCancel() {
+		call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);
+
 		if (HoldTimer == query_cancel) {
 			checkTimer = call TimerQueryFired.getNow();
 			runningTime = checkTimer - timerStartAt;
 			AQQ[query_cancel].query_lifetime = runningTime;			/* krata to running time etsi wste na na upologiseis thn diafora xronoy apo ta alla queries sthn oura */
 			call TimerQueryFired.stop();
 			call TimerQueryFired.startOneShot(10);
-		}
-
-		if (call TimerQueryBroadcast.isRunning() == TRUE) {
-			t0 = call TimerQueryBroadcast.gett0();
-			dt = call TimerQueryBroadcast.getdt();
-			call TimerQueryBroadcast.startOneShot(t0 + dt);
-		}
-		else {
-			call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);
 		}
 	}
 
@@ -776,7 +768,7 @@ implementation
 			upd_bcast->node_id = TOS_NODE_ID;
 			upd_bcast->propagation_mode = 3;								/*Propagation_mode = 3 means that is discover broadcast.*/
 			mode = 3;
-			call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);		/* When boot, send a bcast messaage to learn the network state.*/
+			call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);			/* When boot, send a bcast messaage to learn the network state.*/
 		}
 		else {
 			call RadioAMControl.start();
@@ -836,7 +828,7 @@ implementation
 		AQQ[appHoldingController].TimerRemainingTime = 0;
 		appHoldingTimer = minQuery;
 
-		if (AQQ[appHoldingTimer].TimerRemainingTime > 0 && AQQ[appHoldingTimer].TimerCalled == TRUE) {
+		if (AQQ[appHoldingTimer].TimerRemainingTime > 0 && AQQ[appHoldingTimer].TimerCalled == TRUE && AQQ[appHoldingTimer].state == 1) {
 			call TimerApplications.startOneShot(AQQ[appHoldingTimer].TimerRemainingTime);
 			timerApplicationStartAt = call TimerApplications.getNow();
 		}
@@ -914,7 +906,6 @@ implementation
 
 /* ------------------------------------------------------ TimerConfigurePacket -------------------------------------------------------- */
 	event void TimerConfigurePacket.fired() {
-
 		/****** ORIGINATOR ******/
 		if (TOS_NODE_ID == AQQ[appHoldingController].source_id) {	
 			if (incoming == FALSE) {
@@ -960,7 +951,7 @@ implementation
 		}	/****** MIDDLE NODE *******/
 		else {
 			sendTofather = AQQ[appHoldingController].forwarder_id;	 		/* My Father Node is the one who send me the query bcast, so i will forward the measurements back to him */
-
+			
 			switch (mode) {
 				case 0:
 					if (incoming == FALSE) {
@@ -1062,6 +1053,32 @@ implementation
 /* ----------------------------------------- TimerSendPCSerial => SERIAL SEND : MOTE -> PC -------------------------------------------- */ 
 	event void TimerSendPCSerial.fired() {
 		post SendSerial();
+//		count_received_children = 0;
+//
+//		if (number_Of_queries > 1) {						/* >1 because if we have one query it is neccessary */
+//			start = 0;
+//			minPeriod = 0;
+//			while (start < NUMBER_OF_QUERIES) {
+//				if (start == 0) {
+//					while (minPeriod < NUMBER_OF_QUERIES && AQQ[minPeriod].state == 0) {
+//						minPeriod++;
+//					}
+//				}
+//				if (AQQ[start].state == 1) {
+//					AQQ[start].RemaingTime -= AQQ[Hold_Waiting_Timer].RemaingTime;
+//					if (AQQ[start].RemaingTime <= AQQ[minPeriod].RemaingTime && AQQ[start].RemaingTime != 0) {
+//						minPeriod = start;
+//					}
+//				}
+//				start++;
+//			}
+//
+//			if (minPeriod != Hold_Waiting_Timer) {
+//				Hold_Waiting_Timer = minPeriod;
+//				call TimerSendPCSerial.startOneShot(AQQ[Hold_Waiting_Timer].RemaingTime);
+//				AQQ[Hold_Waiting_Timer].startDelay = call TimerSendPCSerial.getNow();
+//			}
+//		}
 	}
 
 /* ------------------------------------------- TimerQueryFired => Query_Lifetime END -------------------------------------------------- */ 
@@ -1125,9 +1142,10 @@ implementation
 /* ---------------------------------------- Timer_StatsUnicast_Unicast => UNICAST MEASUREMENTS --------------------------------------------- */
 	event void Timer_StatsUnicast_Unicast.fired() {
 		if (!unicast_busy) {
+
 			switch (mode) {
 								/*SIMPLE MODE*/
-				case 0:
+				case 0:	
 					ucast_pkt = (sampling_msg_t*) (call SamplingAMPacket.getPayload(&SamplingPacketBuffer[sampling_send], sizeof (sampling_msg_t)));
 					if (ucast_pkt == NULL) {
 						return;
@@ -1165,8 +1183,6 @@ implementation
 
 /* ----------------------------------------- SAMPLING RADIO RECEIVE MESSAGES ------------------------------------------------ */
 	event message_t* SamplingRadioReceive.receive(message_t* msg, void* payload, uint8_t len) {
-		//AQQ[appHoldingController].pc = pc; 								/* Save the state of the current application running in the interpreter.*/
-
 		if (len == sizeof(sampling_msg_t)) {													/** RECEIVE SIMPLE SAMPLING MESSAGE **/
 			r_sampling_pkt = (sampling_msg_t*) payload;
 
@@ -1305,16 +1321,6 @@ implementation
 				AQQ[appHoldingController].registers[8] = r_stats_sampling_pkt->data_1;
 				AQQ[appHoldingController].registers[9] = r_stats_sampling_pkt->data_2;
 
-				//start = 0;
-				//i = 0;
-				//while (start < LAST_SENDERS) {
-				//	if (ContributedNodes[start].node_id == 0) {
-				//		ContributedNodes[start].node_id = r_stats_sampling_pkt->contributed_ids[i];
-				//		i++;
-				//	}
-				//	start++;
-				//}
-
 				dtDelay = call TimerSendPCSerial.getNow();
 				AQQ[appHoldingController].WaitingTime = dtDelay - AQQ[appHoldingController].startDelay + 200; /** query_pos calculate above and points to the query in whice we receive the measurement ucast.*/
 				AQQ[appHoldingController].RemaingTime = AQQ[appHoldingController].WaitingTime;
@@ -1322,7 +1328,6 @@ implementation
 				/*If i got msg from all my children, stop the timer and procceed to serial transmission*/
 				if (AQQ[appHoldingController].count_received_children == AQQ[appHoldingController].number_of_children) { 
 					call TimerSendPCSerial.stop();
-					//call TimerSendPCSerial.startOneShot(200);
 				}
 			}
 
@@ -1334,8 +1339,7 @@ implementation
 //			rcv_query_cacnel = (query_cancel_msg_t*) payload;
 //
 //			query_pos = 0;
-//			while (query_pos < MAX_APPLICATIONS) {
-//
+//			while (query_pos < NUMBER_OF_QUERIES) {
 //				if (AQQ[query_pos].source_id == rcv_query_cacnel->source_id && AQQ[query_pos].sequence_number == rcv_query_cacnel->sequence_number){
 //					start = 0;
 //					while (start < LAST_SENDERS){
@@ -1345,12 +1349,12 @@ implementation
 //						}
 //						start++;
 //					}
-//				}
-//				query_pos++;	
+//				}	
 //			}
 //		}
 		else if (len == sizeof(response_update_msg_t)) {				/*RECEIVE RESPONSE UPDATE FROM THE NETWORK.*/
 			ucast_ReUpd = (response_update_msg_t*) payload;
+			call Leds.led1On();
 			/* Check if i have already taken a query message from this source_id */
 			query_pos = 0;
 			while (query_pos < LAST_SENDERS && QuerySendersHistory[query_pos].source_id != r_pkt->source_id) {
@@ -1386,7 +1390,9 @@ implementation
 						AQQ[query_pos].forwarder_id = ucast_ReUpd->forwarder_id; // father
 						AQQ[query_pos].father_node = ucast_ReUpd->forwarder_id;
 						AQQ[query_pos].hops = ucast_ReUpd->hops + 1;
+						//AQQ[query_pos].sampling_period = ucast_ReUpd->sampling_period;
 						AQQ[query_pos].query_lifetime = ucast_ReUpd->query_lifetime;
+						//AQQ[query_pos].propagation_mode = ucast_ReUpd->propagation_mode;
 						AQQ[query_pos].WaitingTime = OFFSET;
 						AQQ[query_pos].RemaingTime = OFFSET;
 						AQQ[query_pos].state = 1;
@@ -1410,6 +1416,7 @@ implementation
 					bcast_pkt->forwarder_id = TOS_NODE_ID;
 					bcast_pkt->father_node = AQQ[sendQuery].father_node;
 					bcast_pkt->hops = AQQ[sendQuery].hops;
+					//bcast_pkt->sampling_period = AQQ[sendQuery].sampling_period;
 					bcast_pkt->query_lifetime = AQQ[sendQuery].query_lifetime;
 					//bcast_pkt->propagation_mode = AQQ[sendQuery].propagation_mode;
 					/*____*/
@@ -1436,6 +1443,7 @@ implementation
 		if (len == sizeof(query_flooding_msg_t)) {
 			r_pkt = (query_flooding_msg_t*) payload;
 
+
 			/* Check if i have already taken a query message from this source_id */ 		/* This is where may i have a bug!!!!!!!!!*/
 			query_pos = 0;
 			while (query_pos < LAST_SENDERS && QuerySendersHistory[query_pos].source_id != r_pkt->source_id) {
@@ -1455,35 +1463,60 @@ implementation
 				next++;
 				QuerySendersHistory[query_pos].sequence_number = r_pkt->sequence_number;
 
-				start = 0;														/********** ADD APPLICATION ***********/
 				if (number_of_active_apps < MAX_APPLICATIONS) {
-					while (start < MAX_APPLICATIONS) {
-						if (AQQ[start].state == 0) { 							/*run if you are new app ,until the end of the array to find a position into the system*/
-							AQQ[start].state = 1;
-							number_of_active_apps++;							/*increase the number of active apps.*/
-							AQQ[start].app_id = r_pkt->app_id;
-							memcpy(AQQ[start].BinaryMessage, r_pkt->BinaryMessage, 30 * sizeof(nx_uint8_t));
-							AQQ[start].pc = 4; 									/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
-							break;
+					number_of_active_apps++;
+
+					dbg("ReceiveC", "NEW QUERY \n");
+
+					query_pos = 0;
+					if (r_pkt->action == 0) {
+						while(query_pos < MAX_APPLICATIONS) {
+							if (AQQ[query_pos].state == 1 && AQQ[query_pos].app_id == r_pkt->app_id) {
+								AQQ[query_pos].state = 0;
+								if (r_pkt->app_id == 0) {
+									call Leds.led1Off();
+								}
+								else { 
+									call Leds.led2Off(); 
+								}
+								break;
+							}
+							query_pos++;
 						}
-						start++;
 					}
-
-					AQQ[start].source_id = r_pkt->source_id; 
-					AQQ[start].sequence_number = r_pkt->sequence_number;
-					AQQ[start].sampling_id = 0;
-					AQQ[start].forwarder_id = r_pkt->forwarder_id; // father
-					AQQ[start].father_node = r_pkt->forwarder_id;
-					AQQ[start].hops = r_pkt->hops + 1;
-					AQQ[start].number_of_children = 0;
-					AQQ[start].count_received_children = 0;
-					AQQ[start].query_lifetime = r_pkt->query_lifetime;
-					AQQ[start].WaitingTime = OFFSET;
-					AQQ[start].RemaingTime = OFFSET;
-						
-
-					sendQuery = start;
+					else if (r_pkt->action == 1) {
+						while(query_pos < MAX_APPLICATIONS) {
+							if (AQQ[query_pos].state == 0) {
+								AQQ[query_pos].app_id = r_pkt->app_id;
+								memcpy(AQQ[query_pos].BinaryMessage, r_pkt->BinaryMessage, 30 * sizeof(nx_uint8_t));
+								AQQ[query_pos].state = 1;
+								AQQ[query_pos].pc = 4; 									/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
+								//maxInterpreterIterations = 4 + AQQ[query_pos].BinaryMessage[1];
+								break;
+							}
+							query_pos++;
+						}
+					}
+					
+					AQQ[query_pos].source_id = r_pkt->source_id; 
+					AQQ[query_pos].sequence_number = r_pkt->sequence_number;
+					AQQ[query_pos].sampling_id = 0;
+					AQQ[query_pos].forwarder_id = r_pkt->forwarder_id; // father
+					AQQ[query_pos].father_node = r_pkt->forwarder_id;
+					AQQ[query_pos].hops = r_pkt->hops + 1;
+					AQQ[query_pos].number_of_children = 0;
+					AQQ[query_pos].count_received_children = 0;
+					//AQQ[query_pos].sampling_period = r_pkt->sampling_period;
+					AQQ[query_pos].query_lifetime = r_pkt->query_lifetime;
+					//AQQ[query_pos].propagation_mode = r_pkt->propagation_mode;
+					AQQ[query_pos].WaitingTime = OFFSET;
+					AQQ[query_pos].RemaingTime = OFFSET;
+					
+					sendQuery = query_pos;
 					post QueryScheduling();
+
+					//TimeToMeasure[sendQuery] = AQQ[sendQuery].sampling_period;
+					//post MeasurementScheduling();
 
 					save = save%SIZE;
 					bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
@@ -1497,13 +1530,17 @@ implementation
 					bcast_pkt->forwarder_id = TOS_NODE_ID;
 					bcast_pkt->father_node = AQQ[sendQuery].father_node;
 					bcast_pkt->hops = AQQ[sendQuery].hops;
+					//bcast_pkt->sampling_period = AQQ[sendQuery].sampling_period;
 					bcast_pkt->query_lifetime = AQQ[sendQuery].query_lifetime;
 					bcast_pkt->app_id = r_pkt->app_id;
 					memcpy(bcast_pkt->BinaryMessage, r_pkt->BinaryMessage, 30 * sizeof(nx_uint8_t));
 					bcast_pkt->state = r_pkt->state;
 					bcast_pkt->action = r_pkt->action;
-				}
-			} 					/** If i have reveived that msg before, i try to find if this msg belongs to a child node */
+					//bcast_pkt->propagation_mode = AQQ[sendQuery].propagation_mode;
+					/*____*/
+					mode = 0;//AQQ[sendQuery].propagation_mode;
+				}	
+			} /** If i have reveived that msg before, i try to find if this msg belongs to a child node */
 			else if (r_pkt->sequence_number == QuerySendersHistory[query_pos].sequence_number && query_pos < MAX_APPLICATIONS) {
 				/* Find if that query is active on my system and check if the node that send that message has hop number bigger than mine.*/
 				start = 0;
@@ -1522,6 +1559,7 @@ implementation
 								}
 								j++;
 							}
+							//AQQ[start].WaitingTime = AQQ[start].sampling_period - 1000 ;				/*And set for that query an upper bound for waiting time. */
 							AQQ[start].RemaingTime = AQQ[start].WaitingTime;
 							AQQ[start].number_of_children++;
 							nextChild = nextChild%LAST_SENDERS;
@@ -1537,66 +1575,34 @@ implementation
 		else if (len == sizeof(query_cancel_msg_t)) {
 			rcv_query_cacnel = (query_cancel_msg_t*) payload;
 
-			start = 0;
-			if (TOS_NODE_ID != rcv_query_cacnel->source_id && number_of_active_apps > 0) {		/*Check if i am not the originator and i have #apps > 0*/
-				while (start < MAX_APPLICATIONS) {
-					if (AQQ[start].app_id == rcv_query_cacnel->app_id && AQQ[start].state == 1) {
-						AQQ[start].state = 0;										/*decrease the number of active applications.*/
-						if (rcv_query_cacnel->app_id == 0) {
-							call Leds.led1Off();
-						}
-						else { 
-							call Leds.led2Off(); 
-						}
-
-						query_cancel = start;										/* Define which application will take the controller if the delelted app was the last one that was holding the controller. */
-						
-						if (appHoldingController == AQQ[start].app_id && number_of_active_apps > 1) {
-							start++;
-							start = start%MAX_APPLICATIONS;
-							i=0;
-							while (i < MAX_APPLICATIONS) {
-								if (AQQ[start].state == 1) {
-									count_instructions = 0;
-									appHoldingController = AQQ[start].app_id;		/* found the next application */
-									break;
-								}
-								i++;
-								start++;
-								start = start%MAX_APPLICATIONS;
-							}
-						}
-
-						//post QueryCancel();  										/* task to find the query and cancel its operation */
-						send_qcancelTo_node = AQQ[query_cancel].father_node;
-
-						save = save%SIZE;
-						bcast_query_cancel = (query_cancel_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_cancel_msg_t) ));
-						if (bcast_query_cancel == NULL) {
-							return;
-						}
-						save++;
-
-						bcast_query_cancel->source_id = rcv_query_cacnel->source_id;
-						bcast_query_cancel->app_id = rcv_query_cacnel->app_id;
-						bcast_query_cancel->mode = rcv_query_cacnel->mode;
-						bcast_query_cancel->forwarder_id = TOS_NODE_ID;								/*who is sending the broadcast */
-
-						mode = 2;
-						send_qcancelTo_node = AQQ[query_cancel].father_node;
-						//post QueryCancelConfirmation();					/* Give a response to the father node that send you the query cancelation */
-						if (HoldTimer == query_cancel) {
-							checkTimer = call TimerQueryFired.getNow();
-							runningTime = checkTimer - timerStartAt;
-							AQQ[query_cancel].query_lifetime = runningTime;			/* krata to running time etsi wste na na upologiseis thn diafora xronoy apo ta alla queries sthn oura */
-							call TimerQueryFired.stop();
-							call TimerQueryFired.startOneShot(10); //10
-						}
+			if (number_Of_queries > 0) {
+				query_pos = 0;
+				while (query_pos < NUMBER_OF_QUERIES) {
+					if (AQQ[query_pos].source_id == rcv_query_cacnel->source_id ) {//&& AQQ[query_pos].sequence_number == rcv_query_cacnel->sequence_number && AQQ[query_pos].state == 1) {
+						query_cancel = query_pos;
 						break;
 					}
-					start++;
+					query_pos++;
 				}
 			}
+			post QueryCancel();  			/* task to find the query and cancel its operation */
+
+			save = save%SIZE;
+			bcast_query_cancel = (query_cancel_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_cancel_msg_t) ));
+			if (bcast_query_cancel == NULL) {
+				return;
+			}
+			save++;
+
+			bcast_query_cancel->source_id = rcv_query_cacnel->source_id;
+			bcast_query_cancel->app_id = rcv_query_cacnel->app_id;
+			bcast_query_cancel->mode = rcv_query_cacnel->mode;
+			bcast_query_cancel->forwarder_id = TOS_NODE_ID;								/*who is sending the broadcast */
+
+			mode = 2;
+
+			send_qcancelTo_node = AQQ[query_cancel].father_node;
+			post QueryCancelConfirmation();			/* Give a response to the father node that send you the query cancelation */
 		}
 		else if (len == sizeof(update_msg_t)) {				/*UPDATE NEW NODE ENTRY MESSAGE*/
 			rcv_bcast_upd = (update_msg_t*) payload;
@@ -1620,33 +1626,33 @@ implementation
 
 			switch (s_bin_code->action) {
 				case 0:										/********** DELETE APPLICATION ***********/
-					while (start < MAX_APPLICATIONS) {
+
+					while (start < MAX_APPLICATIONS) {		/*Find the application that should be deleted, searching by id.*/
 						if (AQQ[start].state == 1 && AQQ[start].app_id == s_bin_code->app_id) {
-							AQQ[start].state = 0;								/*decrease the number of active applications.*/
-							if (s_bin_code->app_id == 0) {
-								call Leds.led1Off();
-							}
-							else { 
-								call Leds.led2Off(); 
-							}
+							AQQ[start].state = 0;
+							if (s_bin_code->app_id == 0) {call Leds.led1Off();}
+							else { call Leds.led2Off(); }
 							break;
 						}
 						start++;
 					}
-					query_cancel = start;										/* Define which application will take the controller if the delelted app was the last one that was holding the controller. */
-					if (appHoldingController == AQQ[start].app_id && number_of_active_apps > 1) {
-						start++;
-						start = start%MAX_APPLICATIONS;
-						i=0;
-						while (i < MAX_APPLICATIONS) {
-							if (AQQ[start].state == 1) {
+					query_cancel = start;		/* Next Step: Define which application will take the controller if the delelted app was the last one that was holding the controller. */
+
+					if (number_of_active_apps == 1){
+						if (query_cancel == appHoldingTimer && AQQ[query_cancel].TimerCalled == TRUE) {
+							call TimerApplications.stop();
+						}
+					}
+					else if (number_of_active_apps > 1/*appHoldingController == start &&*/) { 	/*If the app that holds the controller is the deleted one... and #>1*/
+						start = 0;														/*Means that another application that waits for the controoler shoyld take it. How?*/
+						while (start < MAX_APPLICATIONS) {
+							if (AQQ[start].state == 1 && AQQ[start].TimerCalled == FALSE && AQQ[start].pc != 0x00) {  /*active application that didn't catch up the instruction to call the timer.*/
 								count_instructions = 0;
-								appHoldingController = AQQ[start].app_id;		/* found the next application */
+								pc = AQQ[start].pc;
+								appHoldingController = start;		/* found the next application */
 								break;
 							}
-							i++;
 							start++;
-							start = start%MAX_APPLICATIONS;
 						}
 					}
 
@@ -1661,18 +1667,23 @@ implementation
 					}
 					save++;
 
-					bcast_query_cancel->source_id = TOS_NODE_ID;//s_bin_code->source_id;
+					mode = 2;
+					bcast_query_cancel->source_id = TOS_NODE_ID;
 					bcast_query_cancel->app_id = s_bin_code->app_id;
-					bcast_query_cancel->mode  = 2;
+					bcast_query_cancel->mode  = mode;
 					bcast_query_cancel->forwarder_id = TOS_NODE_ID;
 
-					mode = 2;
 					if (HoldTimer == query_cancel) {
+						call Leds.led1Toggle();
 						checkTimer = call TimerQueryFired.getNow();
 						runningTime = checkTimer - timerStartAt;
 						AQQ[query_cancel].query_lifetime = runningTime;			/* krata to running time etsi wste na na upologiseis thn diafora xronoy apo ta alla queries sthn oura */
 						call TimerQueryFired.stop();
 						call TimerQueryFired.startOneShot(10); //10
+					}
+					else {													/*The application will not call TimerQueryfired, so we must decrease here the #apps.*/
+						number_of_active_apps--;
+						call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);
 					}
 					break;
 				case 1:												/********** ADD APPLICATION ***********/
@@ -1733,6 +1744,7 @@ implementation
 	event void RadioAMSend.sendDone(message_t* msg, error_t err) {
 		if (&pkt == msg) {
 			busy = FALSE;
+		
 			send++;
 			if (send > SIZE) {
 				send = 0;
@@ -1743,6 +1755,7 @@ implementation
 	event void SamplingRadioAMSend.sendDone(message_t* msg, error_t err) {
 		if (&pkt == msg) {
 			unicast_busy = FALSE;
+
 			switch (mode) {
 				case 0:
 					sampling_send++;
@@ -1757,7 +1770,7 @@ implementation
 					}
 					break;		
 			}
-			//post init_ContributedNodes();
+			post init_ContributedNodes();
 			post Interpretation();
 		}		
 	}
@@ -1767,7 +1780,8 @@ implementation
 		if (&serial_pkt == msg) {
 			serial_busy = FALSE;
 		}
-		//post init_ContributedNodes();
+		post init_ContributedNodes();
 		post Interpretation();
 	}
+
 }
