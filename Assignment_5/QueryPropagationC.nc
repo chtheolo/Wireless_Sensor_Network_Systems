@@ -839,7 +839,7 @@ implementation
 
 /* -------------------------------------------- TimerQueryBroadcast =>  SOURCE QUERY BROADCAST ------------------------------------------------- */ 	
 	event void TimerQueryBroadcast.fired() {
-		/** if i am the query message source then save that info to SH the array SendersHistory is used to remember the last 5 last
+		/** if i am the query message source then save that info to SH the array SendersHistory is used to remember the 5 last
 		  * nodes that send a query, in order to recognize the new message.
 		  */
 		if (TOS_NODE_ID == bcast_pkt->source_id) {
@@ -853,7 +853,7 @@ implementation
 				}
 				start++;
 			}
-			if (query_pos == 0) {
+			if (query_pos == 0) {				/*This means that i didnt find the source_id*/
 				next = next % LAST_SENDERS;
 				QuerySendersHistory[next].source_id = bcast_pkt->source_id;
 				QuerySendersHistory[next].sequence_number = bcast_pkt->sequence_number;
@@ -1444,23 +1444,27 @@ implementation
 			r_pkt = (query_flooding_msg_t*) payload;
 
 
-			/* Check if i have already taken a query message from this source_id */ 		/* This is where may i have a bug!!!!!!!!!*/
+			/* Check if i have already received a query message with this source_id */
 			query_pos = 0;
 			while (query_pos < LAST_SENDERS && QuerySendersHistory[query_pos].source_id != r_pkt->source_id) {
 				query_pos++;
 			}
 
-			/** If reached the end of the array,means that it is the first time receving a query message from that source_id. */
+			/** If reached the end of the array, it means that is the first time receving a query message from that source_id. */
 			if (query_pos == LAST_SENDERS) { 
 				next = next%LAST_SENDERS;
 				QuerySendersHistory[next].sequence_number = 0;  //den xreiazontai 2 if, tha to kanw iso me auto pou mou irthe logika
 				QuerySendersHistory[next].source_id = r_pkt->source_id;
 				query_pos = next;
+				next++;
+			}
+			if (query_pos == 0)
+			{
+				call Leds.led1Toggle();
 			}
 
 			/** I found that the source_id and now i check the sequence number to define if it is a unique msg. */
 			if (r_pkt->sequence_number > QuerySendersHistory[query_pos].sequence_number &&  query_pos < LAST_SENDERS) { // query_pos < LS is unnecessary
-				next++;
 				QuerySendersHistory[query_pos].sequence_number = r_pkt->sequence_number;
 
 				if (number_of_active_apps < MAX_APPLICATIONS) {
@@ -1506,17 +1510,12 @@ implementation
 					AQQ[query_pos].hops = r_pkt->hops + 1;
 					AQQ[query_pos].number_of_children = 0;
 					AQQ[query_pos].count_received_children = 0;
-					//AQQ[query_pos].sampling_period = r_pkt->sampling_period;
 					AQQ[query_pos].query_lifetime = r_pkt->query_lifetime;
-					//AQQ[query_pos].propagation_mode = r_pkt->propagation_mode;
 					AQQ[query_pos].WaitingTime = OFFSET;
 					AQQ[query_pos].RemaingTime = OFFSET;
 					
 					sendQuery = query_pos;
 					post QueryScheduling();
-
-					//TimeToMeasure[sendQuery] = AQQ[sendQuery].sampling_period;
-					//post MeasurementScheduling();
 
 					save = save%SIZE;
 					bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
@@ -1530,18 +1529,15 @@ implementation
 					bcast_pkt->forwarder_id = TOS_NODE_ID;
 					bcast_pkt->father_node = AQQ[sendQuery].father_node;
 					bcast_pkt->hops = AQQ[sendQuery].hops;
-					//bcast_pkt->sampling_period = AQQ[sendQuery].sampling_period;
 					bcast_pkt->query_lifetime = AQQ[sendQuery].query_lifetime;
 					bcast_pkt->app_id = r_pkt->app_id;
 					memcpy(bcast_pkt->BinaryMessage, r_pkt->BinaryMessage, 30 * sizeof(nx_uint8_t));
 					bcast_pkt->state = r_pkt->state;
 					bcast_pkt->action = r_pkt->action;
-					//bcast_pkt->propagation_mode = AQQ[sendQuery].propagation_mode;
-					/*____*/
-					mode = 0;//AQQ[sendQuery].propagation_mode;
+					mode = 0;
 				}	
 			} /** If i have reveived that msg before, i try to find if this msg belongs to a child node */
-			else if (r_pkt->sequence_number == QuerySendersHistory[query_pos].sequence_number && query_pos < MAX_APPLICATIONS) {
+			else if (r_pkt->sequence_number == QuerySendersHistory[query_pos].sequence_number && query_pos < LAST_SENDERS) { //MAX_APPLICATIONS
 				/* Find if that query is active on my system and check if the node that send that message has hop number bigger than mine.*/
 				start = 0;
 				while (start < MAX_APPLICATIONS) {
@@ -1575,34 +1571,69 @@ implementation
 		else if (len == sizeof(query_cancel_msg_t)) {
 			rcv_query_cacnel = (query_cancel_msg_t*) payload;
 
-			if (number_Of_queries > 0) {
-				query_pos = 0;
-				while (query_pos < NUMBER_OF_QUERIES) {
-					if (AQQ[query_pos].source_id == rcv_query_cacnel->source_id ) {//&& AQQ[query_pos].sequence_number == rcv_query_cacnel->sequence_number && AQQ[query_pos].state == 1) {
-						query_cancel = query_pos;
-						break;
-					}
-					query_pos++;
+			start = 0;
+			query_cancel = 10;
+
+			while (start < MAX_APPLICATIONS) {		/*Find the application that should be deleted, searching by id.*/
+				if (AQQ[start].state == 1 && AQQ[start].app_id == rcv_query_cacnel->app_id) {
+					AQQ[start].state = 0;
+					if (rcv_query_cacnel->app_id == 0) {call Leds.led1Off();}
+					else { call Leds.led2Off(); }
+					query_cancel = start;
+					break;
 				}
+				start++;
 			}
-			post QueryCancel();  			/* task to find the query and cancel its operation */
+			/* Next Step: Define which application will take the controller if the delelted app was the last one that was holding the controller. */
 
-			save = save%SIZE;
-			bcast_query_cancel = (query_cancel_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_cancel_msg_t) ));
-			if (bcast_query_cancel == NULL) {
-				return;
+			if (query_cancel != 10) {
+				if (number_of_active_apps == 1){
+					if (query_cancel == appHoldingTimer && AQQ[query_cancel].TimerCalled == TRUE) {
+						call TimerApplications.stop();
+					}
+				}
+				else if (number_of_active_apps > 1/*appHoldingController == start &&*/) { 	/*If the app that holds the controller is the deleted one... and #>1*/
+					start = 0;														/*Means that another application that waits for the controoler shoyld take it. How?*/
+					while (start < MAX_APPLICATIONS) {
+						if (AQQ[start].state == 1 && AQQ[start].TimerCalled == FALSE && AQQ[start].pc != 0x00) {  /*active application that didn't catch up the instruction to call the timer.*/
+							count_instructions = 0;
+							pc = AQQ[start].pc;
+							appHoldingController = start;		/* found the next application */
+							break;
+						}
+						start++;
+					}
+				}
+
+				//post QueryCancel();  			/* task to find the query and cancel its operation */
+
+				save = save%SIZE;
+				bcast_query_cancel = (query_cancel_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_cancel_msg_t) ));
+				if (bcast_query_cancel == NULL) {
+					return;
+				}
+				save++;
+
+				mode = 2;
+				bcast_query_cancel->source_id = rcv_query_cacnel->source_id;
+				bcast_query_cancel->app_id = rcv_query_cacnel->app_id;
+				bcast_query_cancel->mode = rcv_query_cacnel->mode;
+				bcast_query_cancel->forwarder_id = TOS_NODE_ID;								/*who is sending the broadcast */
+
+				if (HoldTimer == query_cancel) {
+					checkTimer = call TimerQueryFired.getNow();
+					runningTime = checkTimer - timerStartAt;
+					AQQ[query_cancel].query_lifetime = runningTime;			/* krata to running time etsi wste na na upologiseis thn diafora xronoy apo ta alla queries sthn oura */
+					call TimerQueryFired.stop();
+					call TimerQueryFired.startOneShot(10); //10
+				}
+				else {													/*The application will not call TimerQueryfired, so we must decrease here the #apps.*/
+					number_of_active_apps--;
+					call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);
+				}
+				//send_qcancelTo_node = AQQ[query_cancel].father_node;
+				//post QueryCancelConfirmation();			/* Give a response to the father node that send you the query cancelation */
 			}
-			save++;
-
-			bcast_query_cancel->source_id = rcv_query_cacnel->source_id;
-			bcast_query_cancel->app_id = rcv_query_cacnel->app_id;
-			bcast_query_cancel->mode = rcv_query_cacnel->mode;
-			bcast_query_cancel->forwarder_id = TOS_NODE_ID;								/*who is sending the broadcast */
-
-			mode = 2;
-
-			send_qcancelTo_node = AQQ[query_cancel].father_node;
-			post QueryCancelConfirmation();			/* Give a response to the father node that send you the query cancelation */
 		}
 		else if (len == sizeof(update_msg_t)) {				/*UPDATE NEW NODE ENTRY MESSAGE*/
 			rcv_bcast_upd = (update_msg_t*) payload;
@@ -1623,7 +1654,7 @@ implementation
 			s_bin_code = (binary_msg_t*) payload;
 
 			start = 0;
-
+			query_cancel = 10;
 			switch (s_bin_code->action) {
 				case 0:										/********** DELETE APPLICATION ***********/
 
@@ -1632,58 +1663,63 @@ implementation
 							AQQ[start].state = 0;
 							if (s_bin_code->app_id == 0) {call Leds.led1Off();}
 							else { call Leds.led2Off(); }
+							query_cancel = start;
 							break;
 						}
 						start++;
 					}
-					query_cancel = start;		/* Next Step: Define which application will take the controller if the delelted app was the last one that was holding the controller. */
+					/* Next Step: Define which application will take the controller if the delelted app was the last one that was holding the controller. */
 
-					if (number_of_active_apps == 1){
-						if (query_cancel == appHoldingTimer && AQQ[query_cancel].TimerCalled == TRUE) {
-							call TimerApplications.stop();
-						}
-					}
-					else if (number_of_active_apps > 1/*appHoldingController == start &&*/) { 	/*If the app that holds the controller is the deleted one... and #>1*/
-						start = 0;														/*Means that another application that waits for the controoler shoyld take it. How?*/
-						while (start < MAX_APPLICATIONS) {
-							if (AQQ[start].state == 1 && AQQ[start].TimerCalled == FALSE && AQQ[start].pc != 0x00) {  /*active application that didn't catch up the instruction to call the timer.*/
-								count_instructions = 0;
-								pc = AQQ[start].pc;
-								appHoldingController = start;		/* found the next application */
-								break;
+					if (query_cancel != 10) {				/*if application found in my system.*/
+						if (number_of_active_apps == 1){
+							if (query_cancel == appHoldingTimer && AQQ[query_cancel].TimerCalled == TRUE) {
+								call TimerApplications.stop();
 							}
-							start++;
+						}
+						else if (number_of_active_apps > 1/*appHoldingController == start &&*/) { 	/*If the app that holds the controller is the deleted one... and #>1*/
+							start = 0;														/*Means that another application that waits for the controoler shoyld take it. How?*/
+							while (start < MAX_APPLICATIONS) {
+								if (AQQ[start].state == 1 && AQQ[start].TimerCalled == FALSE && AQQ[start].pc != 0x00) {  /*active application that didn't catch up the instruction to call the timer.*/
+									count_instructions = 0;
+									pc = AQQ[start].pc;
+									appHoldingController = start;		/* found the next application */
+									break;
+								}
+								start++;
+							}
+						}
+
+						//post QueryCancel();  										/* task to find the query and cancel its operation */
+						send_qcancelTo_node = AQQ[query_cancel].father_node;
+						post SendSerial();
+
+						save = save%SIZE;
+						bcast_query_cancel = (query_cancel_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_cancel_msg_t) ));
+						if (bcast_query_cancel == NULL) {
+							return;
+						}
+						save++;
+
+						mode = 2;
+						bcast_query_cancel->source_id = TOS_NODE_ID;
+						bcast_query_cancel->app_id = s_bin_code->app_id;
+						bcast_query_cancel->mode  = mode;
+						bcast_query_cancel->forwarder_id = TOS_NODE_ID;
+
+						if (HoldTimer == query_cancel) {
+							checkTimer = call TimerQueryFired.getNow();
+							runningTime = checkTimer - timerStartAt;
+							AQQ[query_cancel].query_lifetime = runningTime;			/* krata to running time etsi wste na na upologiseis thn diafora xronoy apo ta alla queries sthn oura */
+							call TimerQueryFired.stop();
+							call TimerQueryFired.startOneShot(10); //10
+						}
+						else {													/*The application will not call TimerQueryfired, so we must decrease here the #apps.*/
+							number_of_active_apps--;
+							call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);
 						}
 					}
-
-					//post QueryCancel();  										/* task to find the query and cancel its operation */
-					send_qcancelTo_node = AQQ[query_cancel].father_node;
-					post SendSerial();
-
-					save = save%SIZE;
-					bcast_query_cancel = (query_cancel_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_cancel_msg_t) ));
-					if (bcast_query_cancel == NULL) {
-						return;
-					}
-					save++;
-
-					mode = 2;
-					bcast_query_cancel->source_id = TOS_NODE_ID;
-					bcast_query_cancel->app_id = s_bin_code->app_id;
-					bcast_query_cancel->mode  = mode;
-					bcast_query_cancel->forwarder_id = TOS_NODE_ID;
-
-					if (HoldTimer == query_cancel) {
-						call Leds.led1Toggle();
-						checkTimer = call TimerQueryFired.getNow();
-						runningTime = checkTimer - timerStartAt;
-						AQQ[query_cancel].query_lifetime = runningTime;			/* krata to running time etsi wste na na upologiseis thn diafora xronoy apo ta alla queries sthn oura */
-						call TimerQueryFired.stop();
-						call TimerQueryFired.startOneShot(10); //10
-					}
-					else {													/*The application will not call TimerQueryfired, so we must decrease here the #apps.*/
-						number_of_active_apps--;
-						call TimerQueryBroadcast.startOneShot(TOS_NODE_ID * 30);
+					else {
+						post Interpretation();
 					}
 					break;
 				case 1:												/********** ADD APPLICATION ***********/
