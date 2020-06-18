@@ -92,6 +92,7 @@ implementation
 	uint8_t sendQuery;							/* It indicates the query which is ready to be broadcast. */
 	uint8_t Hold_Sampling_Timer;				/* Variable in which we store the query that last called the TimerReadSensor().*/
 	uint8_t sequence_number; // 8
+	uint8_t seq_num;
 	uint8_t data_id; // 8
 	uint8_t s_data_id; // 8
 	uint8_t sampling_id;
@@ -914,7 +915,8 @@ implementation
 				forwarder_id = TOS_NODE_ID;
 				hops = AQQ[appHoldingController].hops;
 				destination_id = AQQ[appHoldingController].source_id;
-				sequence_number = AQQ[appHoldingController].sequence_number;
+				seq_num = AQQ[appHoldingController].sequence_number;
+				//sequence_number = AQQ[appHoldingController].sequence_number;
 			}
 
 			switch (mode) {
@@ -1234,7 +1236,8 @@ implementation
 						forwarder_id = r_sampling_pkt->forwarder_id;
 						sensor_data = r_sampling_pkt->sensor_data;
 						destination_id = r_sampling_pkt->destination_id;
-						sequence_number = r_sampling_pkt->sequence_number;
+						seq_num = r_sampling_pkt->sequence_number;
+						//sequence_number = r_sampling_pkt->sequence_number;
 						mode = 0;
 
 						call TimerSendPCSerial.startOneShot(20);
@@ -1273,7 +1276,8 @@ implementation
 					forwarder_id = r_sampling_pkt->forwarder_id;
 					AQQ[start].registers[8] = r_sampling_pkt->sensor_data;				/* save incoming data to reg_9. */
 					destination_id = r_sampling_pkt->destination_id;
-					sequence_number = r_sampling_pkt->sequence_number;
+					seq_num = r_sampling_pkt->sequence_number;
+					//sequence_number = r_sampling_pkt->sequence_number;
 				}
 
 				appHoldingController = start;
@@ -1443,7 +1447,6 @@ implementation
 		if (len == sizeof(query_flooding_msg_t)) {
 			r_pkt = (query_flooding_msg_t*) payload;
 
-
 			/* Check if i have already received a query message with this source_id */
 			query_pos = 0;
 			while (query_pos < LAST_SENDERS && QuerySendersHistory[query_pos].source_id != r_pkt->source_id) {
@@ -1457,10 +1460,6 @@ implementation
 				QuerySendersHistory[next].source_id = r_pkt->source_id;
 				query_pos = next;
 				next++;
-			}
-			if (query_pos == 0)
-			{
-				call Leds.led1Toggle();
 			}
 
 			/** I found that the source_id and now i check the sequence number to define if it is a unique msg. */
@@ -1495,7 +1494,6 @@ implementation
 								memcpy(AQQ[query_pos].BinaryMessage, r_pkt->BinaryMessage, 30 * sizeof(nx_uint8_t));
 								AQQ[query_pos].state = 1;
 								AQQ[query_pos].pc = 4; 									/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
-								//maxInterpreterIterations = 4 + AQQ[query_pos].BinaryMessage[1];
 								break;
 							}
 							query_pos++;
@@ -1724,9 +1722,10 @@ implementation
 					break;
 				case 1:												/********** ADD APPLICATION ***********/
 					if (number_of_active_apps < MAX_APPLICATIONS) {
-						sequence_number++; 											/*seq_num of that message.*/
+						//sequence_number++;
 						while (start < MAX_APPLICATIONS) {
 							if (AQQ[start].state == 0) { 							/*run if you are new app ,until the end of the array to find a position into the system*/
+								sequence_number++; 											/*seq_num of that message.*/
 								number_of_active_apps++;							/*increase the number of active apps.*/
 								AQQ[start].app_id = s_bin_code->app_id;
 								memcpy(AQQ[start].BinaryMessage, s_bin_code->BinaryMessage, 30 * sizeof(nx_uint8_t));
@@ -1736,7 +1735,6 @@ implementation
 							}
 							start++;
 						}
-
 						AQQ[start].source_id = TOS_NODE_ID; 
 						AQQ[start].sequence_number = sequence_number;
 						AQQ[start].sampling_id = 0;
@@ -1760,7 +1758,7 @@ implementation
 						save++;
 
 						bcast_pkt->source_id = AQQ[sendQuery].source_id;
-						bcast_pkt->sequence_number = AQQ[sendQuery].sequence_number;
+						bcast_pkt->sequence_number = sequence_number; //AQQ[sendQuery].sequence_number;
 						bcast_pkt->forwarder_id = AQQ[sendQuery].forwarder_id;
 						bcast_pkt->father_node = AQQ[sendQuery].father_node;
 						bcast_pkt->hops = 0;													//AQQ[sendQuery].hops;
@@ -1768,9 +1766,9 @@ implementation
 						bcast_pkt->app_id = s_bin_code->app_id;
 						memcpy(bcast_pkt->BinaryMessage, s_bin_code->BinaryMessage, 30 * sizeof(nx_uint8_t));
 						bcast_pkt->state = s_bin_code->state;
-						bcast_pkt->action = s_bin_code->action;
+						bcast_pkt->action = s_bin_code->action;	
 					}
-					break;
+					break; /*end of case 1*/
 			}
 		}	
 		return msg;
