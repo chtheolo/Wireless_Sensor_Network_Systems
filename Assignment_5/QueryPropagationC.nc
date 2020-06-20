@@ -686,36 +686,36 @@ implementation
 
 	task void FindQueryAndSend() {
 		query_pos = 0;
-		while (query_pos < NUMBER_OF_QUERIES) {
+		while (query_pos < MAX_APPLICATIONS) {
 			if (AQQ[query_pos].state == 1) {
-				//sampling_save = sampling_save%SIZE;
+
 				ucast_ReUpd = (response_update_msg_t*) (call SamplingAMPacket.getPayload(&/*SamplingPacketBuffer[sampling_save]*/pkt, sizeof (response_update_msg_t)));
 				if (ucast_ReUpd == NULL) {
 					return;
 				}
-				//sampling_save++;
 
 				ucast_ReUpd->source_id = AQQ[query_pos].source_id;
 				ucast_ReUpd->sequence_number = AQQ[query_pos].sequence_number;
 				ucast_ReUpd->forwarder_id = TOS_NODE_ID;
 				ucast_ReUpd->father_node = AQQ[query_pos].father_node;
 				ucast_ReUpd->hops = AQQ[query_pos].hops;
-				ucast_ReUpd->query_lifetime = AQQ[query_pos].query_lifetime;
-				//ucast_ReUpd->propagation_mode = AQQ[query_pos].propagation_mode;
-				//ucast_ReUpd->rest_of_time_period = TimeToMeasure[query_pos]; 
+				ucast_ReUpd->app_id = AQQ[query_pos].app_id;
+				memcpy(ucast_ReUpd->BinaryMessage, AQQ[query_pos].BinaryMessage, 30 * sizeof(nx_uint8_t));
+				ucast_ReUpd->state = AQQ[query_pos].state;
+				ucast_ReUpd->action = 1;	
 				mode = 4;
 
-				if (AQQ[query_pos].propagation_mode == 1) {
-					checkTimer = call TimerReadSensor.getNow();
-					dt = checkTimer - time4MeasurementStartAt;
-					ucast_ReUpd->rest_of_time_period = TimeToMeasure[query_pos] - dt;
-				}
+				//if (AQQ[query_pos].propagation_mode == 1) {
+				//	checkTimer = call TimerReadSensor.getNow();
+				//	dt = checkTimer - time4MeasurementStartAt;
+				//	//ucast_ReUpd->rest_of_time_period = TimeToMeasure[query_pos] - dt;
+				//}
 
 				checkTimer = call TimerQueryFired.getNow(); /*calculate and send the remaing query lifetime*/
 				dt = checkTimer - timerStartAt;
 				ucast_ReUpd->query_lifetime  = AQQ[query_pos].query_lifetime - dt;
 
-				call Leds.led2On();
+				//call Leds.led2On();
 				if (!unicast_busy) {
 					if (call SamplingRadioAMSend.send(new_entry_node, &pkt, sizeof (response_update_msg_t)) == SUCCESS){
 						unicast_busy = TRUE;
@@ -843,29 +843,29 @@ implementation
 		/** if i am the query message source then save that info to SH the array SendersHistory is used to remember the 5 last
 		  * nodes that send a query, in order to recognize the new message.
 		  */
-		if (TOS_NODE_ID == bcast_pkt->source_id) {
-			start = 0;
-			query_pos = 0;
-			while (start < LAST_SENDERS) {
-				if (QuerySendersHistory[start].source_id == TOS_NODE_ID) {
-					QuerySendersHistory[start].sequence_number = bcast_pkt->sequence_number;
-					query_pos++;
-					break;
-				}
-				start++;
-			}
-			if (query_pos == 0) {				/*This means that i didnt find the source_id*/
-				next = next % LAST_SENDERS;
-				QuerySendersHistory[next].source_id = bcast_pkt->source_id;
-				QuerySendersHistory[next].sequence_number = bcast_pkt->sequence_number;
-				next++;
-			}
-		}
 
 		if (!busy) {
 			memcpy(&pkt, &PacketBuffer[send], sizeof(message_t));
 			switch (mode) {
-				case 0:																							/* BROADCAST (just to remember the mode = 0 in QueryScheduling task) */
+				case 0:																						/* BROADCAST (just to remember the mode = 0 in QueryScheduling task) */
+					if (TOS_NODE_ID == bcast_pkt->source_id) {
+						start = 0;
+						query_pos = 0;
+						while (start < LAST_SENDERS) {
+							if (QuerySendersHistory[start].source_id == TOS_NODE_ID) {
+								QuerySendersHistory[start].sequence_number = bcast_pkt->sequence_number;
+								query_pos++;
+								break;
+							}
+							start++;
+						}
+						if (query_pos == 0) {				/*This means that i didnt find the source_id*/
+							next = next % LAST_SENDERS;
+							QuerySendersHistory[next].source_id = bcast_pkt->source_id;
+							QuerySendersHistory[next].sequence_number = bcast_pkt->sequence_number;
+							next++;
+						}
+					}
 					if (call RadioAMSend.send(AM_BROADCAST_ADDR, &pkt, sizeof (query_flooding_msg_t)) == SUCCESS){
 						busy = TRUE;
 					}
@@ -1045,8 +1045,6 @@ implementation
 				j++;
 			}
 			
-			//call TimerCacheDataSensor.startOneShot(10000);		/*Cache data for 1 minute.*/
-			
 			pc = AQQ[appHoldingController].pc;
 			post Interpretation();
 		}
@@ -1055,32 +1053,6 @@ implementation
 /* ----------------------------------------- TimerSendPCSerial => SERIAL SEND : MOTE -> PC -------------------------------------------- */ 
 	event void TimerSendPCSerial.fired() {
 		post SendSerial();
-//		count_received_children = 0;
-//
-//		if (number_Of_queries > 1) {						/* >1 because if we have one query it is neccessary */
-//			start = 0;
-//			minPeriod = 0;
-//			while (start < NUMBER_OF_QUERIES) {
-//				if (start == 0) {
-//					while (minPeriod < NUMBER_OF_QUERIES && AQQ[minPeriod].state == 0) {
-//						minPeriod++;
-//					}
-//				}
-//				if (AQQ[start].state == 1) {
-//					AQQ[start].RemaingTime -= AQQ[Hold_Waiting_Timer].RemaingTime;
-//					if (AQQ[start].RemaingTime <= AQQ[minPeriod].RemaingTime && AQQ[start].RemaingTime != 0) {
-//						minPeriod = start;
-//					}
-//				}
-//				start++;
-//			}
-//
-//			if (minPeriod != Hold_Waiting_Timer) {
-//				Hold_Waiting_Timer = minPeriod;
-//				call TimerSendPCSerial.startOneShot(AQQ[Hold_Waiting_Timer].RemaingTime);
-//				AQQ[Hold_Waiting_Timer].startDelay = call TimerSendPCSerial.getNow();
-//			}
-//		}
 	}
 
 /* ------------------------------------------- TimerQueryFired => Query_Lifetime END -------------------------------------------------- */ 
@@ -1339,26 +1311,8 @@ implementation
 			count_instructions = 0;
 			post Interpretation();
 		}
-//		else if (len == sizeof(query_cancel_msg_t)) {					/*RECEIVE QUERY CANCEL MESSAGE*/
-//			rcv_query_cacnel = (query_cancel_msg_t*) payload;
-//
-//			query_pos = 0;
-//			while (query_pos < NUMBER_OF_QUERIES) {
-//				if (AQQ[query_pos].source_id == rcv_query_cacnel->source_id && AQQ[query_pos].sequence_number == rcv_query_cacnel->sequence_number){
-//					start = 0;
-//					while (start < LAST_SENDERS){
-//						if (AQQ[query_pos].children[start] == rcv_query_cacnel->forwarder_id) {
-//							AQQ[query_pos].children[start] = 0;
-//							break;
-//						}
-//						start++;
-//					}
-//				}	
-//			}
-//		}
 		else if (len == sizeof(response_update_msg_t)) {				/*RECEIVE RESPONSE UPDATE FROM THE NETWORK.*/
 			ucast_ReUpd = (response_update_msg_t*) payload;
-			call Leds.led1On();
 			/* Check if i have already taken a query message from this source_id */
 			query_pos = 0;
 			while (query_pos < LAST_SENDERS && QuerySendersHistory[query_pos].source_id != r_pkt->source_id) {
@@ -1371,42 +1325,40 @@ implementation
 				QuerySendersHistory[next].sequence_number = 0;
 				QuerySendersHistory[next].source_id = ucast_ReUpd->source_id;
 				query_pos = next;
+				next++;
 			}
 
 			/** I found that the source_id and now i check the sequence number to define if it is a unique msg. */
 			if (ucast_ReUpd->sequence_number > QuerySendersHistory[query_pos].sequence_number &&  query_pos < LAST_SENDERS) { // query_pos < LS is unnecessary
-				next++;
 				QuerySendersHistory[query_pos].sequence_number = ucast_ReUpd->sequence_number;
 
-				if (number_Of_queries < NUMBER_OF_QUERIES) {
-					number_Of_queries++;
-
+				if (number_of_active_apps < MAX_APPLICATIONS) {
 					dbg("ReceiveC", "NEW QUERY \n");
 
-					query_pos = 0;
-					while(AQQ[query_pos].state == 1 && query_pos < NUMBER_OF_QUERIES) {
-						query_pos++;
+					start = 0;
+					while (start < MAX_APPLICATIONS) {
+						if (AQQ[start].state == 0) { 							/*run if you are new app ,until the end of the array to find a position into the system*/
+							AQQ[start].state = 1;
+							number_of_active_apps++;							/*increase the number of active apps.*/
+							AQQ[start].app_id = ucast_ReUpd->app_id;
+							memcpy(AQQ[start].BinaryMessage, ucast_ReUpd->BinaryMessage, 30 * sizeof(nx_uint8_t));
+							AQQ[start].pc = 4; 									/** the Init handler always starts on the fourth position of BinaryMessage, that is 3*/
+							break;
+						}
+						start++;
 					}
 
-					if (query_pos < NUMBER_OF_QUERIES){
-						AQQ[query_pos].source_id = ucast_ReUpd->source_id; 
-						AQQ[query_pos].sequence_number = ucast_ReUpd->sequence_number;
-						AQQ[query_pos].forwarder_id = ucast_ReUpd->forwarder_id; // father
-						AQQ[query_pos].father_node = ucast_ReUpd->forwarder_id;
-						AQQ[query_pos].hops = ucast_ReUpd->hops + 1;
-						//AQQ[query_pos].sampling_period = ucast_ReUpd->sampling_period;
-						AQQ[query_pos].query_lifetime = ucast_ReUpd->query_lifetime;
-						//AQQ[query_pos].propagation_mode = ucast_ReUpd->propagation_mode;
-						AQQ[query_pos].WaitingTime = OFFSET;
-						AQQ[query_pos].RemaingTime = OFFSET;
-						AQQ[query_pos].state = 1;
-					} 
+					AQQ[query_pos].source_id = ucast_ReUpd->source_id; 
+					AQQ[query_pos].sequence_number = ucast_ReUpd->sequence_number;
+					AQQ[query_pos].forwarder_id = ucast_ReUpd->forwarder_id; // father
+					AQQ[query_pos].father_node = ucast_ReUpd->forwarder_id;
+					AQQ[query_pos].hops = ucast_ReUpd->hops + 1;
+					AQQ[query_pos].query_lifetime = ucast_ReUpd->query_lifetime;
+					AQQ[query_pos].WaitingTime = OFFSET;
+					AQQ[query_pos].RemaingTime = OFFSET;
 					
 					sendQuery = query_pos;
 					post QueryScheduling();
-
-					TimeToMeasure[sendQuery] = ucast_ReUpd->rest_of_time_period;
-					post MeasurementScheduling();
 
 					save = save%SIZE;
 					bcast_pkt = (query_flooding_msg_t*) (call Packet.getPayload(&PacketBuffer[save], sizeof (query_flooding_msg_t) ));
@@ -1420,15 +1372,16 @@ implementation
 					bcast_pkt->forwarder_id = TOS_NODE_ID;
 					bcast_pkt->father_node = AQQ[sendQuery].father_node;
 					bcast_pkt->hops = AQQ[sendQuery].hops;
-					//bcast_pkt->sampling_period = AQQ[sendQuery].sampling_period;
 					bcast_pkt->query_lifetime = AQQ[sendQuery].query_lifetime;
-					//bcast_pkt->propagation_mode = AQQ[sendQuery].propagation_mode;
-					/*____*/
-					mode = AQQ[sendQuery].propagation_mode;
+					bcast_pkt->app_id = AQQ[sendQuery].app_id;
+					memcpy(bcast_pkt->BinaryMessage, AQQ[sendQuery].BinaryMessage, 30 * sizeof(nx_uint8_t));
+					bcast_pkt->state = AQQ[sendQuery].state;
+					bcast_pkt->action = 1;
+					mode = 0;
 				}															/*else if receive a same response message.*/
-				else if (ucast_ReUpd->sequence_number == QuerySendersHistory[query_pos].sequence_number && query_pos < NUMBER_OF_QUERIES) {
+				else if (ucast_ReUpd->sequence_number == QuerySendersHistory[query_pos].sequence_number && query_pos < MAX_APPLICATIONS) {
 					start = 0;									/*if it exists in my system.*/
-					while (start < NUMBER_OF_QUERIES) {
+					while (start < MAX_APPLICATIONS) {
 						if (AQQ[start].source_id == ucast_ReUpd->source_id && AQQ[start].sequence_number == ucast_ReUpd->sequence_number){
 							if (ucast_ReUpd->hops + 1 < AQQ[start].hops) {
 								AQQ[start].hops = ucast_ReUpd->hops + 1;
@@ -1637,8 +1590,7 @@ implementation
 			rcv_bcast_upd = (update_msg_t*) payload;
 
 			new_entry_node = rcv_bcast_upd->node_id;
-			if (number_Of_queries > 0) {
-				call Leds.led2On();
+			if (number_of_active_apps > 0) {
 				post FindQueryAndSend();	
 			}
 			
@@ -1722,7 +1674,6 @@ implementation
 					break;
 				case 1:												/********** ADD APPLICATION ***********/
 					if (number_of_active_apps < MAX_APPLICATIONS) {
-						//sequence_number++;
 						while (start < MAX_APPLICATIONS) {
 							if (AQQ[start].state == 0) { 							/*run if you are new app ,until the end of the array to find a position into the system*/
 								sequence_number++; 											/*seq_num of that message.*/

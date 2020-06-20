@@ -12,10 +12,13 @@ typedef nx_struct response_update_msg {
 	nx_uint8_t father_node;
 	nx_uint8_t hops;
 	nx_uint16_t sampling_period;
-	//nx_uint16_t query_lifetime;
 	nx_uint32_t query_lifetime;
 	nx_uint8_t propagation_mode;
-	nx_uint16_t rest_of_time_period;
+	nx_uint8_t app_id;				/* application info */
+	nx_uint8_t BinaryMessage[30];
+	nx_int16_t registers[10];
+	nx_uint8_t state;
+	nx_uint8_t action;
 } response_update_msg_t;
 
 #endif
